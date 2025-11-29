@@ -1,259 +1,255 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bastion PHP v3 — Enterprise Documentation</title>
+  <title>Bastion PHP — Documentation</title>
+  <meta name="description" content="Bastion PHP — Developer documentation, how-to, and exhaustive reference." />
   <style>
-    :root {
-      --bg: #0f1724;
-      --card: #0b1220;
-      --muted: #98a0b3;
-      --accent: #64d5ff;
-      --accent-glow: #3b9eff;
-      --purple: #a78bfa;
-      --purple-glow: #8b5cf6;
-      --panel: #071024;
-      --glass: rgba(255, 255, 255, 0.03);
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: linear-gradient(180deg, #0a0e1a 0%, #0f1724 50%, #071428 100%);
-      color: #e6eef8;
-      line-height: 1.7;
-    }
-    
-    /* Layout & Container */
-    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
-    .grid { display: grid; grid-template-columns: 280px 1fr; gap: 32px; }
-    
-    /* Header */
-    header { padding: 32px 0; border-bottom: 1px solid rgba(100, 213, 255, 0.1); margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
-    .logo h1 { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, #64d5ff 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    
-    /* Navigation */
-    nav { display: flex; gap: 16px; }
-    nav a { color: var(--muted); text-decoration: none; font-weight: 500; transition: color 0.2s; }
-    nav a:hover { color: var(--accent); }
-
-    /* Sidebar */
-    .sidebar { position: sticky; top: 24px; height: calc(100vh - 48px); overflow-y: auto; padding-right: 16px; }
-    .toc { list-style: none; }
-    .toc a { display: block; padding: 8px 12px; color: var(--muted); text-decoration: none; border-radius: 6px; transition: all 0.2s; font-size: 14px; }
-    .toc a:hover { background: rgba(100, 213, 255, 0.1); color: var(--accent); }
-
-    /* Content Area */
-    .content { min-height: 80vh; }
-    .section { margin-bottom: 64px; scroll-margin-top: 24px; }
-    
-    /* Typography */
-    h2 { font-size: 32px; margin-bottom: 24px; color: #fff; border-bottom: 2px solid var(--accent); padding-bottom: 10px; display: inline-block; }
-    h3 { font-size: 24px; margin: 32px 0 16px; color: #fff; }
-    h4 { font-size: 18px; margin: 24px 0 12px; color: var(--accent); }
-    p { margin-bottom: 16px; color: #cbd5e1; }
-    ul { margin: 16px 0; padding-left: 24px; color: #cbd5e1; }
-    li { margin-bottom: 8px; }
-
-    /* Code Blocks */
-    pre { background: #010d1f; padding: 20px; border-radius: 8px; overflow-x: auto; border: 1px solid rgba(100, 213, 255, 0.2); margin: 20px 0; }
-    code { font-family: 'Fira Code', monospace; color: #bfe9ff; font-size: 14px; }
-    p code { background: rgba(100, 213, 255, 0.1); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
-
-    /* Cards */
-    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 28px 0; }
-    .feature-card { background: rgba(11, 18, 32, 0.6); padding: 24px; border-radius: 12px; border: 1px solid rgba(100, 213, 255, 0.1); transition: transform 0.2s; }
-    .feature-card:hover { transform: translateY(-4px); border-color: var(--accent); }
-
-    /* Highlights */
-    .highlight { background: rgba(100, 213, 255, 0.05); border-left: 4px solid var(--accent); padding: 20px; border-radius: 0 8px 8px 0; margin: 24px 0; }
-    .alert { padding: 16px; border-radius: 8px; margin: 20px 0; background: rgba(245, 158, 11, 0.1); border: 1px solid var(--warning); color: #fcd34d; }
-    .alert.info { background: rgba(100, 213, 255, 0.1); border-color: var(--accent); color: var(--accent); }
-
-    /* Footer */
-    footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: var(--muted); font-size: 14px; }
-
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .sidebar { display: none; } }
+    /* Simplified readable style derived from provided theme */
+    :root { --bg:#071428; --panel:#0b1220; --muted:#98a0b3; --accent:#64d5ff; --card:#071024; --glass: rgba(255,255,255,0.03); --accent-glow:#3b9eff; }
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; margin:0; background:linear-gradient(180deg,#071428 0%,#081225 100%); color:#e6eef8; line-height:1.6}
+    .wrap{max-width:1200px;margin:32px auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+    header h1{font-size:20px;margin:0}
+    nav a{color:var(--muted);margin-left:12px;text-decoration:none}
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:24px}
+    .sidebar{background:var(--panel);padding:18px;border-radius:12px;border:1px solid rgba(100,213,255,.06);height:calc(100vh - 120px);position:sticky;top:24px;overflow:auto}
+    .content{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:28px;border-radius:12px;border:1px solid rgba(100,213,255,.06)}
+    h2{color:#fff;margin-top:0}
+    pre{background:#021126;padding:14px;border-radius:8px;overflow:auto}
+    code{font-family:monospace;background:rgba(255,255,255,0.02);padding:2px 6px;border-radius:4px}
+    .banner{background:linear-gradient(90deg, rgba(100,213,255,.06), rgba(167,139,250,.03));padding:8px 12px;border-radius:8px;margin-bottom:12px;color:var(--muted)}
+    .section{margin-bottom:28px}
+    .muted{color:var(--muted)}
+    .btn{background:var(--accent);color:#041026;padding:6px 10px;border-radius:6px;text-decoration:none;font-weight:700}
+    details{margin:6px 0}
+    summary{cursor:pointer;font-weight:700}
+    .depr{background:#3b2b2b;padding:8px;border-left:4px solid #f59e0b;border-radius:6px;color:#ffdcb3;margin:12px 0}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.04);text-align:left}
+    footer{margin-top:24px;color:var(--muted);font-size:13px}
+    .copy {cursor:pointer;color:var(--accent);font-weight:700;margin-left:8px}
+    .toc a{display:block;color:var(--muted);text-decoration:none;padding:6px 0}
   </style>
 </head>
-
 <body>
-  <div class="container">
+  <div class="wrap">
     <header>
-      <div class="logo">
-        <h1>Bastion PHP <span style="font-size: 0.6em; color: var(--muted); vertical-align: middle;">v3.0</span></h1>
-      </div>
+      <h1>Bastion PHP — Documentation</h1>
       <nav>
-        <a href="#architecture">Architecture</a>
-        <a href="#cli">CLI</a>
-        <a href="#styling">Tailwind</a>
-        <a href="#routing">Routing</a>
+        <a class="btn" href="#how-to-use">How to Use</a>
+        <a class="btn" href="#reference">Reference</a>
+        <a class="btn" href="docs/CHANGELOG.md" target="_blank">Changelog</a>
       </nav>
     </header>
 
     <div class="grid">
       <aside class="sidebar">
-        <ul class="toc">
-          <li><a href="#introduction">Introduction</a></li>
-          <li><a href="#installation">Installation</a></li>
-          <li><a href="#architecture">🏛️ Core Architecture</a></li>
-          <li><a href="#cli">⚡ Bastion CLI</a></li>
-          <li><a href="#styling">🎨 Global Styling (v4)</a></li>
-          <li><a href="#dv-engine">👁️ DV Engine</a></li>
-          <li><a href="#routing">File-Based Routing</a></li>
-          <li><a href="#database">Database & Facades</a></li>
-          <li><a href="#auth">Authentication</a></li>
-          <li><a href="#deployment">Deployment</a></li>
-        </ul>
+        <div class="banner">Developer-first docs. Start with "How to Use". Reference is exhaustive and searchable.</div>
+        <nav class="toc">
+          <a href="#how-to-use">How to Use — Quick Onboarding</a>
+          <a href="#quick-commands">Quick Commands (Cheatsheet)</a>
+          <a href="#getting-started">Getting Started (detailed)</a>
+          <a href="#workflows">Common Workflows & Examples</a>
+          <a href="#reference">Reference (Exhaustive)</a>
+          <a href="docs/REFERENCE.md" target="_blank">Open full REFERENCE.md</a>
+          <a href="docs/CHANGELOG.md" target="_blank">CHANGELOG</a>
+          <a href="docs/README.md" target="_blank">README (legacy)</a>
+        </nav>
       </aside>
 
       <main class="content">
+        <!-- HOW TO USE -->
+        <section id="how-to-use" class="section">
+          <h2>How to Use — Quick Onboarding (Developer-first)</h2>
 
-        <section id="introduction" class="section">
-          <h2>Introduction</h2>
-          <p><strong>Bastion PHP v3.0</strong> is an enterprise-grade framework designed for standardization. It combines the <strong>Service Container</strong> pattern with <strong>File-Based Routing</strong> and <strong>Tailwind CSS v4</strong>.</p>
-          
-          <div class="feature-grid">
-            <div class="feature-card">
-              <h4>🏛️ Service Container</h4>
-              <p>Full Dependency Injection and Singleton management.</p>
-            </div>
-            <div class="feature-card">
-              <h4>⚡ Process Manager</h4>
-              <p>New <code>./bastion</code> CLI handles PHP, Tailwind, and BrowserSync concurrently.</p>
-            </div>
-            <div class="feature-card">
-              <h4>👁️ DV Engine</h4>
-              <p>Explicit Data View engine. No more global variable pollution.</p>
-            </div>
-            <div class="feature-card">
-              <h4>🎨 Tailwind v4</h4>
-              <p>Native Oxide engine support. Config lives in CSS, not JS.</p>
-            </div>
-          </div>
+          <p class="muted">This section is the recommended fast path to get started: install, run, create a page, add a route, and deploy.</p>
+
+          <h3 id="quick-commands">Quick reference — most-used commands</h3>
+          <pre><code>./bastion run-dev      # Start dev environment: PHP server + Tailwind watch + BrowserSync
+./bastion run-build    # Build CSS for production
+./bastion migrate      # Run database migrations
+./bastion db:seed      # Run database seeders (creates admin and demo user)
+./bastion serve        # Run PHP built-in server
+./bastion key:generate # Generate APP_KEY and save to .env</code></pre>
+
+          <h3 id="getting-started">Step-by-step: Create & Run a new project (local)</h3>
+
+          <ol>
+            <li>Run the installer/generator:
+              <pre><code>bash create-php-app.sh my-app</code></pre>
+            </li>
+            <li>Enter the project:
+              <pre><code>cd my-app</code></pre>
+            </li>
+            <li>Install dependencies (if not auto-installed):
+              <pre><code>composer install
+npm install</code></pre>
+            </li>
+            <li>Create DB schema and seed example users:
+              <pre><code>./bastion migrate
+./bastion db:seed</code></pre>
+            </li>
+            <li>Start development server (live reload):
+              <pre><code>./bastion run-dev
+# Visit: http://localhost:9876</code></pre>
+            </li>
+          </ol>
+
+          <h3 id="first-page">Create your first page (file-based routing)</h3>
+
+          <p>Create: <code>app/about/page.php</code> with content:</p>
+          <pre><code>&lt;?php
+$title = 'About';
+?&gt;
+
+&lt;h1&gt;&lt;?= e($title) ?&gt;&lt;/h1&gt;
+&lt;p&gt;Welcome to Bastion.&lt;/p&gt;</code></pre>
+
+          <p>Access in browser: <code>http://localhost:9876/about</code></p>
+
+          <h3 id="add-api">Add an API endpoint (+server.php)</h3>
+          <pre><code>// app/api/ping/+server.php
+return [
+  'get' => function($req) {
+      header('Content-Type: application/json');
+      echo json_encode(['pong' => true]);
+  }
+];</code></pre>
+
+          <h3 id="auth-quick">Auth quickstart</h3>
+          <ol>
+            <li>Default seeders create two accounts (admin/demo) after db:seed</li>
+            <li>Login endpoint issues access + refresh tokens via Auth::issueTokens()</li>
+            <li>Use Auth::requireAuth or Auth::loadUser middleware to protect routes</li>
+          </ol>
+
+          <div class="depr"><strong>Deprecated:</strong> If you previously used <code>artisan</code> as the canonical CLI, the project now uses <code>./bastion</code>. The old <code>artisan</code> is kept only as a backup.</div>
         </section>
 
-        <section id="installation" class="section">
-          <h2>Installation</h2>
-          <pre><code>bash create-bastion-app.sh my-app --full-stack</code></pre>
-          
-          <h3>Starting Development</h3>
-          <p>We now use a single command to start the entire environment:</p>
-          <pre><code>cd my-app
-./bastion run-dev</code></pre>
-          <p>This starts PHP (port 8000), Tailwind Watcher, and BrowserSync (port 9876).</p>
-        </section>
+        <!-- WORKFLOWS -->
+        <section id="workflows" class="section">
+          <h2>Common Workflows & Examples</h2>
 
-        <section id="architecture" class="section">
-          <h2>🏛️ Core Architecture</h2>
-          <div class="highlight">
-            <strong>New in v3.0:</strong> We moved from static classes to a <strong>Container-based</strong> architecture with Facades.
-          </div>
+          <h3>Create a service and register in DI container</h3>
+          <p>1) Create <code>app/Services/MyService.php</code>:</p>
+          <pre><code>&lt;?php
+namespace App\Services;
 
-          <h3>The Container</h3>
-          <p>Services are bound in <code>app/Core/App.php</code>:</p>
-          <pre><code>$this->singleton(DB::class, fn() => new DB());</code></pre>
+class MyService {
+  public function greet(string $name): string {
+    return "Hello $name";
+  }
+}</code></pre>
 
-          <h3>Facades</h3>
-          <p>You write clean static code, but it executes via the container instance for testability.</p>
-          <pre><code>// Clean Syntax
-DB::table('users')->get();
+          <p>2) Register and resolve:</p>
+          <pre><code>// in app bootstrap or App::registerCoreServices
+$app->singleton(App\Services\MyService::class, fn() => new App\Services\MyService());
 
-// Actual Execution
-App::getInstance()->resolve(DB::class)->query('users')->get();</code></pre>
-        </section>
+// Use elsewhere
+$svc = App\Core\App::getInstance()->resolve(App\Services\MyService::class);
+echo $svc->greet('Dev');</code></pre>
 
-        <section id="cli" class="section">
-          <h2>⚡ Bastion CLI</h2>
-          <p>The <code>./bastion</code> script is your new best friend. It is a process manager written in PHP.</p>
-
-          <h3>Commands</h3>
+          <h3>Debugging tips</h3>
           <ul>
-            <li><code>./bastion run-dev</code>: Starts Dev Server + Watchers + Live Reload.</li>
-            <li><code>./bastion run-build</code>: Compiles and minifies CSS for production.</li>
+            <li>Use <code>logger()->debug()</code> to emit debug messages to <code>storage/logs/app.log</code>.</li>
+            <li>Temporarily enable errors: set <code>APP_DEBUG=true</code> in .env and restart server.</li>
+            <li>Check DB file for SQLite: <code>storage/db/app.db</code>. Use SQLite CLI for quick queries.</li>
+          </ul>
+
+          <h3>Production deploy (concise)</h3>
+          <pre><code># 1. Set production env
+APP_ENV=production
+APP_DEBUG=false
+SECURE_COOKIES=true
+
+# 2. Install deps & build
+composer install --no-dev --optimize-autoloader
+npm ci && ./bastion run-build
+
+# 3. Run migrations on production database (MySQL/Postgres recommended)
+./bastion migrate
+
+# 4. Configure web server (Nginx/Apache) document root -> public/</code></pre>
+
+          <h3>Troubleshooting common issues</h3>
+          <ul>
+            <li><strong>Missing env keys:</strong> run <code>./bastion key:generate</code> then edit <code>.env</code>.</li>
+            <li><strong>Tailwind CSS not generating:</strong> confirm <code>npm install</code> and run <code>./bastion run-build</code>.</li>
+            <li><strong>Database locked:</strong> ensure WAL mode is enabled; check file permissions on <code>storage/db/app.db</code>.</li>
           </ul>
         </section>
 
-        <section id="styling" class="section">
-          <h2>🎨 Global Styling (Tailwind v4)</h2>
-          <p>Bastion v3 uses Tailwind CSS v4 (Oxide). Configuration is now done in CSS.</p>
+        <!-- REFERENCE -->
+        <section id="reference" class="section">
+          <h2>Reference (Exhaustive)</h2>
 
-          <h3>Configuration (resources/css/app.css)</h3>
-          <pre><code>@import "tailwindcss";
+          <p class="muted">The full machine-friendly reference is in <a href="docs/REFERENCE.md" target="_blank">docs/REFERENCE.md</a>.
+            Below are quick links and a small embedded index for common symbols. Every public class and function is documented
+            in <code>docs/REFERENCE.md</code> with signature, examples, side effects, and security notes.</p>
 
-@variant dark (&:where(.dark, .dark *));
+          <details open>
+            <summary>Top-level files & CLI (click to expand)</summary>
+            <div style="margin-top:8px">
+              <table>
+                <thead><tr><th>Identifier</th><th>Purpose (one-liner)</th></tr></thead>
+                <tbody>
+                  <tr><td><code>create-php-app.sh</code></td><td>Installer/generator: scaffolds project structure, files, and installs deps.</td></tr>
+                  <tr><td><code>./bastion</code></td><td>Primary CLI replacing artisan — dev server, builds, migrations, seeders, key generator.</td></tr>
+                  <tr><td><code>public/index.php</code></td><td>Front controller: bootstraps app and dispatches requests via Router.</td></tr>
+                  <tr><td><code>app/bootstrap.php</code></td><td>Loads .env into environment, starts session, sets timezone.</td></tr>
+                </tbody>
+              </table>
+              <p>Open <a href="docs/REFERENCE.md" target="_blank">docs/REFERENCE.md</a> for the full list of classes, files and examples.</p>
+            </div>
+          </details>
 
-@theme {
-  --font-sans: "Inter", system-ui, sans-serif;
-  --color-brand: #3b82f6;
-}</code></pre>
-
-          <h3>Theme Helper</h3>
-          <p>Use <code>Theme::apply()</code> in your layouts. It handles system preference detection automatically.</p>
-          <pre><code>&lt;html lang="en" &lt;?= \App\Core\Theme::apply() ?&gt;&gt;</code></pre>
+          <details>
+            <summary>Searchable reference (download docs/REFERENCE.md)</summary>
+            <div style="margin-top:8px">
+              <p>Click to open the full reference: <a href="docs/REFERENCE.md" target="_blank">docs/REFERENCE.md</a></p>
+            </div>
+          </details>
         </section>
 
-        <section id="dv-engine" class="section">
-          <h2>👁️ DV (Data View) Engine</h2>
-          <p>Stop using <code>global $title</code>. Use the DV engine to pass data explicitly.</p>
-
-          <h3>Setting Data</h3>
-          <pre><code>&lt;?php
-use App\Core\DV;
-
-// Pass data to the layout and view
-DV::set('title', 'Dashboard');
-DV::set('user', Auth::user());
-?&gt;</code></pre>
-
-          <h3>Using Data</h3>
-          <p>The <code>view()</code> helper extracts these variables locally.</p>
-          <pre><code>&lt;h1&gt;&lt;?= $title ?&gt;&lt;/h1&gt;</code></pre>
-        </section>
-
-        <section id="routing" class="section">
-          <h2>File-Based Routing</h2>
-          <p>Create folders in <code>app/</code>. Use <code>page.php</code> for views and <code>+server.php</code> for API.</p>
-
-          <table>
-            <tr><th>File</th><th>URL</th></tr>
-            <tr><td><code>app/page.php</code></td><td><code>/</code></td></tr>
-            <tr><td><code>app/users/[id]/page.php</code></td><td><code>/users/123</code></td></tr>
-          </table>
-
-          <h3>Accessing Parameters</h3>
-          <p>Dynamic parameters are automatically injected into DV.</p>
-          <pre><code>&lt;?php
-$id = $params['id'];
-?&gt;
-&lt;h1&gt;User &lt;?= $id ?&gt;&lt;/h1&gt;</code></pre>
-        </section>
-
-        <section id="deployment" class="section">
-          <h2>Deployment</h2>
-          <ol>
-            <li>Clone repo to server.</li>
-            <li>Run <code>composer install --no-dev</code>.</li>
-            <li>Run <code>./bastion run-build</code> (Compiles CSS).</li>
-            <li>Point web server to <code>public/index.php</code>.</li>
-          </ol>
+        <section id="change-log" class="section">
+          <h2>Changelog (summary of this update)</h2>
+          <p>This release consolidates v3 generator with the following major changes relative to previous 2.x:</p>
+          <ul>
+            <li><strong>CLI consolidation:</strong> <code>./bastion</code> becomes canonical CLI (replaces artisan). — Breaking change: scripts and docs updated.</li>
+            <li><strong>Smaller generator script:</strong> create-php-app.sh compacted; optional full templates can be toggled.</li>
+            <li><strong>Restored features:</strong> Migrations & seeders, User model, Admin panel, Security middleware, Logger, Response, enhanced Request, CSRF, RateLimit.</li>
+            <li><strong>Deprecated:</strong> heavy inline demo HTML in generator (moved to separate files) — marked in docs and README as deprecated for maintainability.</li>
+          </ul>
+          <p>See <a href="docs/CHANGELOG.md" target="_blank">docs/CHANGELOG.md</a> for a full changelog and migration notes.</p>
         </section>
 
         <footer>
-          <p><strong>Bastion PHP Framework</strong> — Version 3.0.0 Enterprise</p>
-          <p>Built for stability, speed, and standardization.</p>
+          <p>Documentation generated for repository snapshot. If anything is marked <strong>⚠️ inferred</strong>, please verify the example or signature against the source code before publishing.</p>
         </footer>
-
       </main>
     </div>
   </div>
+
+  <script>
+    // Small copy-to-clipboard handler for code blocks
+    document.querySelectorAll('pre').forEach(block => {
+      const btn = document.createElement('button');
+      btn.textContent = 'Copy';
+      btn.className = 'copy';
+      btn.style.float = 'right';
+      btn.style.marginTop = '-28px';
+      btn.style.marginRight = '6px';
+      btn.onclick = () => {
+        navigator.clipboard.writeText(block.innerText).then(() => {
+          btn.textContent = 'Copied';
+          setTimeout(()=>btn.textContent='Copy',1200);
+        });
+      };
+      block.parentNode.insertBefore(btn, block);
+    });
+  </script>
 </body>
 </html>
