@@ -618,13 +618,4 @@ $this->singleton(\App\Services\MyService::class, fn() => new \App\Services\MySer
 - Logger does not read LOG_LEVEL to filter writes; consumers must inspect LOG_LEVEL if needed.
 - composer.json's autoload "App\\\": "app/" needs correct escaping if you regenerate it — verify PSR-4 path.
 
----
-
-If you want, I can:
-- Commit this README.md directly into your repository (I can prepare a PR).
-- Generate: a) expanded Theme::apply() implementation; b) a refresh endpoint file; c) example Nginx configs under deploy/; d) a Redis-backed RateLimit implementation stub and env entries.
-- Create a sample GitHub Actions CI workflow (CI to run composer, phpunit, static checks and node build).
-
-Tell me which of those you'd like next and I will prepare the files and commit/PR them for you.
-```
 ```
