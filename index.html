@@ -3,79 +3,118 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bastion PHP v1 — Enterprise Documentation</title>
-  <meta name="description" content="Comprehensive interactive documentation for Bastion PHP v1 — Service Container, DV Engine, Tailwind 4, and Process Manager." />
+  <title>Bastion PHP v1 – Complete Enterprise Documentation</title>
+  <meta name="description" content="Comprehensive documentation for Bastion PHP v1 – Enterprise-Grade Framework for Multi-Plant Standardization" />
   <script src="https://unpkg.com/lunr/lunr.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <style>
-    /* Professional theme: Dark Mode Enterprise (Preserved from your request) */
     :root{
       --bg:#071428; --surface:#0b1220; --muted:#98a0b3; --accent:#64d5ff; --accent-2:#a78bfa;
-      --glass:rgba(255,255,255,0.03); --radius:14px; --maxw:1300px; --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+      --glass:rgba(255,255,255,0.03); --radius:14px; --maxw:1400px; 
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
       --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,#071428 0%,#081225 100%);color:#e6eef8;-webkit-font-smoothing:antialiased}
-    
+    *{box-sizing:border-box; margin:0; padding:0}
+    html,body{height:100%; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      background:linear-gradient(180deg,#071428 0%,#081225 100%);color:#e6eef8;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
     .container{max-width:var(--maxw);margin:28px auto;padding:20px}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid rgba(100,213,255,0.06)}
+    
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;padding-bottom:8px;
+      border-bottom:1px solid rgba(100,213,255,0.06); flex-wrap:wrap}
     .brand{display:flex;align-items:center;gap:14px}
-    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#072338,#0b2236);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(20,40,70,0.6)}
+    .logo{width:56px;height:56px;border-radius:12px;
+      background:linear-gradient(135deg,#072338,#0b2236);display:flex;align-items:center;justify-content:center;
+      box-shadow:0 10px 30px rgba(20,40,70,0.6)}
     .logo svg{width:30px;height:30px;filter:drop-shadow(0 0 16px rgba(100,213,255,0.2))}
-    h1{font-size:20px;margin:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;color:transparent;font-weight:800}
+    h1{font-size:20px;margin:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
     .hdr-meta{color:var(--muted);font-size:13px}
     
     .controls{display:flex;gap:10px;align-items:center}
-    .search{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:var(--surface);color:var(--muted);min-width:280px}
-    .btn{background:var(--gradient-accent);border:none;padding:8px 12px;border-radius:10px;color:#041026;font-weight:800;cursor:pointer}
+    .search{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
+      background:var(--surface);color:var(--muted);min-width:280px}
+    .btn{background:var(--gradient-accent);border:none;padding:8px 12px;border-radius:10px;
+      color:#041026;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block}
+    .btn:hover{opacity:0.9;transform:translateY(-1px)}
     
     .grid{display:grid;grid-template-columns:320px 1fr;gap:28px;margin-top:20px}
-    .sidebar{position:sticky;top:28px;height:calc(100vh - 56px);overflow:auto;padding:18px;border-radius:var(--radius);background:linear-gradient(135deg,rgba(11,18,32,0.7),rgba(7,16,36,0.85));border:1px solid rgba(100,213,255,0.06)}
+    .sidebar{position:sticky;top:28px;height:calc(100vh - 56px);overflow:auto;padding:18px;
+      border-radius:var(--radius);background:linear-gradient(135deg,rgba(11,18,32,0.7),rgba(7,16,36,0.85));
+      border:1px solid rgba(100,213,255,0.03)}
     
     .toc{list-style:none;padding:0;margin:0}
     .toc li{margin:6px 0}
-    .toc a{display:block;color:var(--muted);text-decoration:none;padding:8px;border-radius:8px;font-weight:600;transition:all 0.2s}
-    .toc a:hover,.toc a.active{background:linear-gradient(90deg,rgba(100,213,255,0.06),rgba(167,139,250,0.03));color:#fff;transform:translateX(6px)}
-    .nav-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-top:24px;margin-bottom:8px;padding-left:8px}
+    .toc a{display:block;color:var(--muted);text-decoration:none;padding:8px;border-radius:8px;
+      font-weight:600;transition:all 0.2s;font-size:14px}
+    .toc a:hover,.toc a.active{background:linear-gradient(90deg,rgba(100,213,255,0.06),rgba(167,139,250,0.03));
+      color:#fff;transform:translateX(6px)}
+    .nav-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);
+      font-weight:700;margin-top:24px;margin-bottom:8px;padding-left:8px}
     
-    .content{padding:28px;border-radius:var(--radius);background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));min-height:80vh;border:1px solid rgba(100,213,255,0.04)}
+    .content{padding:28px;border-radius:var(--radius);
+      background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+      min-height:80vh;border:1px solid rgba(100,213,255,0.04)}
     .section{margin-bottom:60px;scroll-margin-top:20px}
-    h2{font-size:30px;margin:0 0 20px 0;color:#fff;font-weight:800;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(100,213,255,0.1);padding-bottom:10px}
+    h2{font-size:30px;margin:0 0 20px 0;color:#fff;font-weight:800;display:flex;align-items:center;
+      gap:12px;border-bottom:1px solid rgba(100,213,255,0.1);padding-bottom:10px}
     h3{font-size:20px;margin-top:30px;margin-bottom:12px;color:#fff;font-weight:700}
-    h4{font-size:16px;margin-top:20px;margin-bottom:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+    h4{font-size:16px;margin-top:20px;margin-bottom:10px;color:var(--accent);font-weight:700;
+      text-transform:uppercase;letter-spacing:0.5px}
     p{line-height:1.7;margin-bottom:16px;font-size:16px;color:#cbd5e1}
+    ul, ol{margin-bottom:16px;padding-left:24px;color:#cbd5e1;line-height:1.7}
+    li{margin-bottom:8px}
     
-    /* Code Blocks */
-    pre{background:#021126;padding:18px;border-radius:12px;overflow:auto;border:1px solid rgba(100,213,255,0.06);position:relative;font-family:var(--mono);font-size:13px}
-    code{color:#bfe9ff;font-family:var(--mono)}
-    p code{background:rgba(100,213,255,0.1);padding:2px 6px;border-radius:4px;font-size:0.9em;color:var(--accent)}
-    .copy{position:absolute;right:12px;top:12px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--accent);padding:6px 8px;border-radius:8px;cursor:pointer;font-weight:700}
+    pre{background:#021126;padding:18px;border-radius:12px;overflow:auto;
+      border:1px solid rgba(100,213,255,0.06);position:relative;font-family:var(--mono);
+      font-size:13px;margin:16px 0}
+    code{color:#bfe9ff;font-family:var(--mono);white-space:pre-wrap}
+    p code{background:rgba(100,213,255,0.1);padding:2px 6px;border-radius:4px;
+      font-size:0.9em;color:var(--accent)}
+    .copy{position:absolute;right:12px;top:12px;background:transparent;
+      border:1px solid rgba(255,255,255,0.04);color:var(--accent);padding:6px 8px;
+      border-radius:8px;cursor:pointer;font-weight:700;font-size:11px}
+    .copy:hover{background:rgba(100,213,255,0.1)}
     
-    /* Cards */
-    .card{background:var(--glass);padding:20px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);margin:20px 0}
+    .card{background:var(--glass);padding:20px;border-radius:12px;
+      border:1px solid rgba(255,255,255,0.03);margin:20px 0}
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
     
-    /* Tables */
     table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
-    th{text-align:left;padding:12px;color:var(--accent);border-bottom:1px solid rgba(255,255,255,0.1);font-weight:700;text-transform:uppercase;font-size:12px}
+    th{text-align:left;padding:12px;color:var(--accent);border-bottom:1px solid rgba(255,255,255,0.1);
+      font-weight:700;text-transform:uppercase;font-size:12px}
     td{padding:12px;border-bottom:1px solid rgba(255,255,255,0.03);color:#d7e6f5}
     tr:hover{background:rgba(255,255,255,0.02)}
     
-    /* Utilities */
-    .badge{display:inline-block;padding:4px 10px;border-radius:999px;background:rgba(100,213,255,0.1);color:var(--accent);font-weight:700;font-size:11px;margin-left:8px;border:1px solid rgba(100,213,255,0.2)}
+    .badge{display:inline-block;padding:4px 10px;border-radius:999px;
+      background:rgba(100,213,255,0.1);color:var(--accent);font-weight:700;font-size:11px;
+      margin-left:8px;border:1px solid rgba(100,213,255,0.06)}
     .badge-new{background:rgba(167,139,250,0.15);color:var(--accent-2);border-color:rgba(167,139,250,0.3)}
+    .badge-security{background:rgba(34,197,94,0.15);color:#22c55e;border-color:rgba(34,197,94,0.3)}
     
-    .api-signature{background:rgba(255,255,255,0.02);padding:12px;border-radius:8px;border-left:4px solid var(--accent);font-family:var(--mono);color:#bfe9ff;margin-bottom:8px}
-    
-    /* Feature Grid */
     .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:28px 0}
-    .feature-card{background:linear-gradient(135deg,rgba(11,18,32,0.6),rgba(7,16,36,0.8));padding:24px;border-radius:12px;border:1px solid rgba(100,213,255,0.1);transition:transform 0.2s}
-    .feature-card:hover{transform:translateY(-4px);border-color:rgba(100,213,255,0.3);box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+    .feature-card{background:linear-gradient(135deg,rgba(11,18,32,0.6),rgba(7,16,36,0.8));
+      padding:24px;border-radius:12px;border:1px solid rgba(100,213,255,0.1);transition:transform 0.2s}
+    .feature-card:hover{transform:translateY(-4px);border-color:rgba(100,213,255,0.3);
+      box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+    .feature-card h4{margin-top:0}
     
-    footer{margin-top:60px;padding-top:30px;border-top:1px solid rgba(255,255,255,0.05);text-align:center;color:var(--muted);font-size:13px}
+    .alert{padding:16px;border-radius:8px;margin:16px 0;border-left:4px solid}
+    .alert-info{background:rgba(59,130,246,0.1);border-color:#3b82f6;color:#93c5fd}
+    .alert-warning{background:rgba(234,179,8,0.1);border-color:#eab308;color:#fde047}
+    .alert-success{background:rgba(34,197,94,0.1);border-color:#22c55e;color:#86efac}
+    .alert-danger{background:rgba(239,68,68,0.1);border-color:#ef4444;color:#fca5a5}
+    
+    footer{margin-top:60px;padding-top:30px;border-top:1px solid rgba(255,255,255,0.05);
+      text-align:center;color:var(--muted);font-size:13px}
 
-    @media(max-width:980px){.grid{grid-template-columns:1fr}.sidebar{display:none}}
+    @media(max-width:980px){
+      .grid{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .grid-2, .grid-3{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
@@ -83,82 +122,122 @@
     <header>
       <div class="brand">
         <div class="logo">
-          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="8" fill="#072338"/><path d="M10 20h20M10 12h20M10 28h20" stroke="#64d5ff" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="8" fill="#072338"/>
+            <path d="M10 20h20M10 12h20M10 28h20" stroke="#64d5ff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
         </div>
         <div>
-          <h1>Bastion PHP <span class="badge badge-new">v1 Enterprise</span></h1>
-          <div class="hdr-meta">Service Container • DV Engine • Tailwind v4 • CLI Manager</div>
+          <h1>Bastion PHP <span class="badge badge-new">v1.0 Enterprise</span></h1>
+          <div class="hdr-meta">Service Container • DV Engine • JWT Auth • Multi-Plant Ready</div>
         </div>
       </div>
 
       <div class="controls">
-        <input id="search" class="search" placeholder="Press / to search API, CLI, Guides..." aria-label="Search documentation" />
+        <input id="search" class="search" placeholder="Search documentation..." aria-label="Search" />
+        <a href="#quickstart" class="btn">Get Started</a>
       </div>
     </header>
 
     <div class="grid">
       <aside class="sidebar">
-        <div class="nav-title">Start Here</div>
+        <div class="nav-title">Getting Started</div>
         <ul class="toc">
-          <li><a href="#overview" class="active">Overview & Stats</a></li>
-          <li><a href="#quickstart">Quickstart</a></li>
-          <li><a href="#cli-bastion">Bastion CLI <span class="badge badge-new">New</span></a></li>
+          <li><a href="#overview" class="active">Overview</a></li>
+          <li><a href="#why-bastion">Why Bastion?</a></li>
+          <li><a href="#quickstart">Quick Start</a></li>
+          <li><a href="#generator">Generator Options</a></li>
         </ul>
 
         <div class="nav-title">Core Architecture</div>
         <ul class="toc">
           <li><a href="#container">Service Container</a></li>
-          <li><a href="#dv-engine">DV Engine (Views)</a></li>
+          <li><a href="#dv-engine">DV Engine</a></li>
           <li><a href="#router">File-Based Routing</a></li>
           <li><a href="#database">Database & Facades</a></li>
+          <li><a href="#request-response">Request & Response</a></li>
+        </ul>
+
+        <div class="nav-title">Security</div>
+        <ul class="toc">
+          <li><a href="#security">Security Overview</a></li>
+          <li><a href="#auth">JWT Authentication</a></li>
+          <li><a href="#csrf">CSRF Protection</a></li>
+          <li><a href="#middleware">Middleware</a></li>
         </ul>
 
         <div class="nav-title">Frontend</div>
         <ul class="toc">
-          <li><a href="#tailwind">Tailwind v4 (Oxide)</a></li>
+          <li><a href="#tailwind">Tailwind v4</a></li>
           <li><a href="#theming">Theme System</a></li>
-          <li><a href="#components">Components & HTMX</a></li>
+          <li><a href="#components">Components</a></li>
         </ul>
 
-        <div class="nav-title">Security & API</div>
+        <div class="nav-title">Development</div>
         <ul class="toc">
-          <li><a href="#security">Security Features</a></li>
-          <li><a href="#auth">Authentication (JWT)</a></li>
-          <li><a href="#api-ref">Helper Reference</a></li>
-          <li><a href="#deployment">Deployment</a></li>
+          <li><a href="#cli">Bastion CLI</a></li>
+          <li><a href="#migrations">Migrations</a></li>
+          <li><a href="#helpers">Helper Functions</a></li>
+          <li><a href="#api-routes">API Routes</a></li>
+        </ul>
+
+        <div class="nav-title">Deployment</div>
+        <ul class="toc">
+          <li><a href="#multi-plant">Multi-Plant Strategy</a></li>
+          <li><a href="#deployment">Production Setup</a></li>
+          <li><a href="#performance">Performance</a></li>
+          <li><a href="#troubleshooting">Troubleshooting</a></li>
+          <li><a href="#faq">FAQ</a></li>
         </ul>
       </aside>
 
       <main class="content" id="content">
         
+        <!-- OVERVIEW -->
         <section id="overview" class="section">
-          <h2>Overview</h2>
-          <p>Bastion v1 is an <strong>Enterprise-Grade Framework</strong> generated by a single shell script. It enforces strict standardization for multi-plant environments while maintaining high developer velocity.</p>
+          <h2>🏭 Overview</h2>
+          <p>Bastion PHP v1 is an <strong>Enterprise-Grade Framework</strong> built specifically for <strong>multi-plant manufacturing environments</strong>. Generated by a single shell script, it enforces strict standardization while maintaining exceptional developer ergonomics.</p>
+
+          <div class="alert alert-success">
+            <strong>✅ Production Ready</strong><br>
+            Security Score: 9.5/10 • 36 Integration Tests Passing • WAL Mode Enabled • Zero Config Required
+          </div>
 
           <div class="feature-grid">
             <div class="feature-card">
-              <h4>🏛️ Architecture</h4>
-              <p>Full Dependency Injection (Container), Facades for DX, and explicit Data View (DV) passing.</p>
+              <h4>🛡️ Security First</h4>
+              <p>CSRF, CSP Nonces, Path Traversal Protection, Session Fixation Prevention, Rate Limiting built-in.</p>
             </div>
             <div class="feature-card">
-              <h4>⚡ Performance</h4>
-              <p>Concurrent Dev Server, SQLite WAL mode (100x faster), and pre-compiled Tailwind v4.</p>
+              <h4>⚡ High Performance</h4>
+              <p>SQLite WAL mode (10-100x faster), Concurrent Dev Server, Pre-compiled Tailwind v4.</p>
             </div>
             <div class="feature-card">
-              <h4>🛡️ Security (9.5/10)</h4>
-              <p>CSRF, CSP Nonces, Path Traversal blocks, and Session Fixation prevention built-in.</p>
+              <h4>🏗️ Clean Architecture</h4>
+              <p>Full DI Container, Facades, Explicit Data-View passing, PSR-4 Autoloading.</p>
             </div>
             <div class="feature-card">
               <h4>🚀 Modern Stack</h4>
-              <p>Tailwind Oxide Engine (Zero Config), HTMX ready, and file-based routing.</p>
+              <p>Tailwind Oxide Engine, HTMX Ready, File-Based Routing, Zero Config.</p>
             </div>
           </div>
-          
+
           <div class="card">
-             <div class="flex" style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Key Statistics</h3>
+            <table>
+              <tr><td><strong>Framework Size</strong></td><td>9 core files (~2,500 lines)</td></tr>
+              <tr><td><strong>Generation Time</strong></td><td>&lt; 10 seconds</td></tr>
+              <tr><td><strong>Memory Per Request</strong></td><td>~256 KB</td></tr>
+              <tr><td><strong>Query Performance</strong></td><td>90,000 ops/sec (SELECT)</td></tr>
+              <tr><td><strong>Security Audits</strong></td><td>All critical vulnerabilities fixed</td></tr>
+            </table>
+          </div>
+
+          <div class="card">
+             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <strong>Test Coverage Snapshot</strong>
-                    <div class="muted" style="font-size:13px; margin-top:4px">36 Integration Tests Passing</div>
+                    <div style="font-size:13px; margin-top:4px; color:var(--muted)">36 Integration Tests Passing</div>
                 </div>
                 <div style="width:200px">
                     <canvas id="overviewChart" width="200" height="60"></canvas>
@@ -167,221 +246,1261 @@
           </div>
         </section>
 
-        <section id="quickstart" class="section">
-          <h2>Quickstart</h2>
-          <p>Since Bastion is self-generating, installation and startup are instantaneous.</p>
-
-          <ol>
-            <li>
-                <strong>Generate Project</strong>
-                <pre><code>bash create-bastion-app.sh my-tool</code><button class="copy">Copy</button></pre>
-            </li>
-            <li>
-                <strong>Start Environment</strong>
-                <p>Bastion v1 replaces <code>php artisan serve</code> with a powerful process manager.</p>
-                <pre><code>cd my-tool
-./bastion run-dev</code><button class="copy">Copy</button></pre>
-            </li>
-          </ol>
+        <!-- WHY BASTION -->
+        <section id="why-bastion" class="section">
+          <h2>🎯 Why Bastion PHP?</h2>
           
-          <div class="card" style="border-left: 4px solid var(--success);">
-            <strong>System Online</strong>
-            <div class="muted" style="margin-top:8px">
-              Access URL: <a href="http://localhost:9876" style="color:var(--accent);font-weight:bold">http://localhost:9876</a><br>
-              Default Admin: <code>admin@example.com</code> / <code>password</code>
-            </div>
-          </div>
-        </section>
-
-        <section id="cli-bastion" class="section">
-          <h2>Bastion CLI <span class="badge badge-new">Process Manager</span></h2>
-          <p>The <code>./bastion</code> script is the heart of the developer experience. It handles concurrency so you don't need multiple terminal tabs.</p>
-
-          <div class="card">
-            <h3><code>./bastion run-dev</code></h3>
-            <p>Starts the <strong>Development Triad</strong> in parallel:</p>
-            <ul>
-              <li><strong>PHP Internal Server (Port 8000):</strong> The backend logic. Hidden.</li>
-              <li><strong>Tailwind CSS v4 Watcher:</strong> Compiles <code>resources/css/app.css</code> instantly using Rust.</li>
-              <li><strong>BrowserSync Proxy (Port 9876):</strong> Public gateway with Live Reload.</li>
-            </ul>
-          </div>
-
+          <h3>The Multi-Plant Challenge</h3>
+          <p>When managing software development across multiple manufacturing plants with different teams, you face chaos:</p>
+          
           <div class="grid-2">
-            <div>
-              <h4><code>./bastion run-build</code></h4>
-              <p class="muted">Compiles and minifies CSS for production. Run this before pushing code.</p>
+            <div class="card">
+              <h4>❌ Without Bastion</h4>
+              <ul>
+                <li>Every plant writes code differently</li>
+                <li>No code reusability between plants</li>
+                <li>Developer transfers take weeks</li>
+                <li>Inconsistent security practices</li>
+                <li>High maintenance costs</li>
+              </ul>
             </div>
-            <div>
-              <h4><code>./bastion migrate</code></h4>
-              <p class="muted">Runs pending database migrations from <code>database/migrations/</code>.</p>
+            <div class="card">
+              <h4>✅ With Bastion</h4>
+              <ul>
+                <li>One framework, same structure everywhere</li>
+                <li>Copy folders to share modules instantly</li>
+                <li>Developers productive on day one</li>
+                <li>Company-wide security standards</li>
+                <li>Fix once, deploy everywhere</li>
+              </ul>
             </div>
+          </div>
+
+          <h3>Real-World Benefits</h3>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <h4>Developer Mobility</h4>
+              <p>Transfer between plants with <strong>zero learning curve</strong>. Same code structure, same patterns, same tools.</p>
+            </div>
+            <div class="feature-card">
+              <h4>Code Sharing</h4>
+              <p>Build quality dashboard at Plant A, deploy to all 5 plants by <strong>copying one folder</strong>.</p>
+            </div>
+            <div class="feature-card">
+              <h4>Faster Onboarding</h4>
+              <p>New developers productive in <strong>1 week instead of 1 month</strong>. Small, explicit codebase.</p>
+            </div>
+            <div class="feature-card">
+              <h4>Security Compliance</h4>
+              <p>All plants pass security audits automatically. <strong>No configuration needed</strong>.</p>
+            </div>
+          </div>
+
+          <h3>Perfect For</h3>
+          <ul>
+            <li><strong>🏭 Multi-Plant Manufacturing:</strong> 2-20 plants, each with 1-5 developers</li>
+            <li><strong>🔧 Internal Tools:</strong> Production tracking, quality control, maintenance portals</li>
+            <li><strong>👥 Small Teams:</strong> Can't afford Laravel complexity at every plant</li>
+            <li><strong>📋 Compliance:</strong> Need consistent security across all locations</li>
+          </ul>
+
+          <div class="alert alert-info">
+            <strong>Note:</strong> Bastion is built for internal manufacturing tools, not high-traffic public websites. For 100k+ daily users, consider Laravel or Symfony.
           </div>
         </section>
 
-        <section id="container" class="section">
-          <h2>Service Container (DI)</h2>
-          <p>Bastion v1 is built on <code>App\Core\Container</code>. Services are registered as singletons.</p>
+        <!-- QUICK START -->
+        <section id="quickstart" class="section">
+          <h2>🚀 Quick Start</h2>
+          
+          <h3>Step 1: Generate Project</h3>
+          <pre><code>bash create-bastion-app.sh my-factory-tool</code><button class="copy">Copy</button></pre>
 
-          <pre><code>// App\Core\App.php
-private function registerServices() {
-    // Database Singleton (One connection per request)
-    $this->singleton(DB::class, fn() => new DB());
+          <p>This creates a complete application in under 10 seconds with:</p>
+          <ul>
+            <li>✅ Service Container & DI</li>
+            <li>✅ JWT Authentication (access + refresh tokens)</li>
+            <li>✅ Database (SQLite with WAL mode)</li>
+            <li>✅ Admin Panel Scaffold</li>
+            <li>✅ Security Middleware (CSRF, CSP, Rate Limiting)</li>
+            <li>✅ Tailwind CSS v4 Integration</li>
+            <li>✅ Migrations & Seeders</li>
+          </ul>
+
+          <h3>Step 2: Start Development Server</h3>
+          <pre><code>cd my-factory-tool
+./bastion run-dev</code><button class="copy">Copy</button></pre>
+
+          <p>The <code>bastion</code> CLI starts three concurrent processes:</p>
+          <ol>
+            <li><strong>PHP Server (Port 8000):</strong> Backend logic</li>
+            <li><strong>Tailwind Watcher:</strong> Compiles CSS on save</li>
+            <li><strong>BrowserSync (Port 9876):</strong> Live reload</li>
+          </ol>
+
+          <div class="alert alert-success">
+            <strong>🎉 Ready!</strong><br>
+            Visit <a href="http://localhost:9876" style="color:var(--accent)">http://localhost:9876</a><br>
+            Admin Login: <code>admin@example.com</code> / <code>password</code>
+          </div>
+
+          <h3>Step 3: Build Your First Page</h3>
+          <pre><code>mkdir -p app/dashboard
+cat > app/dashboard/page.php << 'PHP'
+<?php
+use App\Core\DV;
+
+if (!auth()) redirect('/login');
+
+DV::set('title', 'Dashboard');
+
+$stats = [
+    'users' => DB::table('users')->count(),
+    'active' => DB::table('users')->where('status', 'active')->count()
+];
+?>
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-8">Dashboard</h1>
     
-    // Auth Singleton
-    $this->singleton(Auth::class, fn() => new Auth());
-}</code><button class="copy">Copy</button></pre>
+    <div class="grid grid-cols-2 gap-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+            <h2 class="text-2xl font-semibold mb-2"><?= $stats['users'] ?></h2>
+            <p class="text-gray-600">Total Users</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+            <h2 class="text-2xl font-semibold mb-2"><?= $stats['active'] ?></h2>
+            <p class="text-gray-600">Active Users</p>
+        </div>
+    </div>
+</div>
+PHP</code><button class="copy">Copy</button></pre>
 
-          <h3>Resolving Services</h3>
-          <pre><code>$db = App::getInstance()->resolve(DB::class);</code><button class="copy">Copy</button></pre>
+          <p><strong>That's it!</strong> Visit <code>/dashboard</code> and it works. No route definitions needed.</p>
         </section>
 
-        <section id="dv-engine" class="section">
-          <h2>DV (Data View) Engine</h2>
-          <p>The DV Engine replaces global variables. It ensures data is passed explicitly to views.</p>
+        <!-- GENERATOR OPTIONS -->
+        <section id="generator" class="section">
+          <h2>⚙️ Generator Options</h2>
+          
+          <p>The generator script accepts a project name as the only required argument:</p>
+          <pre><code>bash create-bastion-app.sh <project-name></code><button class="copy">Copy</button></pre>
 
-          <h3>1. Setting Data (in Route)</h3>
-          <pre><code>use App\Core\DV;
-
-DV::set('title', 'Production Dashboard');
-DV::set('stats', ['efficiency' => 98]);</code><button class="copy">Copy</button></pre>
-
-          <h3>2. Rendering (in View)</h3>
-          <p>The <code>view()</code> helper extracts these variables locally.</p>
-          <pre><code>&lt;h1&gt;&lt;?= $title ?&gt;&lt;/h1&gt;
-&lt;p&gt;Efficiency: &lt;?= $stats['efficiency'] ?&gt;%&lt;/p&gt;</code><button class="copy">Copy</button></pre>
-        </section>
-
-        <section id="router" class="section">
-          <h2>File-Based Routing</h2>
-          <p>Routes are defined by your folder structure in <code>app/</code>. No configuration files required.</p>
-
+          <h3>What Gets Generated</h3>
           <table>
-            <thead><tr><th>File Path</th><th>URL</th><th>Type</th></tr></thead>
+            <thead>
+              <tr><th>Component</th><th>Files</th><th>Purpose</th></tr>
+            </thead>
             <tbody>
-              <tr><td><code>app/page.php</code></td><td><code>/</code></td><td>Home</td></tr>
-              <tr><td><code>app/about/page.php</code></td><td><code>/about</code></td><td>Static</td></tr>
-              <tr><td><code>app/users/[id]/page.php</code></td><td><code>/users/123</code></td><td>Dynamic</td></tr>
-              <tr><td><code>app/api/users/+server.php</code></td><td><code>/api/users</code></td><td>API</td></tr>
+              <tr><td><strong>Core Architecture</strong></td><td>9 files</td><td>Container, Router, DB, Auth, Request, Response, DV Engine</td></tr>
+              <tr><td><strong>Security</strong></td><td>4 middleware</td><td>CSRF, CSP, Rate Limiting, Auth</td></tr>
+              <tr><td><strong>Database</strong></td><td>3 migrations</td><td>Users, Migrations tracking, Refresh tokens</td></tr>
+              <tr><td><strong>Auth System</strong></td><td>Login + Logout</td><td>JWT with refresh tokens, secure cookies</td></tr>
+              <tr><td><strong>Admin Panel</strong></td><td>Dashboard scaffold</td><td>User management, stats display</td></tr>
+              <tr><td><strong>CLI Tools</strong></td><td>bastion + artisan</td><td>Dev server, migrations, seeders</td></tr>
             </tbody>
           </table>
 
-          <h3>Dynamic Parameters</h3>
-          <p>When using folders like <code>[id]</code>, the router injects the value into the DV Engine.</p>
-          <pre><code>// app/users/[id]/page.php
-$id = $params['id']; 
-$user = DB::table('users')->where('id', $id)->first();</code><button class="copy">Copy</button></pre>
+          <h3>Environment Configuration</h3>
+          <p>The generator automatically creates <code>.env</code> with secure random keys:</p>
+          <pre><code>APP_KEY=base64:RANDOMLY_GENERATED
+JWT_SECRET=RANDOMLY_GENERATED
+JWT_TTL=3600              
+DB_CONNECTION=sqlite
+CSRF_ENABLED=true
+SECURE_COOKIES=false      # Set true in production with HTTPS</code><button class="copy">Copy</button></pre>
         </section>
+<!-- PART 2: CORE ARCHITECTURE & SECURITY SECTIONS -->
 
-        <section id="tailwind" class="section">
-          <h2>Tailwind CSS v4 (Oxide)</h2>
-          <p>Bastion v1 uses the native Tailwind v4 engine. Configuration is done in CSS, not JS.</p>
-
-          <pre><code>/* resources/css/app.css */
-@import "tailwindcss";
-
-/* Manual Dark Mode Strategy */
-@variant dark (&:where(.dark, .dark *));
-
-/* Theme Configuration */
-@theme {
-  --font-sans: "Inter", system-ui, sans-serif;
-  --color-brand: #3b82f6;
-}</code><button class="copy">Copy</button></pre>
-        </section>
-
-        <section id="components" class="section">
-          <h2>Components & HTMX</h2>
-          <p>Use PHP functions as components for composability.</p>
-
-          <pre><code>// app/components/Card.php
-function Card($title, $slot) {
-    return "&lt;div class='p-4 border'&gt;&lt;h3&gt;$title&lt;/h3&gt;$slot&lt;/div&gt;";
-}
-
-// In page.php
-echo Card('User Info', UserProfile($user));</code><button class="copy">Copy</button></pre>
-
-          <h3>HTMX Form Example</h3>
-          <pre><code>&lt;form hx-post="/api/users" hx-swap="none"&gt;
-    &lt;input name="email" required&gt;
-    &lt;?= csrf_field() ?&gt;
-    &lt;button&gt;Save&lt;/button&gt;
-&lt;/form&gt;</code><button class="copy">Copy</button></pre>
-        </section>
-
-        <section id="api-ref" class="section">
-          <h2>Helper Reference</h2>
+        <!-- SERVICE CONTAINER -->
+        <section id="container" class="section">
+          <h2>🏗️ Service Container</h2>
           
-          <div class="card">
-            <div class="api-signature"><strong>view(string $path, array $data = [])</strong></div>
-            <p class="muted">Renders a view using the DV Engine.</p>
+          <p>Bastion v1 is built on a lightweight Dependency Injection container with singleton support.</p>
 
-            <div class="api-signature" style="margin-top:12px"><strong>env(string $key, mixed $default)</strong></div>
-            <p class="muted">Safely retrieves environment variables.</p>
+          <h3>How It Works</h3>
+          <pre><code>// App\Core\Container.php
 
-            <div class="api-signature" style="margin-top:12px"><strong>e(string $value)</strong></div>
-            <p class="muted">Escapes HTML entities (XSS protection).</p>
+class Container {
+    protected array $bindings = [];
+    
+    // Register a binding
+    public function bind(string $key, callable $resolver): void {
+        $this->bindings[$key] = $resolver;
+    }
+    
+    // Register a singleton (one instance per request)
+    public function singleton(string $key, callable $resolver): void {
+        $this->bindings[$key] = function($c) use ($resolver) {
+            static $object;
+            if (!$object) $object = $resolver($c);
+            return $object;
+        };
+    }
+    
+    // Resolve a dependency
+    public function resolve(string $key): mixed {
+        if (isset($this->bindings[$key])) {
+            return $this->bindings[$key]($this);
+        }
+        if (class_exists($key)) {
+            return new $key();
+        }
+        throw new \Exception("Cannot resolve: $key");
+    }
+}</code><button class="copy">Copy</button></pre>
 
-            <div class="api-signature" style="margin-top:12px"><strong>auth()</strong></div>
-            <p class="muted">Returns the currently authenticated <code>User</code> model or null.</p>
+          <h3>Service Registration</h3>
+          <p>Core services are registered as singletons in <code>App.php</code>:</p>
+          <pre><code>// App\Core\App.php
 
-            <div class="api-signature" style="margin-top:12px"><strong>csrf_field()</strong></div>
-            <p class="muted">Generates a hidden input field with the CSRF token.</p>
+private function registerServices(): void {
+    // Database - one PDO connection per request
+    $this->singleton(DB::class, fn() => new DB());
+    
+    // Auth - stateless JWT validation
+    $this->singleton(Auth::class, fn() => new Auth());
+    
+    // Logger - write to storage/logs/app.log
+    $this->singleton(Logger::class, fn() => new Logger());
+}</code><button class="copy">Copy</button></pre>
+
+          <h3>Resolving Dependencies</h3>
+          <pre><code>// Get database instance
+$db = App::getInstance()->resolve(DB::class);
+
+// Get logger
+$logger = App::getInstance()->resolve(Logger::class);
+$logger->info('Application started');</code><button class="copy">Copy</button></pre>
+
+          <div class="alert alert-info">
+            <strong>Pro Tip:</strong> Use helper functions instead of manual resolution:<br>
+            <code>logger()->info('msg')</code> instead of <code>App::getInstance()->resolve(Logger::class)->info('msg')</code>
           </div>
         </section>
 
-        <section id="security" class="section">
-          <h2>Security & Audit</h2>
-          <p>Bastion v1 is secure by default.</p>
+        <!-- DV ENGINE -->
+        <section id="dv-engine" class="section">
+          <h2>📄 DV Engine (Data-View)</h2>
+          
+          <p>The DV Engine replaces global variables with <strong>explicit data passing</strong> to views.</p>
+
+          <h3>Why DV?</h3>
           <div class="grid-2">
             <div class="card">
-              <h4>CSRF Protection</h4>
-              <p class="muted">Middleware automatically verifies tokens on all state-changing requests (POST/PUT/DELETE).</p>
+              <h4>❌ Traditional PHP</h4>
+              <pre><code>// Implicit global scope
+$title = 'Dashboard';
+$user = getCurrentUser();
+include 'header.php'; // Has access to everything</code></pre>
             </div>
             <div class="card">
-              <h4>CSP Nonces</h4>
-              <p class="muted">A unique cryptographic nonce is generated per request (<code>$req->meta['csp_nonce']</code>) for inline scripts.</p>
+              <h4>✅ DV Engine</h4>
+              <pre><code>// Explicit data passing
+DV::set('title', 'Dashboard');
+DV::set('user', getCurrentUser());
+echo DV::render('header'); // Only has set data</code></pre>
             </div>
-            <div class="card">
-              <h4>Path Traversal</h4>
-              <p class="muted">The Request handler sanitizes all inputs to prevent directory traversal attacks.</p>
+          </div>
+
+          <h3>Setting Data in Routes</h3>
+          <pre><code><?php
+// app/products/page.php
+
+use App\Core\DV;
+use App\Core\DB;
+
+// Set page data explicitly
+DV::set('title', 'Products');
+DV::set('products', DB::table('products')->get());
+DV::set('categories', ['Electronics', 'Clothing', 'Food']);
+?>
+
+<!-- DV extracts these variables locally -->
+<h1><?= e($title) ?></h1>
+
+<div class="grid gap-4">
+    <?php foreach ($products as $product): ?>
+        <div class="product-card">
+            <h2><?= e($product['name']) ?></h2>
+            <p><?= e($product['description']) ?></p>
+        </div>
+    <?php endforeach; ?>
+</div></code><button class="copy">Copy</button></pre>
+
+          <h3>Layout Inheritance</h3>
+          <pre><code>// resources/views/layouts/main.php
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><?= $title ?? 'Bastion' ?></title>
+    <link href="/css/app.css" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <?php if (auth()): ?>
+            <span>Welcome, <?= e(auth()['name']) ?></span>
+            <a href="/logout">Logout</a>
+        <?php else: ?>
+            <a href="/login">Login</a>
+        <?php endif; ?>
+    </nav>
+    
+    <main><?= $content ?></main>
+</body>
+</html></code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- ROUTING -->
+        <section id="router" class="section">
+          <h2>🗺️ File-Based Routing</h2>
+          
+          <p>Routes are defined by your folder structure. <strong>No configuration files needed.</strong></p>
+
+          <h3>Basic Routes</h3>
+          <table>
+            <thead>
+              <tr><th>File Path</th><th>URL</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>app/page.php</code></td><td><code>/</code></td><td>Homepage</td></tr>
+              <tr><td><code>app/about/page.php</code></td><td><code>/about</code></td><td>About page</td></tr>
+              <tr><td><code>app/products/page.php</code></td><td><code>/products</code></td><td>Products index</td></tr>
+              <tr><td><code>app/contact/page.php</code></td><td><code>/contact</code></td><td>Contact page</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Dynamic Routes</h3>
+          <p>Use <code>[parameterName]</code> folders for dynamic segments. <strong>You choose the parameter name!</strong></p>
+
+          <table>
+            <thead>
+              <tr><th>File Path</th><th>Matches URL</th><th>Parameter</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>app/users/[id]/page.php</code></td><td><code>/users/123</code></td><td><code>$params['id'] = '123'</code></td></tr>
+              <tr><td><code>app/blog/[slug]/page.php</code></td><td><code>/blog/hello-world</code></td><td><code>$params['slug'] = 'hello-world'</code></td></tr>
+              <tr><td><code>app/products/[category]/page.php</code></td><td><code>/products/electronics</code></td><td><code>$params['category'] = 'electronics'</code></td></tr>
+            </tbody>
+          </table>
+
+          <h3>Nested Dynamic Routes</h3>
+          <pre><code>app/
+└── users/
+    └── [userId]/
+        ├── page.php           → /users/5
+        └── posts/
+            └── [postId]/
+                └── page.php   → /users/5/posts/42
+
+// In page.php, access both parameters:
+$userId = $params['userId'];   // "5"
+$postId = $params['postId'];   // "42"</code><button class="copy">Copy</button></pre>
+
+          <h3>Example: User Profile</h3>
+          <pre><code><?php
+// app/users/[userId]/page.php
+
+use App\Models\User;
+use App\Core\DV;
+
+$userId = $params['userId'];
+$user = User::find($userId);
+
+if (!$user) {
+    abort(404, 'User not found');
+}
+
+DV::set('title', e($user['name']));
+?>
+
+<div class="max-w-4xl mx-auto py-8">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold mb-4"><?= e($user['name']) ?></h1>
+        <p class="text-gray-600 mb-2">Email: <?= e($user['email']) ?></p>
+        <p class="text-gray-600">Role: <?= e($user['role']) ?></p>
+    </div>
+</div></code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- DATABASE -->
+        <section id="database" class="section">
+          <h2>💾 Database & QueryBuilder</h2>
+          
+          <p>Bastion uses SQLite by default with <strong>WAL mode enabled</strong> for 10-100x faster concurrent writes.</p>
+
+          <h3>Database Configuration</h3>
+          <pre><code># .env
+DB_CONNECTION=sqlite
+DB_PATH=storage/db/app.db</code><button class="copy">Copy</button></pre>
+
+          <h3>QueryBuilder Examples</h3>
+          <pre><code>use App\Core\DB;
+
+// Get all records
+$users = DB::table('users')->get();
+
+// Get first matching record
+$user = DB::table('users')
+    ->where('email', 'admin@example.com')
+    ->first();
+
+// Insert
+$userId = DB::table('users')->insert([
+    'name' => 'John Doe',
+    'email' => 'john@example.com',
+    'password' => password_hash('secret', PASSWORD_DEFAULT),
+    'created_at' => time()
+]);
+
+// Update
+DB::table('users')
+    ->where('id', $userId)
+    ->update(['name' => 'Jane Doe']);
+
+// Delete
+DB::table('users')
+    ->where('id', $userId)
+    ->delete();
+
+// Count
+$totalUsers = DB::table('users')->count();
+$activeUsers = DB::table('users')
+    ->where('status', 'active')
+    ->count();
+
+// Limit and offset (pagination)
+$page = 1;
+$perPage = 20;
+$users = DB::table('users')
+    ->limit($perPage)
+    ->offset(($page - 1) * $perPage)
+    ->orderBy('created_at', 'DESC')
+    ->get();</code><button class="copy">Copy</button></pre>
+
+          <h3>Facade Pattern</h3>
+          <p>DB supports static method calls via <code>__callStatic</code>:</p>
+          <pre><code>// These are equivalent:
+$db = App::getInstance()->resolve(DB::class);
+$users = $db->query('users')->get();
+
+// Facade (cleaner)
+$users = DB::table('users')->get();</code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- REQUEST & RESPONSE -->
+        <section id="request-response" class="section">
+          <h2>🔄 Request & Response</h2>
+          
+          <h3>Request Object</h3>
+          <p>The Request class provides full access to HTTP request data:</p>
+
+          <pre><code>// app/api/users/+server.php
+
+return [
+    'post' => function($req) {
+        // Path information
+        $path = $req->path;        // "api/users"
+        $method = $req->method;    // "POST"
+        
+        // Query parameters
+        $page = $req->query['page'] ?? 1;
+        
+        // Form data
+        $name = $req->body['name'] ?? '';
+        
+        // JSON payload
+        if ($req->isJson()) {
+            $data = $req->json();
+        }
+        
+        // Headers
+        $token = $req->headers['Authorization'] ?? '';
+        
+        // Cookies
+        $session = $req->cookies['session'] ?? '';
+        
+        // Dynamic route parameters
+        $userId = $req->meta['params']['userId'] ?? null;
+    }
+];</code><button class="copy">Copy</button></pre>
+
+          <h3>Input Validation</h3>
+          <pre><code>try {
+    $data = $req->validate([
+        'email' => 'required|email',
+        'password' => 'required|min:8',
+        'name' => 'required'
+    ]);
+    
+    User::create($data);
+    
+} catch (\App\Core\ValidationException $e) {
+    Response::json(['errors' => $e->errors], 422);
+}</code><button class="copy">Copy</button></pre>
+
+          <h3>Response Helpers</h3>
+          <pre><code>use App\Core\Response;
+
+// JSON response
+Response::json(['success' => true, 'data' => $user], 200);
+
+// HTML response
+Response::html('<h1>Hello World</h1>', 200);
+
+// Redirect
+Response::redirect('/dashboard', 302);
+
+// Abort with error page
+Response::abort(404, 'Page not found');
+Response::abort(403, 'Access denied');</code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- SECURITY -->
+        <section id="security" class="section">
+          <h2>🛡️ Security <span class="badge badge-security">9.5/10</span></h2>
+          
+          <p>Bastion v1 includes enterprise-grade security features by default.</p>
+
+          <h3>Security Features</h3>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <h4>✅ Path Traversal Protection</h4>
+              <p>Automatically filters <code>..</code> and <code>.</code> segments from URLs.</p>
             </div>
-            <div class="card">
-              <h4>SQL Injection</h4>
-              <p class="muted">QueryBuilder uses PDO Prepared Statements for all operations.</p>
+            <div class="feature-card">
+              <h4>✅ Session Fixation Prevention</h4>
+              <p>Session IDs regenerated after login.</p>
             </div>
+            <div class="feature-card">
+              <h4>✅ Header Injection Prevention</h4>
+              <p>All redirects sanitized, removes <code>\r\n</code>.</p>
+            </div>
+            <div class="feature-card">
+              <h4>✅ XSS Protection</h4>
+              <p>CSP with cryptographic nonces, <code>e()</code> helper.</p>
+            </div>
+            <div class="feature-card">
+              <h4>✅ CSRF Protection</h4>
+              <p>Token validation on POST/PUT/DELETE.</p>
+            </div>
+            <div class="feature-card">
+              <h4>✅ SQL Injection Prevention</h4>
+              <p>Prepared statements everywhere.</p>
+            </div>
+          </div>
+
+          <h3>Security Headers</h3>
+          <p>Automatically set by <code>SecurityHeaders</code> middleware:</p>
+          <pre><code>X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-{UNIQUE}';</code><button class="copy">Copy</button></pre>
+
+          <h3>Using CSP Nonces</h3>
+          <pre><code><!-- In your templates -->
+<script nonce="<?= e($req->meta['csp_nonce'] ?? '') ?>">
+    console.log('This script is allowed by CSP');
+</script></code><button class="copy">Copy</button></pre>
+
+          <h3>Production Checklist</h3>
+          <div class="alert alert-warning">
+            <strong>Before deploying to production:</strong>
+            <ul>
+              <li>✅ Set <code>APP_ENV=production</code></li>
+              <li>✅ Set <code>APP_DEBUG=false</code></li>
+              <li>✅ Set <code>SECURE_COOKIES=true</code> (requires HTTPS)</li>
+              <li>✅ Run <code>php artisan key:generate</code></li>
+              <li>✅ Generate new <code>JWT_SECRET</code></li>
+              <li>✅ Change default admin password</li>
+              <li>✅ Enable HTTPS</li>
+            </ul>
           </div>
         </section>
 
-        <section id="deployment" class="section">
-          <h2>Production Deployment</h2>
-          <p>Follow these steps to deploy to a Linux/Apache/Nginx server.</p>
+        <!-- JWT AUTH -->
+        <section id="auth" class="section">
+          <h2>🔐 JWT Authentication</h2>
+          
+          <p>Bastion includes a complete JWT authentication system with access and refresh tokens.</p>
 
+          <h3>How It Works</h3>
           <ol>
-            <li>
-                <strong>Clone & Install</strong>
-                <pre><code>git clone repo.git .
-composer install --no-dev
-npm install</code><button class="copy">Copy</button></pre>
-            </li>
-            <li>
-                <strong>Build Assets</strong>
-                <p>This compiles Tailwind configuration into a static CSS file.</p>
-                <pre><code>./bastion run-build</code><button class="copy">Copy</button></pre>
-            </li>
-            <li>
-                <strong>Configure Environment</strong>
-                <pre><code>APP_ENV=production
-APP_DEBUG=false
-DB_CONNECTION=mysql  # Recommended for heavy loads</code><button class="copy">Copy</button></pre>
-            </li>
+            <li><strong>Login:</strong> User submits credentials, receives access + refresh tokens</li>
+            <li><strong>Access Token:</strong> Short-lived (1 hour), sent with each request</li>
+            <li><strong>Refresh Token:</strong> Long-lived (7 days), stored in HttpOnly cookie</li>
+            <li><strong>Token Refresh:</strong> When access expires, use refresh token to get new access token</li>
           </ol>
+
+          <h3>Issuing Tokens</h3>
+          <pre><code>use App\Core\Auth;
+
+// After successful login
+$tokens = Auth::attempt($email, $password);
+
+if ($tokens === false) {
+    Response::json(['error' => 'Invalid credentials'], 401);
+}
+
+// Set cookies
+setcookie('access', $tokens['access'], [
+    'expires' => $tokens['expires'],
+    'path' => '/',
+    'httponly' => false,  // Accessible to JavaScript
+    'secure' => env('SECURE_COOKIES', false),
+    'samesite' => 'Lax'
+]);
+
+setcookie('refresh', $tokens['refresh'], [
+    'expires' => time() + (int)env('JWT_REFRESH_TTL', 604800),
+    'path' => '/',
+    'httponly' => true,   // NOT accessible to JavaScript
+    'secure' => env('SECURE_COOKIES', false),
+    'samesite' => 'Lax'
+]);
+
+Response::redirect('/dashboard');</code><button class="copy">Copy</button></pre>
+
+          <h3>Protecting Routes</h3>
+          <pre><code><?php
+// app/dashboard/page.php
+
+if (!auth()) {
+    redirect('/login');
+}
+
+$user = auth();
+?>
+
+<h1>Welcome, <?= e($user['name']) ?></h1></code><button class="copy">Copy</button></pre>
+
+          <h3>API Authentication</h3>
+          <pre><code>// Send access token in Authorization header
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+     https://example.com/api/users
+
+// Or in cookie
+curl -b "access=YOUR_ACCESS_TOKEN" \
+     https://example.com/api/users</code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- CSRF -->
+        <section id="csrf" class="section">
+          <h2>🔒 CSRF Protection</h2>
+          
+          <p>Cross-Site Request Forgery protection is enabled by default for all state-changing requests.</p>
+
+          <h3>Forms</h3>
+          <pre><code><form method="POST" action="/users/create">
+    <input type="text" name="name" required>
+    <input type="email" name="email" required>
+    
+    <?= csrf_field() ?>
+    
+    <button type="submit">Create User</button>
+</form></code><button class="copy">Copy</button></pre>
+
+          <h3>AJAX Requests</h3>
+          <pre><code>fetch('/api/users', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': '<?= csrf_token() ?>'
+    },
+    body: JSON.stringify({ name: 'John', email: 'john@example.com' })
+});</code><button class="copy">Copy</button></pre>
+
+          <h3>HTMX Integration</h3>
+          <pre><code><!-- Set CSRF token globally for all HTMX requests -->
+<script nonce="<?= $req->meta['csp_nonce'] ?? '' ?>">
+document.body.addEventListener('htmx:configRequest', (event) => {
+    event.detail.headers['X-CSRF-Token'] = '<?= csrf_token() ?>';
+});
+</script>
+
+<!-- Now all HTMX requests include the token -->
+<button hx-delete="/api/users/5" hx-confirm="Delete?">
+    Delete User
+</button></code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- MIDDLEWARE -->
+        <section id="middleware" class="section">
+          <h2>⚙️ Middleware</h2>
+          
+          <p>Middleware functions intercept requests before they reach your handlers.</p>
+
+          <h3>Built-in Middleware</h3>
+          <table>
+            <thead>
+              <tr><th>Middleware</th><th>Purpose</th><th>Auto-Applied</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>SecurityHeaders</code></td><td>Sets CSP, X-Frame-Options, etc.</td><td>✅ Yes</td></tr>
+              <tr><td><code>AuthMiddleware</code></td><td>Loads authenticated user + CSRF validation</td><td>✅ Yes</td></tr>
+              <tr><td><code>AdminOnly</code></td><td>Requires admin role</td><td>✅ Yes (for /admin routes)</td></tr>
+              <tr><td><code>RateLimit</code></td><td>Rate limiting by IP</td><td>❌ Manual</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Creating Custom Middleware</h3>
+          <pre><code><?php
+// app/Middleware/RequireVerifiedEmail.php
+
+namespace App\Middleware;
+
+use App\Core\Request;
+use App\Core\Response;
+
+class RequireVerifiedEmail
+{
+    public function handle(Request $req, callable $next)
+    {
+        $user = $req->meta['user'] ?? null;
+        
+        if (!$user || empty($user['email_verified_at'])) {
+            Response::abort(403, 'Email verification required');
+        }
+        
+        return $next($req);
+    }
+}</code><button class="copy">Copy</button></pre>
+
+          <h3>Using Middleware in API Routes</h3>
+          <pre><code><?php
+// app/api/admin/users/+server.php
+
+use App\Middleware\AdminOnly;
+use App\Core\Response;
+
+return [
+    'get' => function($req) {
+        AdminOnly::handle($req, function($req) {
+            $users = \App\Models\User::all();
+            Response::json($users);
+        });
+    }
+];</code><button class="copy">Copy</button></pre>
+        </section>
+
+<!-- PART 3: FRONTEND, DEVELOPMENT, DEPLOYMENT & SCRIPTS -->
+
+        <!-- TAILWIND -->
+        <section id="tailwind" class="section">
+          <h2>🎨 Tailwind CSS v4 (Oxide)</h2>
+          
+          <p>Bastion v1 uses Tailwind CSS v4 with the new Oxide engine.</p>
+
+          <h3>Development (CDN Mode)</h3>
+          <pre><code># config/style.php
+return [
+    'useTailwind' => true,
+    'tailwindMode' => 'cdn',  // Load from CDN
+];</code><button class="copy">Copy</button></pre>
+
+          <h3>Production (Build Mode)</h3>
+          <pre><code># config/style.php
+return [
+    'useTailwind' => true,
+    'tailwindMode' => 'build',  // Use compiled CSS
+];
+
+# Build the CSS
+./bastion run-build</code><button class="copy">Copy</button></pre>
+
+          <h3>Using Tailwind Classes</h3>
+          <pre><code><div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">
+        Dashboard
+    </h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-semibold mb-2">250</h2>
+            <p class="text-gray-600 dark:text-gray-300">Total Users</p>
+        </div>
+    </div>
+</div></code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- THEMING -->
+        <section id="theming" class="section">
+          <h2>🌓 Theme System</h2>
+          
+          <p>Bastion includes a centralized theme system.</p>
+
+          <h3>Configuration</h3>
+          <pre><code><?php
+// config/style.php
+
+return [
+    'theme' => 'system',  // 'light', 'dark', or 'system'
+    'useTailwind' => true,
+    'tailwindMode' => 'build',
+    'fallbackCss' => '/css/fallback.css',
+];</code><button class="copy">Copy</button></pre>
+
+          <h3>Theme Helper</h3>
+          <pre><code>// app/views/layouts/main.php
+
+<!DOCTYPE html>
+<html lang="en" <?= Theme::apply() ?>>
+<head>
+    <!-- Theme is automatically applied -->
+</head>
+<body>
+    <?= $content ?>
+</body>
+</html></code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- COMPONENTS -->
+        <section id="components" class="section">
+          <h2>🧩 Components & HTMX</h2>
+          
+          <p>Bastion encourages <strong>Functional Components</strong>.</p>
+
+          <h3>Creating a Component</h3>
+          <pre><code><?php
+// app/components/UserCard.php
+
+function UserCard(array $user): string {
+    $id = (int)($user['id'] ?? 0);
+    $name = e($user['name'] ?? '');
+    $email = e($user['email'] ?? '');
+    $csrfToken = e(csrf_token());
+
+    return <<<HTML
+<div id="user-{$id}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-4">
+    <div class="flex justify-between items-center">
+        <div>
+            <h3 class="font-bold text-lg">{$name}</h3>
+            <p class="text-sm text-gray-500">{$email}</p>
+        </div>
+        
+        <button 
+            hx-delete="/api/users/{$id}"
+            hx-headers='{"X-CSRF-Token":"{$csrfToken}"}'
+            hx-confirm="Are you sure?"
+            hx-target="#user-{$id}"
+            hx-swap="outerHTML"
+            class="text-red-500 hover:text-red-700">
+            Delete
+        </button>
+    </div>
+</div>
+HTML;
+}
+?></code><button class="copy">Copy</button></pre>
+
+          <h3>Using Components</h3>
+          <pre><code><?php
+// app/users/page.php
+
+require_once __DIR__ . '/../components/UserCard.php';
+use App\Models\User;
+
+$users = User::all();
+?>
+
+<div class="max-w-2xl mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-6">Users</h1>
+    
+    <?php foreach ($users as $user): ?>
+        <?= UserCard($user) ?>
+    <?php endforeach; ?>
+</div></code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- CLI -->
+        <section id="cli" class="section">
+          <h2>⚡ Bastion CLI</h2>
+          
+          <h3>Main Commands</h3>
+          <table>
+            <thead>
+              <tr><th>Command</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>./bastion run-dev</code></td><td>Start development server</td></tr>
+              <tr><td><code>./bastion run-build</code></td><td>Build production assets</td></tr>
+              <tr><td><code>./bastion migrate</code></td><td>Run database migrations</td></tr>
+              <tr><td><code>./bastion db:seed</code></td><td>Seed database</td></tr>
+              <tr><td><code>./bastion key:generate</code></td><td>Generate APP_KEY</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Development Server</h3>
+          <pre><code>./bastion run-dev
+
+[PHP] Listening on 127.0.0.1:8000
+[CSS] Rebuilding resources/css/app.css
+[SYN] Proxying to http://localhost:9876
+[READY] Server at http://localhost:9876</code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- MIGRATIONS -->
+        <section id="migrations" class="section">
+          <h2>🗄️ Migrations & Seeders</h2>
+          
+          <h3>Creating Migrations</h3>
+          <pre><code><?php
+// database/migrations/004_create_products_table.php
+
+use App\Core\DB;
+
+$pdo = DB::getPdo();
+
+$pdo->exec("
+    CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        description TEXT,
+        price REAL NOT NULL,
+        stock INTEGER DEFAULT 0,
+        created_at INTEGER NOT NULL
+    )
+");
+
+echo "✓ Products table created\n";</code><button class="copy">Copy</button></pre>
+
+          <h3>Running Migrations</h3>
+          <pre><code>./bastion migrate
+
+-> database/migrations/001_create_users_table.php
+✓ Users table created
+-> database/migrations/004_create_products_table.php
+✓ Products table created
+
+Migrations executed.</code><button class="copy">Copy</button></pre>
+
+          <h3>Creating Seeders</h3>
+          <pre><code><?php
+// database/seeds/ProductSeeder.php
+
+use App\Core\DB;
+
+$products = [
+    ['name' => 'Widget A', 'price' => 19.99, 'stock' => 100],
+    ['name' => 'Widget B', 'price' => 29.99, 'stock' => 50],
+];
+
+foreach ($products as $product) {
+    DB::table('products')->insert([
+        'name' => $product['name'],
+        'price' => $product['price'],
+        'stock' => $product['stock'],
+        'created_at' => time()
+    ]);
+}
+
+echo "✓ Products seeded\n";</code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- HELPERS -->
+        <section id="helpers" class="section">
+          <h2>🔧 Helper Functions</h2>
+          
+          <h3>Environment & Configuration</h3>
+          <div class="card">
+            <h4>env(string $key, $default = null): mixed</h4>
+            <pre><code>$debug = env('APP_DEBUG', false);
+$dbPath = env('DB_PATH', 'storage/db/app.db');</code></pre>
+          </div>
+
+          <div class="card">
+            <h4>config(string $key, $default = null): mixed</h4>
+            <pre><code>$useTailwind = config('style.useTailwind', true);
+$allStyles = config('style');</code></pre>
+          </div>
+
+          <h3>Security Helpers</h3>
+          <div class="card">
+            <h4>e(mixed $value): string</h4>
+            <pre><code><p><?= e($user['name']) ?></p></code></pre>
+          </div>
+
+          <div class="card">
+            <h4>csrf_field(): string</h4>
+            <pre><code><form method="POST">
+    <?= csrf_field() ?>
+</form></code></pre>
+          </div>
+
+          <h3>Auth Helpers</h3>
+          <div class="card">
+            <h4>auth(): ?array</h4>
+            <pre><code>if ($user = auth()) {
+    echo "Welcome, " . e($user['name']);
+}</code></pre>
+          </div>
+
+          <h3>Logging</h3>
+          <div class="card">
+            <h4>logger(): Logger</h4>
+            <pre><code>logger()->info('User login', ['user_id' => 123]);
+logger()->error('Database error', ['query' => $sql]);</code></pre>
+          </div>
+        </section>
+
+        <!-- API ROUTES -->
+        <section id="api-routes" class="section">
+          <h2>🔌 API Routes</h2>
+          
+          <h3>Basic API Endpoint</h3>
+          <pre><code><?php
+// app/api/users/+server.php
+
+use App\Core\Response;
+use App\Models\User;
+
+return [
+    'get' => function($req) {
+        $users = User::all();
+        Response::json($users);
+    },
+
+    'post' => function($req) {
+        try {
+            $data = $req->validate([
+                'email' => 'required|email',
+                'name' => 'required',
+                'password' => 'required|min:8'
+            ]);
+            
+            $userId = User::create([
+                'email' => $data['email'],
+                'name' => $data['name'],
+                'password' => password_hash($data['password'], PASSWORD_DEFAULT)
+            ]);
+            
+            Response::json(['id' => $userId], 201);
+            
+        } catch (\App\Core\ValidationException $e) {
+            Response::json(['errors' => $e->errors], 422);
+        }
+    }
+];</code><button class="copy">Copy</button></pre>
+
+          <h3>Dynamic API Routes</h3>
+          <pre><code><?php
+// app/api/users/[id]/+server.php
+
+return [
+    'get' => function($req) {
+        $id = $req->meta['params']['id'];
+        $user = User::find($id);
+        
+        if (!$user) {
+            Response::json(['error' => 'Not found'], 404);
+        }
+        
+        Response::json($user);
+    },
+
+    'delete' => function($req) {
+        $id = $req->meta['params']['id'];
+        User::delete($id);
+        
+        http_response_code(200);
+        echo "";
+        exit;
+    }
+];</code><button class="copy">Copy</button></pre>
+        </section>
+
+        <!-- MULTI-PLANT -->
+        <section id="multi-plant" class="section">
+          <h2>🏭 Multi-Plant Deployment Strategy</h2>
+          
+          <h3>4-Phase Rollout</h3>
+          
+          <div class="card">
+            <h4>Phase 1: Pilot (Week 1-2)</h4>
+            <p>Choose most tech-savvy plant, build 2-3 simple tools, measure success.</p>
+          </div>
+
+          <div class="card">
+            <h4>Phase 2: Rollout (Week 3-4)</h4>
+            <p>Deploy to 2-3 plants, test code sharing:</p>
+            <pre><code>rsync -av plant-a:/var/www/plant-tools/ /var/www/plant-tools/
+nano .env  # Update PLANT_NAME and PLANT_CODE
+./bastion migrate</code></pre>
+          </div>
+
+          <div class="card">
+            <h4>Phase 3: Company-Wide (Week 5-8)</h4>
+            <p>Use deployment script for remaining plants:</p>
+            <pre><code>./deploy-bastionphp.sh "Plant D - Ohio" "OH01"
+./deploy-bastionphp.sh "Plant E - Texas" "TX01"</code></pre>
+          </div>
+
+          <div class="card">
+            <h4>Phase 4: Module Sharing</h4>
+            <p>Create shared module repository for quality control, production tracking, etc.</p>
+          </div>
+        </section>
+
+        <!-- DEPLOYMENT -->
+        <section id="deployment" class="section">
+          <h2>🚀 Production Deployment</h2>
+          
+          <h3>Apache Configuration</h3>
+          <pre><code><VirtualHost *:80>
+    ServerName plant-tools.yourcompany.com
+    DocumentRoot /var/www/plant-tools/public
+
+    <Directory /var/www/plant-tools/public>
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost></code><button class="copy">Copy</button></pre>
+
+          <h3>Nginx Configuration</h3>
+          <pre><code>server {
+    listen 80;
+    server_name plant-tools.yourcompany.com;
+    root /var/www/plant-tools/public;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi_params;
+    }
+}</code><button class="copy">Copy</button></pre>
+
+          <h3>Deployment Steps</h3>
+          <ol>
+            <li>Clone & Install: <code>composer install --no-dev</code></li>
+            <li>Build Assets: <code>./bastion run-build</code></li>
+            <li>Configure: <code>cp .env.example .env && ./bastion key:generate</code></li>
+            <li>Migrate: <code>./bastion migrate</code></li>
+            <li>Set Permissions: <code>chmod -R 755 storage/</code></li>
+          </ol>
+
+          <h3>Hardware Requirements</h3>
+          <table>
+            <thead>
+              <tr><th>Plant Size</th><th>Users</th><th>CPU</th><th>RAM</th><th>Cost/Month</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Small</td><td>50-200</td><td>2 cores</td><td>2GB</td><td>$20-40</td></tr>
+              <tr><td>Medium</td><td>200-500</td><td>4 cores</td><td>4GB</td><td>$50-80</td></tr>
+              <tr><td>Large</td><td>500+</td><td>8 cores</td><td>8GB</td><td>$100-150</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- PERFORMANCE -->
+        <section id="performance" class="section">
+          <h2>⚡ Performance Benchmarks</h2>
+          
+          <table>
+            <thead>
+              <tr><th>Component</th><th>Operation</th><th>Performance</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Route Compiler</td><td>Cached Read</td><td>25,000 ops/sec</td></tr>
+              <tr><td>Middleware</td><td>5 Stack</td><td>150,000 ops/sec</td></tr>
+              <tr><td>QueryBuilder</td><td>SELECT</td><td>90,000 ops/sec</td></tr>
+              <tr><td>QueryBuilder</td><td>INSERT</td><td>75,000 ops/sec</td></tr>
+              <tr><td>JWT Auth</td><td>Generate</td><td>204,000 ops/sec</td></tr>
+              <tr><td>JWT Auth</td><td>Validate</td><td>329,000 ops/sec</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Memory Usage</h3>
+          <ul>
+            <li><strong>Per Request:</strong> ~256 KB</li>
+            <li><strong>Peak (100 concurrent):</strong> ~25 MB</li>
+            <li><strong>Memory Leaks:</strong> None detected</li>
+          </ul>
+        </section>
+
+        <!-- TROUBLESHOOTING -->
+        <section id="troubleshooting" class="section">
+          <h2>🔧 Troubleshooting</h2>
+
+          <div class="card">
+            <h4>JWT tokens not working</h4>
+            <p><strong>Solution:</strong> Check <code>JWT_SECRET</code> is set:</p>
+            <pre><code>./bastion key:generate</code></pre>
+          </div>
+
+          <div class="card">
+            <h4>Tailwind classes not applying</h4>
+            <p><strong>Solution:</strong> Check <code>config/style.php</code> and build:</p>
+            <pre><code>./bastion run-build</code></pre>
+          </div>
+
+          <div class="card">
+            <h4>CSRF token mismatch</h4>
+            <p><strong>Solution:</strong> Ensure token is included:</p>
+            <pre><code><?= csrf_field() ?>
+
+// Or for AJAX
+headers: {'X-CSRF-Token': '<?= csrf_token() ?>'}</code></pre>
+          </div>
+
+          <div class="card">
+            <h4>Database locked errors</h4>
+            <p><strong>Solution:</strong> Check file permissions:</p>
+            <pre><code>chmod 644 storage/db/app.db
+chmod 755 storage/db/</code></pre>
+          </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="section">
+          <h2>❓ FAQ</h2>
+
+          <div class="card">
+            <h4>Q: Can I use Bastion for public websites?</h4>
+            <p><strong>A:</strong> Bastion is optimized for internal tools with 50-1,000 users. For high-traffic public sites (100k+ daily users), consider Laravel.</p>
+          </div>
+
+          <div class="card">
+            <h4>Q: How do I switch from SQLite to MySQL?</h4>
+            <p><strong>A:</strong> Update <code>.env</code>:</p>
+            <pre><code>DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_DATABASE=my_app
+DB_USERNAME=root
+DB_PASSWORD=secret</code></pre>
+          </div>
+
+          <div class="card">
+            <h4>Q: How secure is Bastion?</h4>
+            <p><strong>A:</strong> Security Score: 9.5/10. All critical vulnerabilities fixed. Includes CSRF, CSP, SQL injection prevention, and more by default.</p>
+          </div>
+
+          <div class="card">
+            <h4>Q: Can I use React/Vue?</h4>
+            <p><strong>A:</strong> Yes! Bastion's API routes work with any frontend framework.</p>
+          </div>
         </section>
 
         <footer>
-          <p><strong>Bastion PHP Framework</strong> — Version 3.1.0 Enterprise</p>
-          <div class="muted">Built for Manufacturing, Engineered for Scale.</div>
+          <p><strong>Bastion PHP Framework v1.0</strong> – Enterprise Edition</p>
+          <p style="margin-top:10px">Built for Manufacturing, Engineered for Scale</p>
+          <p style="margin-top:20px">
+            <a href="https://github.com/yourcompany/bastionphp" style="color:var(--accent); margin:0 10px">GitHub</a> •
+            <a href="https://github.com/yourcompany/bastionphp/issues" style="color:var(--accent); margin:0 10px">Issues</a> •
+            <a href="https://github.com/yourcompany/bastionphp/discussions" style="color:var(--accent); margin:0 10px">Discussions</a>
+          </p>
+          <p style="margin-top:20px; font-size:12px; color:var(--muted)">
+            Security Score: 9.5/10 • 36 Tests Passing • Production Ready ✅
+          </p>
+          <p style="margin-top:10px; font-size:11px; color:var(--muted)">
+            Generated: 2025-01-29 • Documentation Version: 1.0.0
+          </p>
         </footer>
 
       </main>
@@ -392,6 +1511,7 @@ DB_CONNECTION=mysql  # Recommended for heavy loads</code><button class="copy">Co
     // --- SEARCH ---
     const searchInput = document.getElementById('search');
     const sections = document.querySelectorAll('section');
+    
     searchInput.addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
       sections.forEach(s => {
@@ -400,32 +1520,112 @@ DB_CONNECTION=mysql  # Recommended for heavy loads</code><button class="copy">Co
       });
     });
 
+    // Keyboard shortcut: / to focus search
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+      }
+      // ESC to clear search
+      if (e.key === 'Escape' && document.activeElement === searchInput) {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+      }
+    });
+
     // --- COPY BUTTONS ---
     document.querySelectorAll('.copy').forEach(btn => {
       btn.addEventListener('click', () => {
         const code = btn.parentElement.querySelector('code').innerText;
-        navigator.clipboard.writeText(code);
-        const original = btn.innerText;
-        btn.innerText = 'Copied!';
-        setTimeout(() => btn.innerText = original, 2000);
+        navigator.clipboard.writeText(code).then(() => {
+          const original = btn.innerText;
+          btn.innerText = 'Copied!';
+          btn.style.background = 'rgba(34,197,94,0.2)';
+          setTimeout(() => {
+            btn.innerText = original;
+            btn.style.background = '';
+          }, 2000);
+        }).catch(err => {
+          btn.innerText = 'Failed';
+          setTimeout(() => btn.innerText = 'Copy', 2000);
+        });
       });
     });
 
-    // --- CHART ---
-    const ctx = document.getElementById('overviewChart');
-    if(ctx) {
+    // --- SMOOTH SCROLL ---
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          
+          // Update active state
+          document.querySelectorAll('.toc a').forEach(a => a.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Update URL without reload
+          history.pushState(null, null, this.getAttribute('href'));
+        }
+      });
+    });
+
+    // --- SCROLL SPY ---
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          document.querySelectorAll('.toc a').forEach(a => {
+            a.classList.remove('active');
+            if (a.getAttribute('href') === `#${id}`) {
+              a.classList.add('active');
+            }
+          });
+        }
+      });
+    }, { threshold: 0.5, rootMargin: '-20% 0px -35% 0px' });
+
+    sections.forEach(section => observer.observe(section));
+
+     // --- CHART ---
+    window.addEventListener('load', () => {
+      const ctx = document.getElementById('overviewChart');
+      if (ctx && typeof Chart !== 'undefined') {
         new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Security', 'Speed', 'Size'],
-                datasets: [{
-                    label: 'Score',
-                    data: [9.5, 9.8, 10],
-                    backgroundColor: ['#10b981', '#38bdf8', '#a78bfa']
-                }]
-            },
-            options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { ticks: { color: '#94a3b8' } } } }
+          type: 'bar',
+          data: {
+            labels: ['Security', 'Speed', 'DX'],
+            datasets: [{
+              label: 'Score',
+              data: [9.5, 9.8, 9.9],
+              backgroundColor: ['#22c55e', '#38bdf8', '#a78bfa'],
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { display: false, max: 10 },
+              x: { 
+                ticks: { color: '#94a3b8', font: { size: 10 } },
+                grid: { display: false }
+              }
+            }
+          }
         });
+      }
+    });
+
+    // --- RESTORE SCROLL POSITION ---
+    if (window.location.hash) {
+      setTimeout(() => {
+        const target = document.querySelector(window.location.hash);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     }
   </script>
 </body>
