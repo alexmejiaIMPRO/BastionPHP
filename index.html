@@ -178,7 +178,7 @@
             </li>
             <li>
                 <strong>Start Environment</strong>
-                <p>Bastion v3 replaces <code>php artisan serve</code> with a powerful process manager.</p>
+                <p>Bastion v1 replaces <code>php artisan serve</code> with a powerful process manager.</p>
                 <pre><code>cd my-tool
 ./bastion run-dev</code><button class="copy">Copy</button></pre>
             </li>
@@ -221,7 +221,7 @@
 
         <section id="container" class="section">
           <h2>Service Container (DI)</h2>
-          <p>Bastion v3 is built on <code>App\Core\Container</code>. Services are registered as singletons.</p>
+          <p>Bastion v1 is built on <code>App\Core\Container</code>. Services are registered as singletons.</p>
 
           <pre><code>// App\Core\App.php
 private function registerServices() {
@@ -275,7 +275,7 @@ $user = DB::table('users')->where('id', $id)->first();</code><button class="copy
 
         <section id="tailwind" class="section">
           <h2>Tailwind CSS v4 (Oxide)</h2>
-          <p>Bastion v3 uses the native Tailwind v4 engine. Configuration is done in CSS, not JS.</p>
+          <p>Bastion v1 uses the native Tailwind v4 engine. Configuration is done in CSS, not JS.</p>
 
           <pre><code>/* resources/css/app.css */
 @import "tailwindcss";
