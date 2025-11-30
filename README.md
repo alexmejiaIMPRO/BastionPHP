@@ -1,166 +1,228 @@
-# Bastion PHP Framework
+Bastion PHP Framework
 
-**Version:** `0.1.0`  
-**Type:** Internal tools framework for secure, fast PHP apps (Next.js-style routing, Django-style admin mindset, FastAPI-style APIs).
+Version: 0.1.0
+Tagline: Prototype fast. Deploy safe. Run pure PHP.
 
-Bastion PHP is a **file-based PHP framework** designed to build **internal company tools** (dashboards, CRUD systems, admin panels, APIs) with:
+Bastion PHP is a file-based PHP framework for building secure internal tools, dashboards, and APIs using:
 
-- **File-based routing** (like Next.js)
-- **Nested layouts via `layout.php`** (like Next.js `layout.tsx`)
-- **Admin mindset** (like Django admin, but you own all the code)
-- **API handlers via `+server.php`** (like SvelteKit / FastAPI)
-- **Security middlewares** enabled by default
-- **JWT auth + refresh tokens**
-- **SQLite + QueryBuilder** as a simple ORM-style layer
-- **HTMX for interactivity** (no heavy frontend frameworks)
+Next.js–style filesystem routing and nested layouts
 
-This README explains:
+FastAPI/SvelteKit–style endpoints in +server.php
 
-1. How to create and run a Bastion app  
-2. What each folder/file does  
-3. How routing, layouts, DB, auth, middleware and HTMX work  
-4. How to build a **real feature**, step-by-step
+A small QueryBuilder over PDO (ORM-like feel, raw SQL power)
 
----
+A DV Engine (Data View) to share view state like titles, breadcrumbs, flags
 
-## Table of Contents
+Simple components (server-side and HTMX-powered)
 
-1. [Requirements](#requirements)  
-2. [Creating a New Project](#creating-a-new-project)  
-3. [Directory Structure Overview](#directory-structure-overview)  
-4. [How Routing Works (Pages & APIs)](#how-routing-works-pages--apis)  
-5. [Layout System (`layout.php`)](#layout-system-layoutphp)  
-6. [Views & Components](#views--components)  
-7. [Request, Response & Validation](#request-response--validation)  
-8. [Database Layer (DB & QueryBuilder)](#database-layer-db--querybuilder)  
-9. [Authentication (JWT + Refresh Tokens)](#authentication-jwt--refresh-tokens)  
-10. [Middlewares](#middlewares)  
-11. [HTMX Integration](#htmx-integration)  
-12. [CLI Commands (`bastion`)](#cli-commands-bastion)  
-13. [Step-by-Step Example Feature](#step-by-step-example-feature)  
-14. [Troubleshooting & Common Pitfalls](#troubleshooting--common-pitfalls)
+A security-first middleware pipeline (CSP, CSRF, JWT, SameSite, HttpOnly)
+
+
+Everything is written in vanilla PHP, with PSR-4 autoloading, SQLite by default, and a CLI (bastion) to scaffold, migrate, seed and run the app.
+
 
 ---
 
-## Requirements
+1. Philosophy
 
-- PHP **8.1+**
-- Composer
-- SQLite (or any PDO driver you wire later)
-- Node + npm (only if you want Tailwind / BrowserSync dev experience, optional)
+Bastion is designed for environments where:
+
+You need to ship internal tools quickly.
+
+You cannot afford weak security.
+
+You want full control and full visibility of what runs.
+
+
+Core principles:
+
+Filesystem = router: no route arrays, no annotations.
+
+Layouts stack automatically: you get Next.js-like layout inheritance in PHP.
+
+Security first, not optional: headers, CSP, CSRF, JWT and guards always run.
+
+Plain PHP: no templating engines, no frontend JS frameworks.
+
+Minimal QueryBuilder: convenient chains, but clearly SQL-based and PDO-backed.
+
+Error transparency: no silent catch-all, stack traces visible in dev.
+
+
 
 ---
 
-## Creating a New Project
+2. Features Overview
 
-You generate a new project using the **Bastion app generator script**, e.g.:
+File-based routing for pages (page.php) and APIs (+server.php).
 
-```bash
+Layout system with automatic stacking (layout.php per folder).
+
+DV Engine (Data View) for titles, breadcrumbs and global view data.
+
+Request/Response objects with validation helpers.
+
+QueryBuilder: DB::table()->where()->orderBy()->limit()->get().
+
+Global helpers: view(), e(), auth(), csrf_token(), csrf_field(), logger(), etc.
+
+Components:
+
+Server-side components (pure PHP).
+
+HTMX-based interactive components.
+
+
+Middleware pipeline:
+
+SecurityHeaders (CSP, X-Frame-Options, etc.)
+
+RateLimit (stub for throttling)
+
+AuthMiddleware (JWT, CSRF)
+
+AdminOnly (guards admin routes)
+
+
+Authentication system:
+
+JWT access tokens
+
+DB-backed refresh tokens (rotated per use)
+
+
+Configuration via config/*.php
+
+Storage folders for DB, logs, files
+
+Migrations (database/migrations/*.sql)
+
+Seeders (database/seeds/*.php)
+
+CLI (./bastion) for run-dev, migrate, seed, scaffolding
+
+Tailwind + BrowserSync + live reload in development (optional).
+
+
+
+---
+
+3. Getting Started
+
+3.1 Requirements
+
+PHP 8.1+
+
+Composer
+
+SQLite (or another PDO driver you configure)
+
+Node.js + npm (optional, for Tailwind / BrowserSync dev setup)
+
+
+3.2 Creating a new app
+
+Run the generator script (your create-bastion-app):
+
 ./create-bastion-app my-app
 cd my-app
-
-Then install dependencies:
-
 composer install
-npm install       # optional, for Tailwind & BrowserSync
+npm install        # optional: for Tailwind watcher and BrowserSync
 
-Run database migrations and seed default data:
+Run database migrations and seed data:
 
 ./bastion migrate
 ./bastion seed
 
-Finally, start the dev server:
+Start the dev server:
 
 ./bastion run-dev
 
 By default:
 
-PHP dev server runs at http://127.0.0.1:8000
+PHP dev server: http://127.0.0.1:8000
 
-If you wire BrowserSync in package.json, your proxy UI can run on http://127.0.0.1:9876
+BrowserSync proxy (if configured): http://127.0.0.1:9876
 
-
-
----
-
-Directory Structure Overview
-
-After running the generator, the project looks like this (simplified):
-
-my-app/
-├── app/
-│   ├── layout.php           # Root layout (HTML shell for all pages)
-│   ├── page.php             # Root page ("/")
-│   ├── Core/
-│   │   ├── App.php          # Main application, registers services, runs middlewares + router
-│   │   ├── Container.php    # Simple DI container (bind, singleton, resolve)
-│   │   ├── Router.php       # File-based router (pages + api, dynamic [param] folders)
-│   │   ├── Request.php      # Encapsulates HTTP request data (query, body, headers, cookies)
-│   │   ├── Response.php     # Helpers for JSON/HTML/redirect/error responses
-│   │   ├── DB.php           # PDO wrapper + QueryBuilder (DB::table(...))
-│   │   ├── Logger.php       # Simple file logger (storage/logs/app.log)
-│   │   ├── Auth.php         # JWT access + refresh token auth
-│   │   ├── CSRF.php         # CSRF token generation & verification
-│   │   ├── Theme.php        # Theme utilities (e.g. dark mode)
-│   │   └── helpers.php      # Global helper functions (env(), view(), e(), csrf_field(), auth(), logger(), etc.)
-│   ├── Middleware/
-│   │   ├── SecurityHeaders.php  # CSP + nonce + security headers
-│   │   ├── RateLimit.php        # Rate limiting stub (you can implement IP throttling here)
-│   │   ├── AuthMiddleware.php   # Checks JWT, applies CSRF for unsafe methods
-│   │   └── AdminOnly.php        # Protects /admin routes (requires admin user)
-│   ├── admin/
-│   │   ├── layout.php       # Admin layout (wraps all /admin pages)
-│   │   └── page.php         # Admin dashboard page ("/admin")
-│   ├── login/
-│   │   └── page.php         # Login form ("/login")
-│   ├── logout/
-│   │   └── page.php         # Logout action ("/logout")
-│   └── api/
-│       ├── auth/
-│       │   ├── login/+server.php    # POST /api/auth/login
-│       │   ├── logout/+server.php   # POST /api/auth/logout
-│       │   └── refresh/+server.php  # POST /api/auth/refresh
-│       └── users/
-│           ├── +server.php          # GET/POST /api/users
-│           └── [id]/+server.php     # GET/PUT/DELETE /api/users/{id}
-├── config/
-│   ├── style.php            # Theme / CSS config
-│   └── database.php         # Database connection settings
-├── database/
-│   ├── migrations/          # .sql files
-│   └── seeds/               # PHP seeders
-├── public/
-│   ├── index.php            # Front controller (bootstraps App)
-│   └── css/fallback.css     # Fallback CSS file
-└── storage/
-    ├── db/app.db            # SQLite DB
-    └── logs/app.log         # Log file
 
 
 ---
 
-How Routing Works (Pages & APIs)
+4. Project Structure
 
-Bastion uses file-based routing:
+A fresh Bastion app looks like this (simplified):
 
-1. Page routes (page.php files)
+app/
+  layout.php              # root layout (HTML shell)
+  page.php                # root page for "/"
+  Core/
+    App.php               # main app runner (container + middlewares + router)
+    Container.php         # simple dependency injection container
+    Router.php            # file-based router for pages and APIs
+    Request.php           # HTTP request abstraction
+    Response.php          # HTTP response helpers
+    DB.php                # PDO wrapper + QueryBuilder
+    Auth.php              # JWT + refresh token auth
+    CSRF.php              # CSRF token generation/validation
+    DV.php                # DV Engine (Data View)
+    Logger.php            # logging to storage/logs/app.log
+    Theme.php             # theme helpers (e.g., dark mode)
+    helpers.php           # global helper functions
+  Middleware/
+    SecurityHeaders.php   # CSP, security headers, nonce
+    RateLimit.php         # rate limiting stub
+    AuthMiddleware.php    # JWT + CSRF enforcement
+    AdminOnly.php         # guard for /admin routes
+  admin/
+    layout.php            # admin module layout
+    page.php              # "/admin" dashboard
+  login/
+    page.php              # "/login" page
+  logout/
+    page.php              # "/logout" endpoint
+  api/
+    auth/
+      login/+server.php   # POST /api/auth/login
+      logout/+server.php  # POST /api/auth/logout
+      refresh/+server.php # POST /api/auth/refresh
+    users/
+      +server.php         # /api/users (list, create)
+      [id]/+server.php    # /api/users/{id} (detail, update, delete)
+resources/
+  views/
+    components/           # PHP components
+    errors/               # error views (404, 403, 500)
+config/
+  app.php
+  database.php
+  security.php
+  style.php
+database/
+  migrations/
+  seeds/
+public/
+  index.php               # front controller
+storage/
+  db/app.db               # SQLite database
+  logs/app.log            # framework logs
 
-Every directory under app/ can define a page.php
 
-The URL path is based on the folder structure.
+---
 
+5. Routing: Pages and APIs
 
-Examples:
+5.1 Page routes (page.php)
+
+Page routes live under app/ with page.php:
 
 URL	File
 
 /	app/page.php
 /login	app/login/page.php
-/logout	app/logout/page.php
 /admin	app/admin/page.php
 
 
-Basic page example: app/page.php
+Example app/page.php:
 
 <?php
 
@@ -170,39 +232,40 @@ DV::set('title', 'Welcome to Bastion');
 
 ?>
 <section>
-    <h1>Home</h1>
-    <p>Hello from Bastion home page.</p>
+  <h1>Home</h1>
+  <p>This is the root page.</p>
 </section>
 
-> You do not put <html>, <head>, <body> here.
-Those come from the layout (layout.php), explained later.
+You do not output <html>, <head> or <body> here; those come from app/layout.php.
 
+5.2 API routes (+server.php)
 
+API routes live under app/api/... and are defined by a single +server.php file per resource. The file returns an associative array mapping HTTP methods to handler closures.
 
-
----
-
-2. API routes (+server.php files)
-
-API routes live under app/api/....
-
-Each +server.php returns an array of handlers keyed by HTTP method (get, post, put, delete, etc.).
-
-Example: app/api/users/+server.php
+Example app/api/users/+server.php:
 
 <?php
 
+use App\Core\DB;
 use App\Core\Response;
-use App\Models\User;
 use App\Core\ValidationException;
 
 return [
-    'get' => function($req) {
-        $users = User::all();
+
+    'get' => function ($req) {
+        $role = $req->input('role'); // query/body both
+
+        $query = DB::table('users')->orderBy('id', 'DESC')->limit(50);
+
+        if ($role) {
+            $query = $query->where('role', $role);
+        }
+
+        $users = $query->get();
         Response::json($users);
     },
 
-    'post' => function($req) {
+    'post' => function ($req) {
         try {
             $data = $req->validate([
                 'email'    => 'required|email',
@@ -210,306 +273,523 @@ return [
                 'password' => 'required|min:8',
             ]);
 
-            $id = User::create([
-                'email'    => $data['email'],
-                'name'     => $data['name'],
-                'password' => password_hash($data['password'], PASSWORD_DEFAULT),
-                'role'     => 'user',
+            $id = DB::table('users')->insert([
+                'email'      => $data['email'],
+                'name'       => $data['name'],
+                'password'   => password_hash($data['password'], PASSWORD_DEFAULT),
+                'role'       => 'user',
+                'created_at' => time(),
             ]);
 
-            Response::json(['id' => $id, 'message' => 'User created'], 201);
+            Response::json(['id' => $id], 201);
         } catch (ValidationException $e) {
             Response::json(['errors' => $e->errors], 422);
         }
     },
+
 ];
 
-URL mapping:
+5.3 Dynamic routes ([id])
 
-URL	File
+Dynamic parameters use [name] folders:
 
-/api/users	app/api/users/+server.php
-/api/users/10	app/api/users/[id]/+server.php
+URL	File	Param
+
+/api/users/5	app/api/users/[id]/+server.php	id=5
 
 
-Dynamic [id] folder example: app/api/users/[id]/+server.php:
+Example app/api/users/[id]/+server.php:
 
 <?php
 
+use App\Core\DB;
 use App\Core\Response;
-use App\Models\User;
 
 return [
-    'get' => function($req) {
-        $id   = $req->meta['params']['id'] ?? null;
-        $user = $id ? User::find($id) : null;
-        if (!$user) {
-            Response::json(['error' => 'Not found'], 404);
+
+    'get' => function ($req) {
+        $id = $req->meta['params']['id'] ?? null;
+        if (!$id) {
+            Response::json(['error' => 'missing id'], 400);
         }
+
+        $user = DB::table('users')->where('id', $id)->first();
+        if (!$user) {
+            Response::json(['error' => 'not found'], 404);
+        }
+
         Response::json($user);
     },
+
+    'delete' => function ($req) {
+        $id = $req->meta['params']['id'] ?? null;
+        if (!$id) {
+            Response::json(['error' => 'missing id'], 400);
+        }
+
+        DB::table('users')->where('id', $id)->delete();
+        Response::json(['deleted' => true]);
+    },
+
 ];
 
-> The router gives you path parameters in $req->meta['params'].
-
-
-
 
 ---
 
-Layout System (layout.php)
+6. Layout System (Next.js-Style)
 
-Bastion uses a stacked layout system like Next.js:
+6.1 Layout stacking rules
 
-Root layout: app/layout.php (wraps everything)
+When a route is resolved, Bastion collects all layout.php files from the leaf folder up to app/:
 
-Nested layouts: app/admin/layout.php, app/admin/users/layout.php, etc.
+/admin → app/admin/layout.php → app/layout.php
 
+/admin/users → app/admin/users/layout.php → app/admin/layout.php → app/layout.php
 
-Layout resolution order for /admin/users
-
-1. app/admin/users/layout.php (if exists)
-
-
-2. app/admin/layout.php (if exists)
+/settings/security → app/settings/security/layout.php → app/settings/layout.php → app/layout.php
 
 
-3. app/layout.php (always the last fallback)
+Each layout receives a $content() closure and must call it to render the inner content.
 
+6.2 Example nested layout
 
-
-Each layout receives a $content() closure it can call to render nested content.
-
-
----
-
-Root layout: app/layout.php
-
-This is the main HTML shell.
+app/admin/layout.php:
 
 <?php
-use App\Core\Theme;
-$nonce = $_SESSION['csp_nonce'] ?? ($_SESSION['csp_nonce'] = base64_encode(random_bytes(16)));
-$title = \App\Core\DV::get('title', 'Bastion PHP');
+
 ?>
-<!doctype html>
-<html lang="en" <?= Theme::applyHtmlAttrs() ?>>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title><?= e($title) ?></title>
+<section class="admin-shell">
+  <aside class="admin-sidebar">
+    <!-- links -->
+  </aside>
 
-  <!-- Tailwind via CDN (example) -->
-  <script nonce="<?= e($nonce) ?>" src="https://cdn.tailwindcss.com"></script>
-
-  <!-- HTMX for interactive components -->
-  <script nonce="<?= e($nonce) ?>" src="https://unpkg.com/htmx.org@1.9.10"></script>
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen">
-  <nav>...navbar...</nav>
-
-  <main class="max-w-6xl mx-auto px-4 py-8">
+  <div class="admin-main">
     <?php $content(); ?>
-  </main>
-</body>
-</html>
-
-
----
-
-Nested layout: app/admin/layout.php
-
-<?php
-$nonce = $_SESSION['csp_nonce'] ?? ($_SESSION['csp_nonce'] = base64_encode(random_bytes(16)));
-?>
-<section class="space-y-6">
-  <header class="flex items-center justify-between mb-4">
-    <h1 class="text-3xl font-bold">Admin Panel</h1>
-    <span class="text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/40">
-      Bastion 0.1.0
-    </span>
-  </header>
-
-  <div class="grid gap-4 grid-cols-1 md:grid-cols-3">
-    <div class="md:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-      <?php $content(); ?>
-    </div>
-
-    <aside class="space-y-3">
-      <!-- Sidebar shortcuts -->
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 text-sm text-slate-300">
-        <h2 class="font-semibold mb-2 text-slate-100">Shortcuts</h2>
-        <ul class="space-y-1">
-          <li><a href="/admin" class="hover:text-white">Dashboard</a></li>
-          <li><a href="/admin/users" class="hover:text-white">Users</a></li>
-        </ul>
-      </div>
-    </aside>
   </div>
 </section>
 
-Any page.php in /admin or its subfolders is rendered inside this layout.
-
-
----
-
-Views & Components
-
-Views
-
-By default, you compose pages from:
-
-app/.../page.php → main content
-
-app/.../layout.php → wrappers
-
-Optionally resources/views/... if you want separate view files
-
-
-You can use the view() helper:
+app/admin/users/layout.php:
 
 <?php
-// In some controller or page
-echo view('pages.profile', ['name' => 'Sunset']);
 
-(which resolves to resources/views/pages/profile.php).
+?>
+<div class="users-shell">
+  <h2>Users</h2>
+  <?php $content(); ?>
+</div>
 
-Components
+Then app/admin/users/page.php prints only the page body:
 
-Simple PHP “components” live under resources/views/components/.
+<?php
 
-Example: resources/views/components/searchbar.php
+use App\Core\DV;
+use App\Core\DB;
 
-<section>
-  <input
-    hx-get="/api/users"
-    hx-trigger="keyup changed delay:400ms"
-    hx-target="#user-table"
-    placeholder="Search users..."
-    type="text"
-  >
-</section>
+DV::set('title', 'Admin · Users');
 
-You include it in a page or layout like:
+$users = DB::table('users')->orderBy('id','DESC')->get();
 
-<?php include __DIR__.'/../../components/searchbar.php'; ?>
+?>
+<ul>
+  <?php foreach ($users as $user): ?>
+    <li><?= htmlspecialchars($user['email']) ?></li>
+  <?php endforeach; ?>
+</ul>
+
+The final output is:
+
+app/layout.php shell
+
+wrapping app/admin/layout.php
+
+wrapping app/admin/users/layout.php
+
+wrapping app/admin/users/page.php.
+
 
 
 ---
 
-Request, Response & Validation
+7. DV Engine (Data View)
 
-Request (App\Core\Request)
+The DV Engine is a tiny layer to share data between pages, layouts, and components without passing arguments everywhere.
 
-Every handler (page or API) can receive a $req object in APIs and global helpers for pages.
+7.1 Core API
 
-Key methods:
+DV::set(string $key, mixed $value): void;
+DV::get(string $key, mixed $default = null): mixed;
 
-$req->method;        // "GET", "POST", etc.
-$req->path;          // "admin/users", "api/users"
-$req->query;         // $_GET array
-$req->body;          // $_POST array (for form requests)
-$req->headers;       // HTTP headers
-$req->cookies;       // $_COOKIE
-$req->meta;          // extra metadata (like route params)
+7.2 Typical use cases
 
-$req->input('email'); // read from body or query
-$req->isJson();       // true if Content-Type: application/json
-$req->json();         // parse raw request as JSON and return array
+Page title
 
-Validation
+Breadcrumbs
 
-You can validate input using $req->validate():
+Layout flags (e.g. hide sidebar)
 
-$data = $req->validate([
-    'email'    => 'required|email',
-    'password' => 'required|min:8',
-]);
-
-If validation fails:
-
-It throws ValidationException
-
-Status code 422
-
-You can catch it and return structured errors
+Global messages or context
 
 
-Example in API:
+Example:
+
+<?php
+
+use App\Core\DV;
+
+// In a page
+DV::set('title', 'Admin · Users');
+DV::set('breadcrumbs', ['Admin', 'Users']);
+
+In the root layout:
+
+<?php
+
+use App\Core\DV;
+
+$title       = DV::get('title', $GLOBALS['title'] ?? 'Bastion PHP');
+$breadcrumbs = DV::get('breadcrumbs', []);
+
+You can still use $GLOBALS['title'] if you want very simple scripts:
+
+$GLOBALS['title'] = 'Home';
+
+But the recommended pattern is:
+
+DV::set('title', 'Home');
+$title = DV::get('title', $GLOBALS['title'] ?? 'Bastion PHP');
+
+
+---
+
+8. Request and Response
+
+8.1 Request object
+
+Each +server.php handler receives a $req instance with:
+
+$req->method – GET, POST, etc.
+
+$req->path – normalized path (e.g. admin/users).
+
+$req->query – query parameters.
+
+$req->body – parsed request body (form or JSON).
+
+$req->cookies – cookies.
+
+$req->meta['params'] – route parameters ([id] folders).
+
+
+Helpers:
+
+$req->input('key');      // from body or query
+$req->isJson();          // Content-Type is JSON
+$req->json();            // decoded JSON array
+$req->validate([...]);   // validate data and either return it or throw
+
+8.2 Validation example
+
+<?php
+
+use App\Core\ValidationException;
 
 try {
     $data = $req->validate([
         'email' => 'required|email',
+        'name'  => 'required',
     ]);
 } catch (ValidationException $e) {
     Response::json(['errors' => $e->errors], 422);
 }
 
-Response (App\Core\Response)
+8.3 Response helper class
 
-Static helpers:
-
-Response::json($data, $status = 200);           // JSON and exit
-Response::html($html, $status = 200);           // HTML and exit
-Response::redirect($url, $code = 302);          // Location header and exit
-Response::abort($code, $message = '');          // Use error views if present
+Response::json($data, $status = 200);
+Response::html($html, $status = 200);
+Response::redirect('/admin');
+Response::abort(403, 'Forbidden');
 
 
 ---
 
-Database Layer (DB & QueryBuilder)
+9. Database Layer (QueryBuilder)
 
-Configuration
+The DB layer is configured via config/database.php. By default it uses SQLite, but since it is PDO-based, you can change it to MySQL, PostgreSQL, etc.
 
-config/database.php (simplified):
+9.1 Common patterns
 
-<?php
-return [
-  'driver'   => 'sqlite',
-  'database' => __DIR__.'/../storage/db.sqlite',
-];
-
-The DB class uses PDO internally.
-
-QueryBuilder usage
-
-use App\Core\DB;
-
-// Get multiple
-$users = DB::table('users')
+// All admins
+$admins = DB::table('users')
     ->where('role', 'admin')
     ->orderBy('id', 'DESC')
-    ->limit(10)
+    ->limit(20)
     ->get();
 
-// Get first row
+// One user
 $user = DB::table('users')
-    ->where('id', 5)
+    ->where('id', 1)
     ->first();
 
-// Insert
+if (!$user) {
+    // handle not found
+}
+
+// Create
 $id = DB::table('users')->insert([
     'name'       => 'New User',
     'email'      => 'user@example.com',
-    'password'   => password_hash('secret', PASSWORD_DEFAULT),
+    'password'   => password_hash('secret123', PASSWORD_DEFAULT),
     'role'       => 'user',
     'created_at' => time(),
 ]);
 
 // Update
-DB::table('users')->where('id', $id)->update([
-    'role' => 'admin',
-]);
+DB::table('users')->where('id', $id)->update(['role' => 'admin']);
 
 // Delete
 DB::table('users')->where('id', $id)->delete();
 
-// Count
-$count = DB::table('users')->where('role', 'admin')->count();
 
-Migrations
+---
 
-Migrations are simple .sql files in database/migrations.
+10. Components
+
+Components live under resources/views/components/ and are small PHP functions that return HTML strings.
+
+10.1 Server-side component (no HTMX)
+
+resources/views/components/UserCard.php:
+
+<?php
+
+function UserCard(array $user): string
+{
+    $name  = htmlspecialchars($user['name']);
+    $email = htmlspecialchars($user['email']);
+
+    return <<<HTML
+<article class="card">
+  <h3>{$name}</h3>
+  <p>{$email}</p>
+</article>
+HTML;
+}
+
+Usage in a page:
+
+<?php
+
+require_once __DIR__ . '/../../../resources/views/components/UserCard.php';
+
+$users = DB::table('users')->limit(10)->get();
+
+foreach ($users as $user) {
+    echo UserCard($user);
+}
+
+10.2 HTMX component (client-triggered)
+
+resources/views/components/UserRow.php:
+
+<?php
+
+function UserRow(array $user): string
+{
+    $id    = (int) $user['id'];
+    $name  = htmlspecialchars($user['name']);
+    $email = htmlspecialchars($user['email']);
+
+    return <<<HTML
+<tr id="user-{$id}">
+  <td>{$name}</td>
+  <td>{$email}</td>
+  <td>
+    <button
+      hx-delete="/api/users/{$id}"
+      hx-target="#user-{$id}"
+      hx-swap="outerHTML"
+    >
+      Delete
+    </button>
+  </td>
+</tr>
+HTML;
+}
+
+In the API endpoint:
+
+<?php
+
+use App\Core\DB;
+use App\Core\Response;
+
+require_once __DIR__ . '/../../../resources/views/components/UserRow.php';
+
+return [
+    'get' => function ($req) {
+        $users = DB::table('users')->orderBy('id', 'DESC')->get();
+
+        if (isset($_SERVER['HTTP_HX_REQUEST'])) {
+            ob_start();
+            echo "<table><tbody>";
+            foreach ($users as $user) {
+                echo UserRow($user);
+            }
+            echo "</tbody></table>";
+            $html = ob_get_clean();
+            Response::html($html);
+        }
+
+        Response::json($users);
+    },
+];
+
+In the page:
+
+<button
+    hx-get="/api/users"
+    hx-target="#users-table"
+    hx-swap="innerHTML"
+>
+  Load users
+</button>
+
+<div id="users-table"></div>
+
+
+---
+
+11. Authentication (JWT + Refresh Tokens)
+
+Bastion uses:
+
+An access token (JWT) for short-term authorization.
+
+A refresh token, stored in DB and in a HttpOnly cookie, rotated each time it is used.
+
+
+11.1 Login example
+
+app/api/auth/login/+server.php:
+
+<?php
+
+use App\Core\Auth;
+use App\Core\Response;
+
+return [
+    'post' => function ($req) {
+        $email = $req->input('email');
+        $pass  = $req->input('password');
+
+        $tokens = Auth::attempt($email, $pass);
+        if (!$tokens) {
+            Response::json(['error' => 'Invalid credentials'], 401);
+        }
+
+        $secure = filter_var(getenv('SECURE_COOKIES') ?: 'false', FILTER_VALIDATE_BOOLEAN);
+
+        setcookie('access', $tokens['access'], [
+            'expires'  => $tokens['expires'],
+            'path'     => '/',
+            'secure'   => $secure,
+            'httponly' => false,
+            'samesite' => 'Lax',
+        ]);
+
+        setcookie('refresh', $tokens['refresh'], [
+            'expires'  => time() + (int) (getenv('JWT_REFRESH_TTL') ?: 604800),
+            'path'     => '/',
+            'secure'   => $secure,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
+        Response::redirect('/admin');
+    },
+];
+
+11.2 Current user helper
+
+$user = auth();
+if ($user !== null) {
+    // $user['id'], $user['email'], $user['role'] ...
+}
+
+11.3 Admin check
+
+if (!Auth::isAdmin()) {
+    Response::abort(403, 'Admins only');
+}
+
+
+---
+
+12. Middleware and Security
+
+The middleware pipeline typically looks like this:
+
+SecurityHeaders → RateLimit → AuthMiddleware → AdminOnly → Router → Handler
+
+12.1 SecurityHeaders
+
+Adds:
+
+Content-Security-Policy with a nonce
+
+X-Frame-Options
+
+X-Content-Type-Options
+
+Referrer-Policy
+
+X-XSS-Protection (for older UAs)
+
+
+Stores a nonce in session (for layouts):
+
+$nonce = $_SESSION['csp_nonce'] ?? base64_encode(random_bytes(16));
+$_SESSION['csp_nonce'] = $nonce;
+
+Layouts use this nonce in <script> and <style> tags.
+
+12.2 CSRF
+
+Uses tokens per session:
+
+// add hidden field to forms
+<?= csrf_field() ?>
+
+On unsafe methods (POST, PUT, PATCH, DELETE), the CSRF token is checked by AuthMiddleware or CSRF helper.
+
+
+---
+
+13. CLI (bastion)
+
+The bastion CLI manages your app:
+
+Typical commands:
+
+./bastion run-dev        # start PHP dev server
+./bastion migrate        # run .sql migrations
+./bastion seed           # run seeders
+./bastion key:generate   # generate APP_KEY
+./bastion jwt:secret     # generate JWT secret
+./bastion make:page name # scaffold a new page
+./bastion make:api name  # scaffold a new API endpoint
+./bastion make:module name # scaffold a module folder
+
+You can extend it with more commands as the framework evolves.
+
+
+---
+
+14. Migrations and Seeders
+
+14.1 Migrations
+
+Migrations are raw .sql files under database/migrations.
 
 Example database/migrations/001_create_users.sql:
 
@@ -526,9 +806,9 @@ Run:
 
 ./bastion migrate
 
-Seeders
+14.2 Seeders
 
-Seeders are PHP files in database/seeds.
+Seeders are PHP scripts under database/seeds.
 
 Example database/seeds/UsersSeeder.php:
 
@@ -537,406 +817,91 @@ Example database/seeds/UsersSeeder.php:
 use App\Core\DB;
 
 $pdo = DB::getPdo();
-$exists = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$count = (int) $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 
-if ((int)$exists === 0) {
-    $stmt = $pdo->prepare(
-      "INSERT INTO users (name, email, password, role, created_at) VALUES (?, ?, ?, ?, ?)"
-    );
+if ($count === 0) {
+    $stmt = $pdo->prepare("INSERT INTO users (name,email,password,role,created_at) VALUES (?,?,?,?,?)");
     $stmt->execute([
-        'Admin User',
+        'Admin',
         'admin@example.com',
-        password_hash('password', PASSWORD_DEFAULT),
+        password_hash('admin123', PASSWORD_DEFAULT),
         'admin',
         time(),
     ]);
 }
 
-Run seeder:
+Run:
 
 ./bastion seed
 
 
 ---
 
-Authentication (JWT + Refresh Tokens)
+15. Assets, Tailwind and BrowserSync (Optional)
 
-Bastion uses:
+You can wire Tailwind and BrowserSync in package.json to get:
 
-Access token (JWT) — short-lived; stored in cookie or Authorization header
+Tailwind compilation
 
-Refresh token — stored server-side in DB, rotated each use
-
-
-Login flow
-
-1. User sends email/password to /api/auth/login
+Live reload proxy on :9876 watching :8000
 
 
-2. Auth::attempt() checks password:
+Example dev scripts (conceptually):
 
-If ok → issues tokens (Auth::issueTokens($userId))
-
-
-
-3. Access token and refresh token are stored as cookies
-
-
-
-Example login handler: app/api/auth/login/+server.php:
-
-<?php
-
-use App\Core\Auth;
-use App\Core\Response;
-
-return [
-    'post' => function($req) {
-        $email    = $req->input('email');
-        $password = $req->input('password');
-
-        $tokens = Auth::attempt($email, $password);
-        if ($tokens === false) {
-            Response::redirect('/login?error=1');
-        }
-
-        $secure = filter_var(getenv('SECURE_COOKIES') ?: 'false', FILTER_VALIDATE_BOOLEAN);
-
-        setcookie('access', $tokens['access'], [
-            'expires'  => $tokens['expires'],
-            'path'     => '/',
-            'secure'   => $secure,
-            'httponly' => false,  // you may set this true if you don’t need front-end access
-            'samesite' => 'Lax',
-        ]);
-
-        setcookie('refresh', $tokens['refresh'], [
-            'expires'  => time() + (int)(getenv('JWT_REFRESH_TTL') ?: 604800),
-            'path'     => '/',
-            'secure'   => $secure,
-            'httponly' => true,
-            'samesite' => 'Lax',
-        ]);
-
-        Response::redirect('/admin');
-    },
-];
-
-Accessing current user
-
-Anywhere in your code:
-
-$user = auth();        // returns user array or null
-if ($user && $user['role'] === 'admin') { ... }
-
-Also in middleware, $req->meta['user'] can hold the user.
-
-
----
-
-Middlewares
-
-Middlewares are run in a chain before the router handles a request.
-
-Typical pipeline:
-
-SecurityHeaders
-→ RateLimit
-→ AuthMiddleware
-→ (optionally AdminOnly for certain routes)
-→ Router
-→ Page or API handler
-
-SecurityHeaders
-
-Sets:
-
-CSP with nonce
-
-X-Frame-Options
-
-X-Content-Type-Options
-
-Referrer-Policy
-
-
-It also stores csp_nonce in the request metadata or session, so layouts can use it.
-
-AuthMiddleware
-
-Reads JWT from cookies / headers
-
-If valid, fetches user from DB and sets auth() and $req->meta['user']
-
-For non-GET methods, also calls CSRF protection
-
-
-CSRF
-
-Generates tokens with CSRF::token()
-
-Verifies them for POST/PUT/PATCH/DELETE requests
-
-
-Helpful helpers:
-
-<input type="hidden" name="_csrf" value="<?= e(csrf_token()) ?>">
-<?= csrf_field() ?>
-
-
----
-
-HTMX Integration
-
-HTMX lets you add AJAX-like behavior without writing JS by hand.
-
-Example use case in admin page: app/admin/page.php:
-
-<button
-  hx-get="/api/users"
-  hx-target="#user-table"
-  hx-swap="innerHTML"
->
-  Reload via HTMX
-</button>
-
-<div id="user-table">
-  <!-- initial loaded table -->
-</div>
-
-In the API handler, you can detect HTMX or HTML Accept headers and return HTML instead of JSON:
-
-if (isset($_SERVER['HTTP_HX_REQUEST'])) {
-    // Return partial HTML
-    ob_start();
-    foreach ($users as $u) {
-        echo '<div>'.e($u['email']).'</div>';
-    }
-    $html = ob_get_clean();
-    Response::html($html);
-} else {
-    Response::json($users);
+{
+  "scripts": {
+    "dev:css": "tailwindcss -i ./resources/css/app.css -o ./public/css/app.css --watch",
+    "dev:proxy": "browser-sync start --proxy '127.0.0.1:8000' --files 'public'"
+  }
 }
 
+Then run:
 
----
-
-CLI Commands (bastion)
-
-Use the bastion script in project root:
-
-./bastion
-
-Typical commands:
-
+npm run dev:css
+npm run dev:proxy
 ./bastion run-dev
-Starts the PHP dev server (by default on 127.0.0.1:8000).
-
-./bastion migrate
-Runs all database/migrations/*.sql files.
-
-./bastion seed
-Executes all database/seeds/*.php.
-
-
-(If your script adds more commands like make:page, build, etc., they will be documented there.)
 
 
 ---
 
-Step-by-Step Example Feature
+16. Titles and Document Head
 
-Here is a quick end-to-end feature you can build to understand the flow:
+You can set the page title using DV or $GLOBALS:
 
-> “List products in /admin/products with a searchable table, using HTMX.”
+Recommended:
 
+DV::set('title', 'Admin · Users');
 
+Also supported:
 
-1. Create migration for products
+$GLOBALS['title'] = 'Admin · Users';
 
-Create database/migrations/010_create_products.sql:
+In app/layout.php:
 
-CREATE TABLE IF NOT EXISTS products (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  sku TEXT NOT NULL UNIQUE,
-  name TEXT NOT NULL,
-  price REAL NOT NULL,
-  created_at INTEGER NOT NULL
-);
+$title = DV::get('title', $GLOBALS['title'] ?? 'Bastion PHP');
 
-Run:
-
-./bastion migrate
-
-2. Seed some products (optional)
-
-database/seeds/ProductsSeeder.php:
-
-<?php
-
-use App\Core\DB;
-
-$pdo = DB::getPdo();
-$exists = $pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
-if ((int)$exists === 0) {
-    $stmt = $pdo->prepare("INSERT INTO products (sku, name, price, created_at) VALUES (?,?,?,?)");
-    $stmt->execute(['P-001', 'Test Product 1', 9.99, time()]);
-    $stmt->execute(['P-002', 'Test Product 2', 19.99, time()]);
-}
-
-Run:
-
-./bastion seed
-
-3. Create API endpoint: app/api/products/+server.php
-
-<?php
-
-use App\Core\Response;
-use App\Core\DB;
-
-return [
-    'get' => function($req) {
-        $search = $req->input('q', '');
-
-        $query = DB::table('products')->orderBy('id', 'DESC');
-
-        if ($search !== '') {
-            // Simple filter example
-            $query = $query->where('name', $search); // You can switch to LIKE later
-        }
-
-        $products = $query->get();
-
-        if (isset($_SERVER['HTTP_HX_REQUEST'])) {
-            // Return HTML partial for HTMX table
-            ob_start();
-            ?>
-            <table class="w-full text-sm">
-                <thead>
-                    <tr>
-                        <th>SKU</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($products as $p): ?>
-                    <tr>
-                        <td><?= e($p['sku']) ?></td>
-                        <td><?= e($p['name']) ?></td>
-                        <td><?= e(number_format($p['price'], 2)) ?></td>
-                    </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-            <?php
-            $html = ob_get_clean();
-            Response::html($html);
-        } else {
-            Response::json($products);
-        }
-    },
-];
-
-4. Create admin page: app/admin/products/page.php
-
-<?php
-
-use App\Core\DV;
-
-DV::set('title', 'Products');
-
-?>
-<section class="space-y-4">
-    <h2 class="text-2xl font-bold mb-2">Products</h2>
-
-    <input
-        type="text"
-        placeholder="Search products..."
-        hx-get="/api/products"
-        hx-trigger="keyup changed delay:300ms"
-        hx-target="#products-table"
-        class="w-full max-w-sm px-3 py-2 rounded bg-slate-950 border border-slate-700"
-    >
-
-    <div id="products-table" class="mt-4">
-        <!-- HTMX will load table here from /api/products -->
-        <button
-          hx-get="/api/products"
-          hx-target="#products-table"
-          hx-swap="innerHTML"
-          class="px-4 py-2 rounded bg-blue-600 text-white"
-        >
-          Load Products
-        </button>
-    </div>
-</section>
-
-5. Navigate to /admin/products
-
-Make sure your app/admin/layout.php is in place so that your new page is wrapped inside the admin shell.
+This ensures your layout always has a title, even if a page is missing DV::set('title', ...).
 
 
 ---
 
-Troubleshooting & Common Pitfalls
+17. Future Additions
 
-1. 404 on /admin/...
+Later, this framework documentation and tooling will be extended with:
 
-Check: app/admin/page.php exists.
+OpenAPI schema generation for all +server.php endpoints.
 
-Check: app/admin/layout.php exists (or at least app/layout.php).
+Benchmark suite comparing Bastion PHP with Django, FastAPI and Next.js for typical internal tool workloads.
 
+Cache adapters (Redis, Memcached) integrated into the QueryBuilder and Response layer.
 
-2. 404 on /api/...
+WebSocket notifications layer for real-time events.
 
-Check folder: app/api/.../+server.php.
+Migration conflict detection and safe multi-env workflows.
 
-Make sure your file returns an array: return ['get' => function(...) {...}].
+Automated module and component generators in the CLI.
 
-
-3. CSRF errors (403) on POST/PUT/DELETE
-
-Ensure you used <?= csrf_field() ?> in HTML forms.
-
-For JSON requests, send header X-CSRF-TOKEN with csrf_token() value (you can send it from page).
+More official component patterns (tables, paginators, filters) ready to use.
 
 
-4. JWT invalid or user lost session
-
-Check .env has JWT_SECRET.
-
-Ensure seeds created an admin user with correct password.
-
-Check cookie names match your code (access, refresh).
-
-
-5. White screen / weird error
-
-In .env, set: APP_DEBUG=true.
-
-You get raw stack trace in browser for easier debugging.
-
-
-
----
-
-If you are a PHP developer coming from Laravel, think of Bastion like this:
-
-app/Core/Router.php ≈ a custom router using the filesystem
-
-app/layout.php ≈ a global layout like a Blade layout
-
-app/.../page.php ≈ your Blade views/controllers merged
-
-+server.php ≈ route/controller for REST endpoints
-
-DB::table() ≈ simplified Query Builder
-
-bastion ≈ tiny custom artisan
-
-
-Everything is plain PHP, you can open any file and see exactly what runs.
-
---- 
+For now, the features described above already exist in the current version (0.1.0) and are enough to build real internal applications with a secure, maintainable architecture.
