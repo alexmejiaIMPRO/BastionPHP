@@ -1,621 +1,276 @@
-# Bastion PHP — README & Full Developer Reference
+# Bastion PHP — Enterprise-Grade Internal Tools Framework
+**Version: 0.1.0**
 
-This document is intended to be an exhaustive, practical reference for developers who want to understand, extend, debug, and deploy a project created with create-bastion-app (create-php-app.sh).
+Bastion PHP is a **fully file-driven PHP framework** engineered for companies that need to ship **internal applications fast** while maintaining **military-grade security defaults** and **developer control without framework bloat**.
 
-Short flow: Request → public/index.php → app/bootstrap.php → App (service container) → global middleware → Router → page.php / +server.php → Response
-
-Table of contents
-- Project layout (file tree)
-- Environment variables (detailed)
-- Boot sequence (what runs, in what order)
-- Core components (classes, important methods & signatures)
-- Router & route resolution algorithm (step-by-step)
-- API contract (+server.php handlers) & Response expectations
-- Views (DV) and template helpers (examples)
-- Database, migrations, schema & QueryBuilder details
-- Auth (JWT & refresh tokens) — flow and security notes
-- CSRF flow & examples
-- Middleware chain, ordering and how to add your own
-- CLI tools (bastion, artisan) and common workflows
-- Tailwind / assets & run-dev behavior
-- Extending the app: services, middleware, models, tests
-- Debugging, logging, common errors and fixes
-- Deployment checklist, nginx example, file permissions
-- Security checklist & hardening recommendations
-- Next steps / recommended improvements
+It unifies:
+- **Next.js developer ergonomics** (nested layouts + filesystem routing)
+- **Django admin mindset** (dashboard + data management UI)
+- **FastAPI clarity and middleware pipeline philosophy**
+- **HTMX interactivity without client frameworks**
+- **Raw PDO-based DB operation chains behaving like a minimal fearless ORM**
 
 ---
 
-1) Project layout (important files & directories)
-- public/
-  - index.php                — application HTTP entrypoint (front controller)
-- app/
-  - bootstrap.php            — environment loader + session config + timezone
-  - Core/
-    - Container.php          — tiny DI container (bind, singleton, resolve)
-    - App.php                — application runtime, middleware & router integration
-    - Router.php             — file-based router (page, +server.php API)
-    - Request.php            — Request wrapper & validate()
-    - Response.php           — helpers: json, html, redirect, abort
-    - DB.php                 — PDO wrapper and QueryBuilder
-    - DV.php                 — DV template renderer
-    - CSRF.php               — token generator and middleware-compatible verify
-    - Auth.php               — JWT logic and refresh token handling
-    - Logger.php             — file logger (storage/logs/app.log)
-    - helpers.php            — global helper functions (env, view, e, csrf_field, auth, logger)
-    - ValidationException.php— exception carrying validation errors
-  - Middleware/
-    - SecurityHeaders.php
-    - RateLimit.php
-    - AuthMiddleware.php
-    - AdminOnly.php
-  - Models/
-    - User.php
-  - admin/, login/, logout/, page.php — sample pages / pages scaffolding
-- resources/
-  - views/layouts/main.php   — default HTML layout
-  - css/app.css              — tailwind entrypoint / fallback
-- config/
-  - style.php                — theme + tailwind config
-- database/
-  - migrations/*.php         — migration scripts run by CLI
-  - seeds/*.php              — seeders
-- storage/
-  - db/app.db
-  - logs/app.log
-- artisan                    — compatibility CLI shim
-- bastion                    — developer process manager
-- package.json, composer.json
+## 🔥 What Bastion PHP **really** is
+
+Bastion is **not**:
+- A UI library
+- A micro-framework like Slim or Laravel
+- A MVC boilerplate
+- A monolithic fullstack tool
+
+Bastion **IS**:
+- A PHP runtime that **behaves like a compiler-grade server framework**
+- A system where **filesystem structure = actual routing logic**
+- A framework where **`layout.php` files are inherited automatically like React/Next**
+- A middleware pipeline always executed **before any route handler**
+- A secure-by-default authentication system using **JWT + rotated refresh tokens**
+- A SQL interface that feels like an **ORM but stays raw PDO under the hood**
+- A component rendering system where **components are PHP includes**
+- A dev-friendly CLI called **`bastion`** (but extendable like artisan)
+- A dark-UI-first internal admin design system (your current visual style)
 
 ---
 
-2) Environment variables (exhaustive, type, default & usage)
-Use env('KEY', $default) helper to read them.
+## 🧠 Framework Philosophy
 
-- APP_NAME (string)
-  - default: "Bastion Enterprise"
-  - usage: UI, logging, templates.
+> **"Fast to write. Safe to deploy. Impossible to hide errors."**
 
-- APP_ENV (string)
-  - default: local
-  - usage: toggling dev vs prod behavior.
-
-- APP_DEBUG (bool-ish "true"/"false")
-  - default: true
-  - usage: enable/disable debug output and more verbose logging.
-
-- APP_URL (string)
-  - default: http://localhost:9876
-  - usage: generating absolute links if needed.
-
-- APP_KEY (string, base64)
-  - generated by the installer
-  - usage: application-level symmetric key for future encryption needs. Rotate on clone.
-
-- DB_CONNECTION (string)
-  - default: sqlite
-  - usage: DB:: constructor currently supports sqlite. Adding mysql/pgsql requires changes.
-
-- DB_PATH (string)
-  - default: storage/db/app.db
-  - usage: SQLite file location used by DB class (prepends repo root when building DSN).
-
-- JWT_SECRET (string)
-  - generated by installer; required for JWT signing (HS256).
-  - usage: Auth::issueTokens(), Auth::validate().
-
-- JWT_TTL (int, seconds)
-  - default: 3600
-  - usage: access token lifetime.
-
-- JWT_REFRESH_TTL (int, seconds)
-  - default: 604800
-  - usage: refresh token expiry recorded in refresh_tokens table.
-
-- CSRF_ENABLED (bool)
-  - default: true
-  - usage: AuthMiddleware executes CSRF::handle when true.
-
-- SECURE_COOKIES (bool)
-  - default: false (set true in prod)
-  - usage: when true cookies set secure=true (HTTPS-only).
-
-- LOG_LEVEL (string: debug|info|warning|error)
-  - default: debug
-  - usage: Logger writes all levels; use LOG_LEVEL to filter in your code when reading logs.
-
-- THEME_MODE (string: system|light|dark) read by config/style.php
-  - usage: Theme::apply() and layout logic
-
-Other notes:
-- env() returns second argument when getenv() returns false. It also strips surrounding quotes.
-- .env file is parsed line-by-line in app/bootstrap.php; blank lines and comments are ignored.
+| Principle | Meaning |
+|---|---|
+| Explicit > Magic | No hidden behavior, everything is in files you own |
+| Filesystem = Router | No routing arrays, no attributes, no decorators |
+| Layout inheritance | Closest `layout.php` wraps child → parent → root |
+| Middlewares always run | No request skips security layers |
+| No unsafe-inline code | CSP uses dynamic nonces automatically |
+| No frontend frameworks | Client interactivity via HTMX, not JS bundlers |
+| No email surprises | Developer sees full trace on every failure |
+| Security never optional | Auth/CSRF/CSP/Headers run by default |
+| No template mixing | PHP includes over Jinja/Jinja-like templating |
 
 ---
 
-3) Boot sequence (what runs, in order)
-- public/index.php:
-  - require vendor/autoload.php (Composer autoload)
-  - require app/bootstrap.php (loads .env, sets session & tz)
-  - new App(__DIR__ . '/..') → initializes Router with app path and registers services
-  - $app->use(SecurityHeaders), $app->use(AuthMiddleware)
-  - create Request instance (to detect admin path) and conditionally $app->use(AdminOnly)
-  - $app->run():
-    - constructs Request and stores it in App instances
-    - builds middleware stack in LIFO order (last registered runs first)
-    - sets base handler to $router->dispatch($req)
-    - executes pipeline: security headers → auth & csrf → admin only → router dispatch
+## 📁 How Your Project Scaffold Looks After Running the Script
+
+my-tool/ ├── app/ │   ├── layout.php          ← ROOT layout (wraps all pages) │   ├── page.php            ← ROOT public home page │   ├── Core/ │   │   ├── Container.php   ← Dependency injection container │   │   ├── App.php         ← Main app runtime │   │   ├── Router.php      ← File-based router using folder resolution │   │   ├── DB.php          ← PDO Facade +QueryBuilder │   │   ├── Auth.php        ← JWT + Refresh rotation │   │   ├── Request.php     ← Unified HTTP Request interface │   │   ├── Response.php    ← HTTP Response helpers │   │   ├── CSRF.php        ← CSRF validation layer │   │   └── Theme.php       ← Dark mode helper resolution │   ├── Middleware/ │   │   ├── SecurityHeaders.php ← CSP and headers │   │   ├── AuthMiddleware.php  ← Validates JWT & CSRF │   │   ├── AdminOnly.php       ← Protect admin pages │   │   └── RateLimit.php       ← Limiting stub ├── resources/ │   ├── css/app.css         ← Tailwind entry point generated for watch │   ├── views/ │   │   ├── errors/         ← 404.php/403.php/500.php │   │   └── components/     ← PHP UI components folder ├── database/ │   ├── migrations/.sql    ← SQL migrations run by CLI │   └── seeds/.php         ← Data seed scripts (users, roles, etc.) ├── public/ │   ├── index.php           ← Front-controller entry point │   └── css/fallback.css    ← fallback style layer └── storage/ ├── db/app.db           ← SQLite WAL database default └── logs/app.log        ← Dev friendly logger
 
 ---
 
-4) Core components — classes, methods, expected return types & behavior
+## ⚡ Next.js-Like Layout & Routing System (REAL behavior)
 
-app/Core/Container.php
-- bind(string $key, callable $resolver): void
-- singleton(string $key, callable $resolver): void
-- resolve(string $key): mixed
-  - behavior: if binding exists call resolver; if class exists instantiate; else throw Exception
+Bastion routes are deduced from filesystem structure:
 
-app/Core/App.php
-- __construct(string $rootPath)
-  - sets Router with "$rootPath/app"
-  - calls registerServices()
-- static getInstance(): App
-- singleton / bind available by inheritance (Container)
-- use(callable|string $middleware): void
-  - middleware can be string class name (expects handle(Request, callable)) or callable(Request, callable)
-- run(): void
-  - builds pipeline and executes
+If URL = /admin/users/settings
 
-app/Core/Request.php
-- public properties:
-  - path, method, headers, cookies, query, body, files, meta
-- __construct(): builds properties by reading PHP superglobals
-- input(string $key, mixed $default = null): mixed
-  - returns from JSON body when Content-Type application/json; else POST then GET
-- json(): array — decodes php://input
-- isJson(): bool — checks headers Content-Type for application/json
-- validate(array $rules): array
-  - rules example: ['email' => 'required|email', 'pwd' => 'required|min:8']
-  - on failure throws ValidationException with $errors array keyed by field
+Router walks: app/ → admin/   (check if admin/layout.php exists) → users/   (check if app/admin/users/layout.php exists) → settings/
 
-app/Core/ValidationException.php extends Exception
-- public array $errors
+Layout stack resolved:
 
-app/Core/Response.php
-- static json($data, int $status = 200): never
-  - sets HTTP status, Content-Type: application/json and echo json_encode($data)
-  - exits script (never)
-- static html(string $content, int $status = 200): never
-  - sets text/html, echoes content, exit
-- static redirect(string $url, int $code = 302): never
-  - sets Location header and exits
-- static abort(int $code, string $msg = ''): never
-  - tries resources/views/errors/{code}.php else returns JSON or plain HTML fallback
-  - exits
+1. app/admin/users/settings/layout.php
 
-Important: Response methods call exit; provide control flow expectations — don't call Response::json() expecting to continue.
 
-app/Core/DB.php
-- __construct() opens PDO sqlite DSN using DB_PATH, sets ERRMODE_EXCEPTION and DEFAULT_FETCH_MODE=ASSOC, PRAGMA journal_mode=WAL.
-- query(string $table): QueryBuilder
-- getPdo(): PDO
-- static __callStatic($method, $args) proxy to resolved DB instance (so DB::table('users') works via facade)
+2. app/admin/users/layout.php
 
-QueryBuilder
-- where($col, $val): self — currently only "=" conditions supported; internally stores bindings
-- limit(int $l): self
-- orderBy($col, $dir='ASC'): self
-- get(): array — returns all rows
-- first(): ?array — returns first row or null
-- insert(array $data): int — returns lastInsertId() as int
-- update(array $data): bool — returns execute() bool
-- delete(): bool
-- count(): int
 
-Security note: QueryBuilder uses prepared statements for values to prevent SQL injection; column names are interpolated directly — ensure column names are safe (use hard-coded column names or sanitize).
+3. app/admin/layout.php
 
-app/Core/DV.php (view engine)
-- static set(string $key, mixed $value): void — shared scope data
-- static render(string $path, array $local = []): string
-  - path resolution: if $path exists as file, include it; else tries resources/views/$path.php
-  - extract merges static data + locals and includes template inside output buffering
-  - returns rendered HTML
-- use DV::set('title', '...') in pages; layout picks up $title variable.
 
-app/Core/CSRF.php
-- static token(): string — ensures session started; creates $_SESSION['_csrf'] if missing
-- static handle(Request $req, callable $next): mixed — middleware-compatible; on POST/PUT/PATCH/DELETE checks _csrf form field or X-CSRF-TOKEN header (skips if JSON) and returns Response::json([...],403) on mismatch
-- static verify(Request $req): void — direct check used by non-middleware flows (aborts on mismatch)
+4. app/layout.php   ← root fallback, always last
 
-app/Core/Auth.php
-- static issueTokens(int|string $userId): array
-  - returns ['access' => JWT, 'refresh' => 'selector:validator', 'expires' => intTimestamp]
-  - Access token payload: sub, iat, exp, type='access'
-  - Refresh token: selector (stored plaintext in cookie) + validator (validator hashed and stored)
-  - DB store: insert into refresh_tokens (user_id, selector, validator_hash, expires_at)
-- static validate(string $token): ?object
-  - returns decoded JWT object or null on failure
-- static validateRefreshToken(string $token): ?int
-  - splits selector:validator, fetches refresh_tokens row by selector; deletes row immediately (single-use); checks expiry and hash_equals on validator hash; returns user_id or null
-- static attempt($email, $password): array|false
-  - verifies password via password_verify and returns tokens via issueTokens()
-- static check(Request $req): mixed
-  - looks for Authorization header (Bearer) or access cookie; validates token, loads user via User::find(); sets $GLOBALS['auth_user'] and $req->meta['user']
-- static user(): ?array
 
-Auth security points:
-- JWT tokens are stateless (verification by signature). Refresh tokens are stateful and stored hashed; selectors are deleted on use (single-use).
-- Cookie settings:
-  - access cookie: HttpOnly=false (accessible to JS), short-lived, expires at 'expires'
-  - refresh cookie: HttpOnly=true, long-lived (JWT_REFRESH_TTL)
-  - Both cookies respect SECURE_COOKIES for secure flag and samesite Lax.
 
-app/Middleware/*
-- SecurityHeaders::handle(Request $req, callable $next): sets CSP that includes nonce in $req->meta['csp_nonce'] and sets common headers.
-- RateLimit::handle: development stub. Replace with Redis-based store for prod.
-- AuthMiddleware::handle: calls Auth::check($req) and then CSRF::handle if CSRF_ENABLED.
-- AdminOnly::handle: checks auth() and user role === 'admin', else Response::abort(403).
+Then it loads: page.php from deepest folder
 
-app/Models/User.php
-- Methods: find, findByEmail, all, create, update, delete — thin wrappers on DB::table('users')->...
+Execution order: Request parsed → Middlewares → Router → stacked layouts → page output inserted
 
----
+### Example of how a layout looks:
 
-5) Router & route-resolution algorithm (detailed)
-- Router is initialized with root path pointing to app/ directory (app/Core/App constructs Router with "$rootPath/app").
-- Route dispatch process:
-  - Router::dispatch(Request $req):
-    - calls apiRoute($req) first; if that returns true it handles request
-    - else calls pageRoute($req)
-- apiRoute(Request):
-  - resolve($req->path) yields directory path (see resolveWithParams)
-  - checks for file "+server.php" inside that directory
-  - require $file which must return an array mapping lowercased HTTP verbs to callables; invokes the callable passing the Request
-  - If method missing returns 405 JSON
-- pageRoute(Request):
-  - resolveWithParams($req->path) returns [$path, $params]
-  - path must be directory with page.php to render as page content
-  - DV::set('params', $params) — make params accessible to view
-  - DV::render($file) returns content string
-  - layout = resources/views/layouts/main.php; echo DV::render($layout, ['content' => $content])
-- resolveWithParams($uri) algorithm:
-  - if uri empty or '/' => segments []
-  - start at $this->root
-  - for each segment:
-    - if $curr/<segment> is a directory -> set $curr to that directory
-    - else for each subdirectory name in $curr check if name matches /^\[(.+)\]$/ (dynamic param)
-      - if match, store param name => segment, set $curr to that directory, break
-    - if neither direct nor dynamic found -> return [null, []] (no route)
-  - return [$curr, $params]
-- Examples:
-  - /about -> app/about/page.php
-  - /posts/hello-world -> app/posts/[slug]/page.php with params['slug'] = 'hello-world'
-  - /api/users -> app/api/users/+server.php
-
-Edge-cases:
-- Directory names must match expected characters; avoid using characters that cause filesystem conflicts.
-- Only directories are matched in the routing algorithm (files are expected inside directories).
-- If you need to map root-level file to '/', create app/page.php.
-
----
-
-6) API contract (+server.php) & handler patterns
-- +server.php must return an associative array with keys like 'get', 'post', 'put', 'delete' each mapping to a callable function signature: function (Request $req) { ... }
-- Examples:
-  - Return JSON: Response::json(['users'=> $data])
-  - Redirect: Response::redirect('/login')
-  - Validate input: $data = $req->validate(['email' => 'required|email'])
-- Handler should not echo raw content unless returning HTML (Response::html). Prefer Response helpers.
-- Error handling: throw exceptions or use Response::json([...], 400) — Response abort will send error pages.
-
----
-
-7) Views (DV) & template helpers (practical examples)
-- Templates are plain PHP files included after extracting variables.
-- Global helpers:
-  - view($path, $data = []) => DV::render($path, $data)
-  - e($s) => htmlspecialchars($s, ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8')
-  - csrf_token() => CSRF::token()
-  - csrf_field() => '<input type="hidden" name="_csrf" value="...">'
-  - auth() => currently-authenticated user array (or null)
-  - logger() => App\Core\Logger instance
-- Example page (app/about/page.php):
-  <?php DV::set('title', 'About'); ?>
-  <h1><?= e($title) ?></h1>
-  <p>Welcome, <?= e(auth()['name'] ?? 'guest') ?></p>
-
-- Using CSP nonce in inline script inside layout:
-  <script nonce="<?= e($req->meta['csp_nonce'] ?? '') ?>">/* inline JS */</script>
-
-Note: the layout's Theme::apply() is meant to set classes/attributes. The generated stub may need minor fix-ups if you need non-FOUC behavior — consider moving the logic to inline script in layout and use $req->meta['csp_nonce'] for nonce.
-
----
-
-8) Database, migrations & schema
-- Default DB: SQLite at storage/db/app.db. DB class ensures file exists and enables WAL journaling.
-- Default migrations (order matters):
-  - 001_create_users_table.php
-    - users: id PK, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'user', created_at INTEGER
-  - 002_create_migrations_table.php
-    - migrations: id, migration TEXT UNIQUE, executed_at INTEGER
-  - 003_create_refresh_tokens_table.php
-    - refresh_tokens: id, user_id FK users(id), selector TEXT UNIQUE, validator_hash TEXT, expires_at INTEGER
-- Seeders:
-  - UserSeeder.php creates Admin (admin@example.com) and Demo (user@example.com) with password hashed via password_hash('password')
-- Running migrations:
-  - ./bastion migrate or php artisan migrate
-  - Each migration is an idempotent script that runs CREATE TABLE IF NOT EXISTS
-- QueryBuilder example:
-  - DB::table('users')->where('email', $email)->first()
-  - DB::table('users')->insert(['name'=>'x','email'=>'x','password'=>'y'])
-
-Transactions:
-- Use DB::getPdo()->beginTransaction(), commit(), rollBack() directly for multi-statement atomic operations.
-
-Porting to MySQL:
-- Replace DB::__construct to support mysql DSN with host, port, dbname, username, password from .env; adjust migrations SQL accordingly and remove SQLite WAL PRAGMA.
-
----
-
-9) Authentication flow (detailed)
-Login (app/login/+server.php)
-- Auth::attempt(email, password):
-  - Validates credentials via password_verify against stored hashed password
-  - If valid returns Auth::issueTokens($userId)
-
-Auth::issueTokens($userId)
-- generates access JWT with exp = time() + JWT_TTL
-- generates selector (random 12 bytes hex) and validator (random 32 bytes hex)
-- stores selector & sha256(validator) in refresh_tokens with expiry = now + JWT_REFRESH_TTL
-- returns:
-  - access token (JWT string)
-  - refresh token (selector:validator) — the raw validator is NOT stored; its hash is stored
-  - expires: access token expiry epoch
-
-Cookie strategy:
-- access cookie: short-lived, HttpOnly=false (so JS can read it if needed), path '/', samesite Lax, secure based on SECURE_COOKIES
-- refresh cookie: HttpOnly=true, long-lived, same samesite & secure settings
-
-Validating access:
-- Each request Auth::check($req) will look for Authorization Bearer header or access cookie; decode JWT and load user
-- If invalid/expired, client should call refresh endpoint (create one at app/api/auth/refresh/+server.php)
-
-Refresh token endpoint (example)
-- Handler receives refresh token (either cookie or Authorization header)
-- Call Auth::validateRefreshToken($refreshToken)
-  - Splits selector:validator
-  - SELECT * FROM refresh_tokens WHERE selector=?
-  - Deletes row immediately (single-use)
-  - If not expired and hash_equals(stored_validator_hash, sha256(validator)) => returns user_id
-- When validated, issue new access + refresh tokens via issueTokens(user_id)
-- Send new cookies
-- Important: Because selectors are deleted on use, replay attacks are mitigated. If attacker steals refresh cookie after use, it will be invalid.
-
-Revocation & logout:
-- logout page removes cookies (sets expiry in past)
-- You can revoke all refresh tokens for a user: DELETE FROM refresh_tokens WHERE user_id=?
-
-Security notes:
-- Always rotate JWT_SECRET and APP_KEY on clones.
-- Do not store raw validators in DB — only store hashes (current implementation stores hash).
-- Consider tying refresh tokens to user agent or IP footprint for additional checks.
-
----
-
-10) CSRF flow (practical)
-- CSRF::token() creates session-backed token stored in $_SESSION['_csrf'].
-- For non-JSON state-changing requests (POST/PUT/PATCH/DELETE) the middleware checks:
-  - request param _csrf OR header X-CSRF-TOKEN OR X-CSRF-Token
-  - uses hash_equals() to compare session vs sent token
-- For forms include <?= csrf_field() ?> inside form
-- For fetch/XHR requests include header "X-CSRF-TOKEN: <csrf_token>"
-
-Notes:
-- For JSON requests the CSRF handler bypasses forcing you to design your API to use Authorization headers (JWT) OR add header-based verification.
-
----
-
-11) Middleware chain & adding custom middleware
-- $app->use($middleware) in public/index.php registers middleware in the App instance.
-- Middleware is executed last-in-first-out (LIFO): the last registered middleware executes first.
-- Middleware signature options:
-  - class with handle(Request $req, callable $next)
-    - e.g. class MyMw { public function handle($req, $next) { /*...*/ return $next($req); } }
-  - callable(Request $req, callable $next)
-- To register your middleware globally, add $app->use(\App\Middleware\MyMiddleware::class) in public/index.php (or in App::registerServices with appropriate code).
-- To apply route-specific middleware, inside +server.php handlers you can call middleware imperatively or in your layout you can check $req->meta.
-
----
-
-12) CLI tools (bastion & artisan)
-bastion
-- run-dev
-  - starts: php -S 127.0.0.1:8000 -t public
-  - starts tailwind watch: npx @tailwindcss/cli -i resources/css/app.css -o public/css/app.css --watch
-  - starts browser-sync proxy: browser-sync proxy 127.0.0.1:8000 --port 9876
-  - Shows combined output with colored prefixes
-- run-build
-  - calls tailwind CLI to build public/css/app.css --minify
-- migrate
-  - requires vendor/autoload + bootstrap; executes database/migrations/*.php
-- db:seed
-  - executes database/seeds/*.php
-- key:generate
-  - writes new APP_KEY to .env
-
-artisan (compatibility shim)
-- replicate functionality for migrate, db:seed, key:generate
-
-Notes:
-- bastion uses proc_open and relies on system having node, npx, tailwind CLI & browser-sync installed in project devDependencies or globally.
-- If you lack node, bastion will still let you run migrations and PHP server tasks manually.
-
----
-
-13) Tailwind, assets & run-dev specifics
-- resources/css/app.css is tailwind entrypoint; package.json contains devDependencies with tailwind CLI and browser-sync (version compatibility note: the generator uses alpha versions; update to stable version as necessary).
-- Two tailwind modes:
-  - build: local build via tailwind CLI (recommended)
-  - cdn: include CDN link to tailwindcd
-- The layout includes /css/app.css by default. If 'tailwindMode' => 'cdn' adapt layout to inject <script src="https://cdn.tailwindcss.com"></script> with CSP nonce.
-
----
-
-14) Extending the app (services, middleware, models, tests)
-- Adding a service:
-  - Create class under app/Services/MyService.php (namespace App\Services)
-  - Register in App::registerServices() using $this->singleton(MyService::class, fn() => new MyService())
-  - Retrieve via App::getInstance()->resolve(MyService::class) or add method to App for typed getter
-- Adding middleware:
-  - Implement handle(Request $req, callable $next) and register via $app->use()
-- Adding a model:
-  - Create class in app/Models with static methods using DB::table
-- Unit & integration tests:
-  - Add tests/ directory; use PHPUnit or Pest.
-  - To run DB-related tests, create a separate DB_PATH in .env.testing pointing to temp file and ensure migrations run in test bootstrap.
-
----
-
-15) Debugging, logging & common pitfalls
-- Logs: storage/logs/app.log (plain text JSON optional context)
-- Quick checks:
-  - Is APP_ENV correct? APP_DEBUG?
-  - Is JWT_SECRET present? php -r "echo getenv('JWT_SECRET') ?: 'missing';"
-  - Is DB file writable? ls -la storage/db/app.db
-  - File permissions: storage must be writable by web server
-  - If templates fail to render, check PHP error log or enable APP_DEBUG temporarily
-- Common issues:
-  - 404 on routes — verify directory names and ensure page.php exists
-  - CSRF token mismatch — ensure session cookies are persisted (Samesite, secure flags) and csrf_field() is included in forms
-  - Access token invalid/expired — inspect Authorization header or cookie; use refresh endpoint
-  - Tailwind not building — run npm install and npx tailwindcss path.. test manually
-
----
-
-16) Deployment checklist (expanded)
-- .env:
-  - Set APP_ENV=production
-  - APP_DEBUG=false
-  - Rotate APP_KEY and JWT_SECRET
-  - SECURE_COOKIES=true
-  - Set DB to MySQL or Postgres for scalable deployments (edit DB.php accordingly)
-- Composer:
-  - composer install --no-dev --optimize-autoloader
-- Build:
-  - ./bastion run-build (or npm run build)
-- Migrate:
-  - ./bastion migrate
-- File system:
-  - chown -R www-data:www-data storage (or web server user)
-  - chmod -R 755 storage
-  - chmod 644 .env
-- Web server:
-  - Point web root to project/public
-  - Deny access to /.env and /storage via server config
-- Optional:
-  - Use PHP-FPM + Nginx for production
-  - Use Redis for sessions & rate-limiting
-  - Use a process manager (supervisor/systemd) to run background jobs, queue processors, etc.
-
-Sample Nginx snippet:
-server {
-    listen 80;
-    server_name example.com;
-    root /var/www/bastion/public;
-    index index.php;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \.php$ {
-        include fastcgi_params;
-        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-    }
-
-    location ~ /\.env { deny all; }
-    location ~ /storage/ { deny all; }
-}
-
----
-
-17) Security checklist & hardening
-- Never commit .env or storage files with secrets
-- Rotate APP_KEY and JWT_SECRET before production
-- Set SECURE_COOKIES=true on HTTPS
-- Replace in-memory RateLimit with Redis for multiple processes
-- Use HTTPS everywhere; redirect HTTP to HTTPS
-- Sanitize any dynamic SQL column names or construct whitelists in QueryBuilder
-- Regularly audit dependencies (composer, npm)
-- Consider adding Content Security Policy reporting & strict policies (CSP report-uri)
-- Consider implementing refresh token binding to user agent / device id for additional safety
-- Monitor logs for suspicious refresh token activity (replay attempts)
-
----
-
-18) Common modification recipes (copy/paste)
-
-Add POST API at /api/auth/refresh
-- create app/api/auth/refresh/+server.php
 ```php
-<?php
-use App\Core\Auth;
-use App\Core\Response;
+<div class="bg-gray-900 text-white p-6">
+  <?php $content(); ?>
+</div>
+
+You never write full HTML inside pages. The layout wraps it automatically.
+
+
+---
+
+🗄 Database Facade (Minimal, raw, chainable ORM feel)
+
+You interact with DB using chains:
+
+$users = DB::table('users')->where('role','admin')->limit(10)->orderBy('id','DESC')->get();
+
+Supported methods include:
+
+Method	Description
+
+DB::table(name)	selects table and returns QueryBuilder
+where(column,value)	adds bind-safe where clause
+orWhere(column,value)	optional expansion
+limit(n)	adds SQL LIMIT
+offset(n)	adds SQL OFFSET
+orderBy(col,dir)	adds SQL ORDER BY
+get()	executes SQL, returns array results
+first()	returns 1 result or null
+insert(data)	inserts row, returns inserted ID
+update(data)	updates matched rows, returns bool
+delete()	deletes matched rows
+count()	returns COUNT of matched rows
+
+
+Powered 100% by PDO and SQLite WAL concurrency by default.
+
+
+---
+
+👤 Auth System (JWT Access + Rotated Refresh Tokens)
+
+[
+  'access'  => 'eyJ...'  ← JWT access token
+  'refresh' => 'abcd1234:ef567...' ← rotated refreshed token pair
+  'expires' => 1732912341
+]
+
+Developer helpers:
+
+auth();                  // Returns current user or null
+Auth::check($req);       // Populates request->meta user
+Auth::isAdmin();         // Boolean admin check
+Auth::attempt(email,pass)// Issues tokens
+Auth::issueTokens(userId)// Create JWT + Refresh
+Auth::validate(token)    // validates JWT
+Auth::validateRefreshToken(refreshCookieValue) → int user ID or null
+
+Refresh tokens auto-delete after use (rotation).
+
+
+---
+
+🔐 Security Middlewares (Always wrapped before routing)
+
+Pipeline runs:
+
+SecurityHeaders → RateLimit → AuthMiddleware → AdminOnly → Router → Route Handler
+
+SecurityHeaders.php injects CSP nonces like:
+
+$nonce = base64_encode(random_bytes(16));
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-$nonce'");
+
+This middleware is never skipped.
+
+
+---
+
+🧰 DV View Rendering (App\Core\DV)
+
+Singleton rendering class for passing view data:
+
+DV::set('title','Admin Users');
+echo view('pages.admin.users', ['users'=>$users]);
+
+Features:
+
+Capability	Meaning
+
+Global data store	Share keys across renders
+Singleton	Same instance used globally
+Extract support	auto expose variables into scope
+Dot-path include resolution	pages.admin.users → resources/views/pages/admin/users.php
+Partial rendering	Inject only HTML when HTMX triggered
+Full error visibility	No silent template failures
+
+
+
+---
+
+🎨 Theme System (Dark first, system detect)
+
+Defined in config/style.php:
 
 return [
-  'post' => function($req) {
-    $refresh = $req->headers['Authorization'] ?? $_COOKIE['refresh'] ?? null;
-    if (!$refresh) return Response::json(['error'=>'No refresh token'], 401);
-    $userId = Auth::validateRefreshToken($refresh);
-    if (!$userId) return Response::json(['error'=>'Invalid refresh token'], 401);
-    $tokens = Auth::issueTokens($userId);
-    $secure = filter_var(getenv('SECURE_COOKIES') ?: 'false', FILTER_VALIDATE_BOOLEAN);
-    setcookie('access', $tokens['access'], ['expires' => $tokens['expires'], 'path'=>'/', 'secure'=>$secure, 'httponly'=>false, 'samesite'=>'Lax']);
-    setcookie('refresh', $tokens['refresh'], ['expires'=>time() + (int)(getenv('JWT_REFRESH_TTL') ?: 604800), 'path'=>'/', 'secure'=>$secure, 'httponly'=>true, 'samesite'=>'Lax']);
-    return Response::json(['access_expires' => $tokens['expires']]);
-  }
+  'theme' => getenv('THEME_MODE') ?: 'system'
 ];
-```
 
-Register a global middleware in public/index.php:
-```php
-$app->use(\App\Middleware\SecurityHeaders::class);
-$app->use(\App\Middleware\AuthMiddleware::class);
-// register custom:
-$app->use(\App\Middleware\MyRateLimiter::class);
-```
+The helper can apply html <html class="dark"> attributes or detect system mode.
 
-Add a persistent service accessible via container:
-- app/Services/MyService.php:
-```php
-<?php namespace App\Services;
-class MyService { public function foo() { return 'bar'; } }
-```
-- Register in App::registerServices():
-$this->singleton(\App\Services\MyService::class, fn() => new \App\Services\MyService());
-- Resolve: App::getInstance()->resolve(\App\Services\MyService::class)
 
 ---
 
-19) Tests & CI suggestions
-- Add GitHub Actions workflow:
-  - install php, composer, node
-  - composer install --no-interaction
-  - npm ci
-  - run phpunit and static analyzers (phpstan / psalm) and a lint step for PHP and JS
-- Add integration tests hitting the built-in PHP server via HTTP requests to validate routes and API flows.
-- Seed a test DB per CI job to ensure deterministic tests.
+💥 HTMX Components (Native interactivity without JS frameworks)
+
+Examples:
+
+<button hx-get="/api/users" hx-target="#result" hx-swap="innerHTML">Load</button>
+<input hx-get="/api/users/search" hx-trigger="keyup changed delay:400ms" hx-target="#result"/>
+
+CSP nonce injected into htmx script tags so inline CSS enhancements don’t break CSP.
+
 
 ---
 
-20) Known gaps in generated code (things to improve / watch for)
-- Theme::apply() in generator is incomplete and may contain a syntax stub — adjust to return safe attributes or use inline script in layout.
-- QueryBuilder does not support complex where clauses (LIKE, IN, OR), prepared identifiers or joins — extend as required and sanitize column names.
-- RateLimit is an in-memory stub; not safe for multiple PHP processes.
-- CSRF skips JSON; if you accept JSON mutating requests, prefer Authorization header + JWT rather than CSRF token.
-- Logger does not read LOG_LEVEL to filter writes; consumers must inspect LOG_LEVEL if needed.
-- composer.json's autoload "App\\\": "app/" needs correct escaping if you regenerate it — verify PSR-4 path.
+⚡ CLI Utilities
 
-```
+Commands your generator creates:
+
+Command	Function
+
+./bastion run-dev	Starts PHP dev server on :8000
+./bastion migrate	Runs SQL files from database/migrations
+./bastion seed	Run seed scripts
+./bastion key:generate	Generates APP_KEY
+./bastion jwt:secret	New JWT secret
+./bastion make:page name	Scaffolds page.php + inheritable parent layouts
+./bastion make:api name	Makes an api folder with +server.php
+./bastion make:module name	Scaffold module folder
+./bastion build	Minifies Tailwind/css
+
+
+CLI is fearless: errors are always printed in terminal or browser.
+
+
+---
+
+🧪 Development Testing Strategy
+
+Right after generation you should test in development, not at the end:
+
+✔ Break router intentionally → full stacktrace shows in browser if APP_DEBUG=true
+✔ Invalid CSRF → rejects properly via JSON abort or 403 redirect
+✔ Invalid JWT → returns null and no global side-effects
+
+You can test APIs like:
+
+curl -X POST localhost:8000/api/auth/login -d '{"email":"admin@example.com","password":"admin123"}' -H "Content-Type:application/json"
+
+or test DB table existence:
+
+sqlite3 storage/db/app.db ".tables"
+
+
+---
+
+✅ Summary
+
+Bastion PHP is a truly file-driven, secure-by-default, middleware-first, internal-app framework that gives you:
+
+✅ Filesystem routing like Next.js
+
+✅ Layout inheritance & stacking
+
+✅ Middleware pipeline always first
+
+✅ HTMX interactive UI components
+
+✅ Raw PDO → Query chains ORM-feel ergonomics
+
+✅ JWT Access + rotated refresh tokens
+
+✅ CLI for pages, APIs, modules, migrations and seeds
+
+✅ Fully inspectable development behavior
+
+✅ Dark-UI-first internal dashboard design
+
