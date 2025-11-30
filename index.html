@@ -2,915 +2,581 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <!--
-    TITLE (for docs site):
-    This is static only because this index.html belongs to the documentation website.
-    In Bastion generated apps, titles must be dynamic using the DV engine:
-       DV::set('title', 'Your Page');
-    And consumed in layout with:
-       <title><?= e(DV::get('title', 'Fallback')) ?></title>
-  -->
+
+  <!-- ========================================================= -->
+  <!--                      FRAMEWORK DOC TITLE                  -->
+  <!-- ========================================================= -->
+  <!-- Static because this is the documentation website, NOT a generated Bastion app page -->
   <title>Bastion PHP 0.1.0 – Developer Documentation</title>
 
-  <!--
-    VIEWPORT:
-    Ensures responsiveness on all devices. This is a docs convenience, not Bastion runtime code.
-  -->
+  <!-- Viewport for responsive UI -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!--
-    TAILWIND CDN (always active in docs page):
-    Bastion itself is Tailwind-ready by default in generated apps, but this docs page loads CDN directly for simplicity.
-  -->
+  <!-- Tailwind active via CDN for responsive documentation -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!--
-    SMALL STYLE:
-    These are only visual improvements for code readability inside documentation.
-  -->
   <style>
+    /* Smooth scrolling across the docs */
     html, body { scroll-behavior: smooth; }
-    pre, code  { font-family: ui-monospace, monospace; }
+
+    /* Monospace type for code blocks */
+    pre, code { font-family: ui-monospace, monospace; }
   </style>
 </head>
 
-<!--
-  BODY:
-  Uses dark theme for documentation clarity. In real apps, theme can be toggled using DV::set('theme').
--->
-<body class="bg-slate-950 text-slate-100 min-h-screen leading-relaxed antialiased">
+<body class="bg-slate-950 text-slate-100 min-h-screen leading-relaxed">
 
-<!-- =============================== TOP HEADER =============================== -->
-<header class="sticky top-0 z-50 bg-slate-900/70 border-b border-slate-800 backdrop-blur px-4 py-3 shadow-lg">
+<!-- ========================================================= -->
+<!--                        DOCS HEADER                      -->
+<!-- ========================================================= -->
+<header class="border-b border-slate-800 bg-slate-900/80 px-4 py-3 sticky top-0 z-50 backdrop-blur">
   <div class="max-w-6xl mx-auto flex items-center gap-3">
-    <!-- Minimal visual logo block -->
+
+    <!-- Framework branding badge -->
     <div class="h-10 w-10 flex items-center justify-center bg-cyan-500/10 border border-cyan-500/40 rounded-lg text-cyan-300 text-xs font-bold">
       BP
     </div>
+
+    <!-- Header text -->
     <div>
       <h1 class="text-xl font-bold">Bastion PHP <span class="text-xs font-normal text-slate-400">v0.1.0</span></h1>
-      <p class="text-xs text-slate-500 mt-[-2px]">Security-First, Filesystem-Routed, Zero-Magic PHP Framework</p>
+      <p class="text-xs text-slate-400">Ultra Secure · File Routed · Zero-Magic PHP Framework</p>
     </div>
   </div>
 </header>
 
-<!-- =============================== SIDEBAR NAVIGATION =============================== -->
-<aside class="fixed top-24 left-0 w-64 h-[calc(100vh-6rem)] overflow-y-auto border-r border-slate-800/40 text-sm bg-slate-900/10 p-4 hidden lg:block">
-  <!--
-    This is a docs-only sidebar, it does NOT exist in generated apps unless you create one.
-    Used to quickly navigate sections like pro docs.
-  -->
-  <nav class="space-y-2 text-slate-400">
-    <p class="font-semibold text-xs text-slate-500 uppercase tracking-widest mb-2">Docs Navigation</p>
-    <ul class="space-y-1">
-      <li><a class="hover:text-cyan-400" href="#overview">Overview</a></li>
-      <li><a class="hover:text-cyan-400" href="#installation">Installation</a></li>
-      <li><a class="hover:text-cyan-400" href="#configuration">Configuration</a></li>
-      <li><a class="hover:text-cyan-400" href="#title-system">Title System</a></li>
-      <li><a class="hover:text-cyan-400" href="#dv-engine">DV Engine</a></li>
-      <li><a class="hover:text-cyan-400" href="#routing">Filesystem Routing</a></li>
-      <li><a class="hover:text-cyan-400" href="#middleware">Middleware Pipeline</a></li>
-      <li><a class="hover:text-cyan-400" href="#database">Database & QueryBuilder</a></li>
-      <li><a class="hover:text-cyan-400" href="#components">Components</a></li>
-      <li><a class="hover:text-cyan-400" href="#api-products">Products API</a></li>
-      <li><a class="hover:text-cyan-400" href="#routing-wizard">Routing Wizard</a></li>
-      <li><a class="hover:text-cyan-400" href="#migrations-seeds">Migrations & Seeds</a></li>
-      <li><a class="hover:text-cyan-400" href="#cli-commands">CLI Commands</a></li>
-      <li><a class="hover:text-cyan-400" href="#deployment">Deployment</a></li>
-    </ul>
-  </nav>
-</aside>
+<!-- ========================================================= -->
+<!--                       DOCUMENTATION MAIN                  -->
+<!-- ========================================================= -->
+<main class="max-w-6xl mx-auto px-4 py-8 space-y-24">
 
-<!-- =============================== MAIN CONTAINER =============================== -->
-<main class="max-w-6xl mx-auto px-4 pt-12 lg:pl-72 space-y-32">
-
-<!-- ================================================================ -->
-<!-- 1. OVERVIEW                                                     -->
-<!-- ================================================================ -->
+<!-- ========================================================= -->
+<!-- 1. OVERVIEW SECTION                                      -->
+<!-- ========================================================= -->
 <section id="overview" class="space-y-6">
-  <h2 class="text-4xl font-bold border-l-4 border-cyan-500 pl-3">1. Overview</h2>
+  <h2 class="text-4xl font-bold border-l-4 border-cyan-400 pl-3">1. Framework Overview</h2>
 
-  <p class="text-lg text-slate-300">
-    Bastion PHP is a <strong>company-grade internal framework</strong> designed for security and fast deployment.
-    Nothing is optional. Everything is generated with protections always enabled.
-    It works like a fusion of ideas from <strong>Next.js (filesystem routing)</strong>,
-    <strong>Django (structured admin tools)</strong>, and <strong>FastAPI (closure endpoints and validation ergonomics)</strong>,
-    but implemented entirely in pure PHP with HTMX for client interactions.
+  <!-- Human-friendly explanation -->
+  <p class="text-base text-slate-300">
+    BastionPHP is a <strong>company-focused PHP framework produced by a generator script</strong>, designed for building
+    internal tooling that is:
   </p>
 
-  <div class="bg-slate-900/20 border border-slate-800 rounded-2xl p-6 text-sm shadow-xl">
-    <p class="font-bold text-base text-cyan-400 mb-2">Framework Principles</p>
-    <ul class="list-disc list-inside space-y-1 text-slate-400">
-      <li>✔ No frontend frameworks like React or template engines like Twig/Jinja</li>
-      <li>✔ All runtime pages are fragments (<code>page.php</code> without HTML shell)</li>
-      <li>✔ Routing happens through folders, not annotations</li>
-      <li>✔ <code>+server.php</code> returns closures mapping HTTP methods</li>
-      <li>✔ Security is not disabled in any environment</li>
-      <li>✔ SQLite is main database by default using WAL for parallel writes</li>
-      <li>✔ DV Engine is used to set <code>title</code>, <code>theme</code>, <code>breadcrumbs</code>, or UI flags</li>
-      <li>✔ ORM ergonomics exist via QueryBuilder (<code>DB::table()</code>) but never hides SQL entirely</li>
-    </ul>
-  </div>
-</section>
-
-<!-- ================================================================ -->
-<!-- 2. INSTALLATION                                                  -->
-<!-- ================================================================ -->
-<section id="installation" class="space-y-6">
-  <h2 class="text-4xl font-bold border-l-4 border-emerald-500 pl-3" id="installation">2. Installation</h2>
-
-  <p class="text-lg text-slate-300">
-    Install Bastion by cloning the repository and running the app generator script (example available in the attached file).
-  </p>
-
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-x-auto">
-# Clone framework
-git clone https://github.com/alexmejiaIMPRO/BastionPHP.git
-
-# Move into project directory
-cd BastionPHP
-</pre>
-
-  <p class="text-sm text-slate-500">
-    Next: run the scaffolding script to generate a project (shown later in this docs page).
-  </p>
-</section>
-
-<!-- ================================================================ -->
-<!-- 3. CONFIGURATION SYSTEM                                         -->
-<!-- ================================================================ -->
-<section id="configuration" class="space-y-8" id="configuration">
-  <h2 class="text-4xl font-bold border-l-4 border-yellow-500 pl-3">3. Configuration System</h2>
-
-  <!-- 3.1 ENV -->
-  <h3 class="text-xl font-semibold text-slate-200">3.1 <code>.env</code> variables</h3>
-  <p class="text-sm text-slate-400">
-    Bastion loads environment variables *first*, using the `phpdotenv` library. These values influence authentication, security rules,
-    and database configuration.
-  </p>
-
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-auto">
-# App behavior
-APP_ENV=development         # can be: "development", "production"
-APP_DEBUG=true             # shows full stack traces during development
-
-# Encryption seed for internal helpers
-APP_KEY=base64:GENERATED_APP_KEY_HERE
-
-# Database (default: SQLite)
-DB_CONNECTION=sqlite
-DB_PATH=storage/db/app.db  # main DB
-DB_CACHE_PATH=storage/db/cache.db # optional second DB for caching wizard or cached API responses
-
-# Authentication (JWT)
-JWT_SECRET=GENERATED_JWT_SECRET_HERE
-JWT_TTL=900                # seconds → 15 minutes
-JWT_REFRESH_TTL=604800     # 7 days
-
-# Cookie Security
-SECURE_COOKIES=false
-SAME_SITE=lax              # can be: "strict", "lax", "none"
-
-# CSRF Protection
-CSRF_ENABLED=true          # enables CSRF compare for unsafe HTTP methods
-CSRF_HEADER_NAME=X-CSRF-Token
-
-# Content Security Policy reporting
-CSP_REPORT_URI=/api/csp-report
-</pre>
-
-  <!-- 3.2 APP CONFIG -->
-  <h3 class="text-2xl font-semibold text-slate-200">3.2 <code>config/app.php</code></h3>
-  <p class="text-sm text-slate-400">
-    Static app config. In boot, Bastion reads this file to determine runtime environment and debugging rules.
-  </p>
-
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-auto">
-&lt;?php
-// FILE LOCATION: config/app.php
-// PURPOSE: reads app metadata such as name, environment, and debug flag.
-
-return [
-  'name'    => 'Bastion App',
-  'env'     => env('APP_ENV', 'production'),
-  'debug'   => env('APP_DEBUG', false),
-  // timezone set here globally for logs, Request helper, or DB timestamps
-  'timezone'=> 'America/Mexico_City',
-];
-?&gt;
-</pre>
-
-  <!-- 3.3 DATABASE CONFIG -->
-  <h3 class="text-2xl font-semibold text-blue-400">3.3 <code>config/database.php</code></h3>
-  <p class="text-sm text-slate-400">
-    Configuration used by DB service to connect to SQLite or Oracle or any DB you want to plug manually.
-  </p>
-
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-auto">
-&lt;?php
-// FILE: config/database.php
-// PURPOSE: contains the PDO connection configuration.
-
-return [
-  'connections' => [
-    'sqlite' => [
-      'driver' => 'sqlite',
-      'path'   => env('DB_PATH', 'storage/db/app.db'),
-    ],
-    // Bastion can be manually extended to other DBs like Oracle without hidden magic
-    'oracle'  => [
-      'driver'   => 'oci',
-      'host'     => env('ORACLE_HOST'),
-      'port'     => env('ORACLE_PORT','1521'),
-      'database' => env('ORACLE_DB'),
-      'username' => env('ORACLE_USER'),
-      'password' => env('ORACLE_PASS'),
-      'charset'  => 'AL32UTF8',
-    ]
-  ]
-];
-?&gt;
-</pre>
-
-  <!-- 3.4 SECURITY CONFIG -->
-  <h3 class="text-2xl font-semibold text-red-400">3.4 <code>config/security.php</code></h3>
-  <p class="text-sm text-slate-400">
-    Controls all internal security behavior.
-    Bastion uses this file automatically to enable CSRF comparison, JWT signing, cookie flags, etc.
-  </p>
-
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-auto">
-&lt;?php
-// FILE: config/security.php
-// PURPOSE: defines runtime security flags.
-
-return [
-  'csrf_enabled' => env('CSRF_ENABLED', true),
-  'csrf_header'  => env('CSRF_HEADER_NAME', 'X-CSRF-Token'),
-  'jwt_secret'   => env('JWT_SECRET'),
-  'cookie' => [
-    'same_site' => env('SAME_SITE','lax'),
-    'http_only' => true,
-    'secure'    => env('APP_ENV') === 'production',
-  ],
-  // if enabled, adds an extra ID encryption layer for Request and Response helpers.
-  'input_sanitization_global' => true,
-];
-?&gt;
-</pre>
-
-  <!-- 3.5 STYLE CONFIG -->
-  <h3 class="text-2xl font-semibold text-emerald-400">3.5 <code>config/style.php</code> – Tailwind default + theme setup</h3>
-  <p class="text-sm text-slate-400">
-    Bastion generated apps load Tailwind automatically from this config *if enabled* (always enabled in your build system),
-    but in documentation we use CDN so code is not too long for non-technical readers.
-  </p>
-
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-auto">
-&lt;?php
-// FILE: config/style.php
-// PURPOSE: stores theme rules and Tailwind source.
-
-return [
-  'theme'         => 'dark',  // can be: "dark", "light"
-  'use_tailwind'  => true,
-  'tailwind_mode' => 'cdn',   // For docs page loaded via CDN. For prod: set to 'build'.
-  'navbar_fixed'  => true,
-  'sidebar' => [
-    'enabled'     => true,
-    'breakpoints' => [ 'lg' => true, 'md' => false, 'sm' => false ],
-  ],
-];
-?&gt;
-</pre>
-</section>
-
-<!-- ================================================================ -->
-<!-- 4. TITLE SYSTEM                                                  -->
-<!-- ================================================================ -->
-<section id="title-system" class="space-y-4">
-  <h2 class="text-4xl font-bold border-l-4 border-yellow-500 pl-3">4. Title System</h2>
-  <!--
-    Bastion supports legacy globals and DV Engine titles, but always prefers DV.
-  -->
-  <p class="text-sm text-slate-300">Set title inside <code>page.php</code>:</p>
-  <pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-auto">
-&lt;?php
-DV::set('title','Admin · Users');
-?&gt;
-  </pre>
-
-  <p class="text-sm text-slate-300">Read it inside <code>layout.php</code>:</p>
-  <pre class="bg-black/40 border border-slate-900 rounded-xl p-4 text-xs overflow-auto">
-&lt;?php
-$title = DV::get('title', $GLOBALS['title'] ?? 'Bastion PHP');
-echo "<title>" . e($title) . "</title>";
-?&gt;
-  </pre>
-</section>
-
-<!-- ================================================================ -->
-<!-- 5. DV ENGINE                                                     -->
-<!-- ================================================================ -->
-<section id="dv-engine" class="space-y-6">
-  <h2 class="text-4xl font-bold border-l-4 border-purple-500 pl-3">5. DV Engine</h2>
-
-  <p class="text-sm text-slate-300">
-      This class acts similar to FastAPI’s dependency context bag but stores UI and metadata for layouts and API responses.
-  </p>
-
-  <ul class="list-disc list-inside text-sm text-slate-400 space-y-1">
-    <li><code>DV::set('key',value)</code> → Set UI state</li>
-    <li><code>DV::get('key',fallback)</code> → Read UI state</li>
+  <ul class="list-disc list-inside text-lg text-slate-400">
+    <li>✔ Extremely secure (CSP, CSRF, HttpOnly, SameSite cookies)</li>
+    <li>✔ Fast to develop and deploy</li>
+    <li>✔ Zero "magic" – Everything is explicit</li>
+    <li>✔ No frontend frameworks required</li>
   </ul>
 
-  <pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-x-auto">
-Common keys used in Bastion generated apps:
-  - title
-  - theme
-  - breadcrumbs[]
-  - hideSidebar
-  - hideNavbar
-  - requiresAuth (bool)
+  <p class="text-sm text-slate-500">
+    The framework intentionally <strong>imitates the ergonomics</strong> of inspiring systems like:
+    Next.js (routing), Django (models/admin feel), FastAPI (method-map endpoints).
+  </p>
+
+  <div class="bg-slate-900/20 border border-slate-800 rounded-xl p-4 text-xs sm:text-sm text-slate-300">
+    <strong>Core Architecture Principles:</strong>
+    <ul class="list-disc list-inside text-slate-400 mt-2 space-y-1">
+      <li>Filesystem routing like Next.js</li>
+      <li>Middleware pipeline executed before routing</li>
+      <li>No templating engines, no hidden globals</li>
+      <li>SQL is never abstracted away</li>
+      <li>Reusable components are PHP functions</li>
+      <li>Shared UI state is stored in the Data View Engine (DV::class)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<!-- 2. ENVIRONMENT VARIABLES & CONFIGURATION                  -->
+<!-- ========================================================= -->
+<section id="env-config">
+  <h2 class="text-4xl font-bold border-l-4 border-yellow-400 pl-3 mb-6">2. Environment Variables & Configuration</h2>
+
+  <p class="text-lg text-slate-300">
+    BastionPHP applications load configuration from 4 main sources at boot:
+  </p>
+
+  <ul class="list-decimal list-inside text-lg text-slate-400 mb-4">
+    <li><strong>.env file</strong> → stores secrets, toggles, and driver paths</li>
+    <li><strong>config/app.php</strong> → core app settings</li>
+    <li><strong>config/security.php</strong> → CSRF/JWT/CSP rules</li>
+    <li><strong>config/style.php</strong> → UI flags (dark mode, CDN mode, navbar, etc)</li>
+  </ul>
+
+  <p class="text-sm text-slate-500">
+    Bastion <strong>never deletes or disables security by flags</strong>. Every app generated already contains all protection by default.
+  </p>
+
+  <!-- ENV FILE -->
+  <h3 class="text-2xl font-bold text-cyan-300 mt-8 mb-2">Example: <code>.env</code> file</h3>
+  <pre class="bg-black/80 border border-slate-900 rounded-xl p-4 text-xs overflow-auto">
+# =========================================================
+#            CORE ENVIRONMENT SETTINGS
+# =========================================================
+APP_ENV=development          # can be: development, production
+APP_DEBUG=true              # enables detailed error output
+APP_KEY=base64:GENERATEDKEY  # application encryption seed
+TIMEZONE=UTC-6              # used for logs and sessions
+
+# =========================================================
+#            SQLITE DATABASE SETTINGS (default)
+# =========================================================
+DB_DRIVER=sqlite             # WAL enabled for concurrency
+DB_PATH=storage/db/app.db
+
+# =========================================================
+#            JWT AUTH SETTINGS
+# =========================================================
+JWT_SECRET=GENERATEDJWTSECRET
+JWT_TTL=900                # 900 seconds = 15 minutes
+JWT_REFRESH_TTL=604800     # 7 days refresh validity
+
+# =========================================================
+#            COOKIE SECURITY
+# =========================================================
+SAME_SITE=lax              # recommended: lax or strict
+HTTP_ONLY=true             # prevents JavaScript access to cookies
+SECURE_COOKIE=true         # only via HTTPS in production
+  </pre>
+
+  <!-- CONFIG FILES -->
+  <h3 class="text-2xl font-bold text-slate-200 mt-12 mb-6 border-b border-slate-800 pb-2">Configuration Files</h3>
+
+  <!-- app.php -->
+  <h4 class="text-xl font-bold text-indigo-400 mb-2">config/app.php</h4>
+  <pre class="bg-black/80 border border-slate-900 rounded-xl p-4 text-xs overflow-x-auto">
+&lt;?php
+// =========================================================
+// FILE PURPOSE:
+//   - Basic application identity and behavior settings
+//   - Influenced by ENV values but NOT a source of secrets
+// =========================================================
+
+return [
+    'app_name'    =&gt; 'Bastion Internal Dashboard',
+    // Reads variable from ENV using `env()` helper, fallback to default if missing
+    'environment' =&gt; env('APP_ENV', 'production'),
+    'debug_mode'  =&gt; env('APP_DEBUG', false),
+    // Uses server timezone for consistent log timestamps
+    'timezone'    =&gt; env('TIMEZONE', 'UTC'),
+];
+?&gt;
+  </pre>
+
+  <!-- security.php -->
+  <h4 class="text-xl font-bold text-red-400 mb-2 mt-8">config/security.php</h4>
+  <pre class="bg-black/80 border border-slate-900 rounded-xl p-4 text-xs overflow-x-auto">
+&lt;?php
+// =========================================================
+// FILE PURPOSE:
+//   - Controls backend protection behavior
+//   - Security is always ON, these flags tune behavior only
+// =========================================================
+
+return [
+  'JWT_SIGNING_KEY'   =&gt; env('JWT_SECRET'),
+  'JWT_ACCESS_EXPIRY' =&gt; (int)env('JWT_TTL', 900),
+
+  // CSRF protection toggle
+  'ENABLE_CSRF' =&gt; (bool) env('CSRF_ENABLED', true),
+
+  // Cookie Security
+  'COOKIE_OPTIONS' =&gt; [
+      'SameSite' =&gt; env('SAME_SITE', 'lax'),
+      'HttpOnly' =&gt; true,
+      'Secure'   =&gt; env('APP_ENV') === 'production'
+  ],
+
+  // CSP header config (URI for violation reports)
+  'CSP_REPORT_URI' =&gt; '/api/csp-report',
+];
+?&gt;
+  </pre>
+
+  <!-- style.php -->
+  <h4 class="text-xl font-bold text-emerald-400 mb-2 mt-8">config/style.php</h4>
+  <pre class="bg-black/80 border border-slate-900 rounded-xl p-6 text-xs overflow-x-auto">
+&lt;?php
+// =========================================================
+// FILE PURPOSE:
+//   - Controls style behavior for the frontend
+//   - THIS DOC PAGE uses Tailwind CDN, generated apps compile locally
+// =========================================================
+
+return [
+  // Recommended UI theme for generated apps
+  'theme' =&gt; 'dark',
+
+  // Default frontend styles shipped with scaffold
+  'use_tailwind' =&gt; true,
+
+  // Layout configuration flags so each layout nested can behave correctly
+  'layout' =&gt; [
+      'navbar_fixed' =&gt; true,   // navbar should stay visible when scrolling
+      'sidebar'     =&gt; true,   // sidebar enabled by default for dashboard UX
+      'container_padding' =&gt; 'p-4 sm:p-6 lg:p-8',
+  ],
+
+  // Framework which developer can include if CDN is desired (not secrets)
+  'fallbackCss' =&gt; '/public/css/fallback.css',
+];
+?&gt;
   </pre>
 </section>
 
-<!-- ================================================================ -->
-<!-- 6. FILESYSTEM ROUTING (like Next.js)                            -->
-<!-- ================================================================ -->
-<section id="routing" class="space-y-6">
-  <h2 class="text-4xl font-bold border-l-4 border-indigo-500 pl-3">6. Filesystem Routing</h2>
+<!-- ========================================================= -->
+<!-- 3. DV ENGINE EXAMPLES                                     -->
+<!-- ========================================================= -->
+<section id="dv-engine-examples" class="space-y-6">
+  <h2 class="text-4xl font-bold border-l-4 border-purple-500 pl-3">3. DV Engine Usage</h2>
 
-  <!--
-      In Bastion:
-      - You create routes by creating folders under /app.
-      - A page must be named `page.php`.
-      - A layout must be named `layout.php`.
-      - API endpoint files must be named `+server.php`.
-      - Dynamic params use folders `[param]`.
-  -->
-  <p class="text-sm text-slate-300">How routes map to real files:</p>
-  <pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-x-auto">
-/                    -> app/page.php
-/admin               -> app/admin/page.php + app/admin/layout.php
-/admin/users         -> app/admin/users/page.php + nested layout stacking
-/api/products        -> app/api/products/+server.php
-/api/products/10     -> app/api/products/[Id]/+server.php (dynamic param)
+  <p class="text-sm text-slate-400">
+    The Data View Engine (<code>DV::class</code>) stores UI metadata to be consumed by layouts.
+  </p>
+
+  <pre class="bg-black/80 border border-slate-900 rounded-xl p-4 text-xs overflow-x-auto">
+&lt;?php
+// =========================================================
+// BEST PRACTICE FOR BASTION APPS:
+// Use DV::set() inside page files BEFORE output
+// so layouts consume them like Next.js layout nesting.
+// =========================================================
+
+// Sets the dynamic page title to be read by all stacked layout files
+DV::set('title', 'Admin · Products');
+
+// Stores UI flags
+DV::set('showSidebar', true);
+DV::set('hideNavbar', false);
+
+// Example: Breadcrumbs for navigation
+DV::set('breadcrumbs', ['Admin', 'Products', 'Create']);
+?&gt;
   </pre>
+
+  <p class="text-xs text-slate-500 mt-3">
+    We <strong>never escape JSON using `e()`</strong>, but we <strong>always escape HTML output</strong>.
+  </p>
+</section>
+
+<!-- ========================================================= -->
+<!-- 4. ESCAPING EXPLANATION (e() why matters)                 -->
+<!-- ========================================================= -->
+<section id="escaping-why" class="space-y-6">
+  <h2 class="text-4xl font-bold border-l-4 border-red-400 pl-3">4. Escaping Output: Why <code>e()</code> Matters</h2>
+
+  <p class="text-lg text-slate-300">
+    <strong>The e() function exists ONLY for HTML rendering safety.</strong>
+  </p>
+
+  <p class="text-sm text-slate-400">
+    It prevents XSS attacks by converting dangerous characters:
+  </p>
+
+  | Raw | Escaped |
+  |---|---|
+  | `<script>` | `&lt;script&gt;` |
+  | `"` | `&amp;quot;` |
+  | `'` | `&amp;#039;` |
+  | `&` | `&amp;amp;` |
+
+<pre class="bg-black/70 border border-slate-800 rounded-xl p-4 text-xs overflow-auto">
+&lt;?php
+// Escape product name BEFORE inserting into HTML
+$name = e("Cookies <b> & CSP"); 
+echo $name;
+?&gt;
+</pre>
 
   <p class="text-xs text-slate-500">
-      The router internally collects nested <code>layout.php</code> files like Next.js to compose UI.
-      API endpoints do NOT enforce layout stacking unless they intentionally return HTML fragments.
-  </p>
-
-</section>
-
-<!-- ================================================================ -->
-<!-- 7. MIDDLEWARE PIPELINE                                          -->
-<!-- ================================================================ -->
-<section id="middleware" class="space-y-6">
-  <h2 class="text-4xl font-bold border-l-4 border-teal-500 pl-3">7. Middleware Pipeline</h2>
-
-  <p class="text-sm text-slate-300">
-      Every request passes through middlewares BEFORE router resolution.
-      Order by default:
-  </p>
-
-  <pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-x-auto">
-SecurityHeaders → RateLimit → AuthMiddleware → AdminOnly → Router
-  </pre>
-
-  <p class="text-xs text-slate-500">
-      You can disable nothing, security is ALWAYS enforced. You can EXTEND each middleware forever.
+    Again: <strong>Escape data when rendering HTML, NEVER when returning JSON.</strong>
   </p>
 </section>
 
-<!-- ================================================================ -->
-<!-- 8. DATABASE LAYER                                                -->
-<!-- ================================================================ -->
-<section id="database" class="space-y-6">
-  <h2 class="text-4xl font-bold border-l-4 border-lime-500 pl-3">8. Database & QueryBuilder</h2>
+<!-- ========================================================= -->
+<!-- 5. Database QueryBuilder ORM-like usage                   -->
+<!-- ========================================================= -->
+<section id="db-section" class="space-y-6">
+  <h2 class="text-4xl font-bold border-l-4 border-blue-500 pl-3">5. Database Layer & QueryBuilder</h2>
 
-  <!--
-      Bastion wraps PDO but never hides logic from the developer:
-        $rows = DB::table('resource')->where(...)->limit(...)->get();
-      Uses WAL enabled sqlite by default for concurrency.
-      For Oracle: you just call raw CRUD stored procedures or SQL manually inside closures.
-  -->
-  <p class="text-sm text-slate-300">
-      Default DB: SQLite with WAL for parallel writes and fast internal tools.
-      You can extend to Oracle without losing Query ergonomics.
-  </p>
+<pre class="bg-black/80 border border-slate-900 rounded-xl p-4 text-xs overflow-x-auto">
+&lt;?php
+// =========================================================
+// CONNECTION:
+// Bastion uses PDO internally. SQLite is default because
+// it supports WAL mode for concurrency.
+// QueryBuilder is facade-like, simulating ORM chains.
+// =========================================================
 
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-auto">
+// Fetch many rows
 $users = DB::table('users')
-    ->where('role','admin')
-    ->orderBy('id','DESC')
-    ->limit(10)
-    ->get();
-</pre>
+  -&gt;where('role','admin')
+  -&gt;limit(10)
+  -&gt;get();
 
-  <p class="text-xs text-slate-500">
-      Always escape values printed into documentation or UI using <code>e()</code> to prevent XSS.
-  </p>
-</section>
+// Fetch single row
+$user = DB::table('users')
+  -&gt;where('email','test@example.com')
+  -&gt;first();
 
-<!-- ================================================================ -->
-<!-- 9. COMPONENTS (SERVER AND CLIENT INTERACTIVE)                    -->
-<!-- ================================================================ -->
-<section id="components" class="space-y-12">
-  <h2 class="text-4xl font-bold border-l-4 border-pink-500 pl-3">9. Components System</h2>
+// Insert new row
+$id = DB::table('products')
+  -&gt;insert([
+      'name'       =&gt; 'Keyboard',
+      'price'      =&gt; 99.5,
+      'created_at' =&gt; time()
+   ]);
 
-  <p class="text-lg text-slate-400">
-    Bastion PHP simulates <strong>React component ergonomics without a frontend framework</strong>.
-    You build reusable UI pieces with <strong>PHP functions that return HTML strings or fragments</strong>.
-  </p>
+// Update row
+DB::table('products')
+  -&gt;where('id', $id)
+  -&gt;update(['price'=&gt;120]);
 
-  <!-- Server side -->
-  <div>
-    <h3 class="text-2xl font-bold text-emerald-400">9.1 Server-Side PHP Components</h3>
-    <p class="text-sm text-slate-400 mb-2">
-      These do NOT include HTMX attributes. They are static and rendered on the server, reusable across pages.
-    </p>
-
-<pre class="bg-black/70 border border-slate-800 rounded-xl p-6 text-xs overflow-x-auto">
-&lt;?php
-// FILE: resources/views/components/ProductCard.php
-// PURPOSE: render a reusable Product UI card safely.
-
-// Every line explained for developers that don't know internals:
-
-// 1. `function ProductCard(array $product): string`
-//    ➤ Declares a PHP function that expects an array (like a DB row or API payload)
-//    ➤ It RETURNS a string that contains HTML.
-
-// 2. `e($product['name'])` ➤ `e()` escapes HTML, so attackers cannot inject malicious code.
-//    Think of it like: if `name` is "&lt;script&gt;alert('XSS')&lt;/script&gt;", it prints safely as TEXT.
-
-// 3. `(string)$product['price']` ➤ Cast to string *before escaping*, because `htmlspecialchars()` only works on strings.
-
-// ✅ FULL SAFE FUNCTION ↓
-
-function ProductCard(array $product): string {
-  $id    = (int) $product['id'];       // convert ID to integer for extra safety
-  $name  = e($product['name']);        // escape name
-  $price = e((string)$product['price']);// convert to string + escape
-
-  return "
-  <article id='product-{$id}' 
-           class='p-4 sm:p-6 bg-slate-900/20 border border-slate-800 rounded-xl shadow-lg transition-all duration-300 hover:shadow-cyan-500/10'>
-    <h3 class='text-xl font-bold'>{$name}</h3>
-    <p class='text-sm opacity-70'>💰 Price: \${$price}</p>
-    <p class='text-xs text-slate-500'>🆔 ID: {$id}</p>
-  </article>
-  ";
-}
+// Delete row
+DB::table('products')
+  -&gt;where('id', $id)
+  -&gt;delete();
 ?&gt;
 </pre>
-  </div>
-
-  <!-- Client hydrated with HTMX -->
-  <div>
-    <h3 class="text-2xl font-bold text-red-400">9.2 Client-Interactive Components (HTMX hydrated)</h3>
-    <p class="text-sm text-slate-400 mb-2">
-      Same as server components but include <strong>HTMX attributes</strong> to update UI without JavaScript.
-    </p>
-
-<pre class="bg-black/70 border border-slate-800 rounded-xl p-6 text-xs overflow-x-auto text-slate-200">
-&lt;?php
-// FILE: resources/views/components/ProductRow.php
-// PURPOSE: reusable product row that deletes or updates without frontend JS.
-
-// ❗ SECURITY IS IDENTICAL:
-// We STILL escape everything using `e()` BEFORE returning the HTML.
-
-// We add `hx-delete`, `hx-put`, etc to make it interactive via backend.
-// We NEVER build SQL manually in UI, we call Bastion request and response helpers.
-
-// ✅ SAFE FUNCTION ↓
-function ProductRow(array $product): string {
-  $id   = (int)$product['id'];
-  $name = e($product['name']);
-
-  return "
-  <tr id='product-{$id}' class='border-b border-slate-800 transition-all hover:bg-slate-900/20'>
-    <td class='py-2'>📦 {$name}</td>
-    <td class='text-right'>
-      <button
-        hx-delete='/api/products/{$id}'
-        hx-target='#product-{$id}'
-        hx-swap='outerHTML'
-        class='px-2 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded-md hover:bg-red-500/20 transition'>
-        🗑 Delete
-      </button>
-    </td>
-  </tr>
-  ";
-}
-?&gt;
-</pre>
-
-<pre class="bg-slate-900/10 border border-slate-800 rounded-xl p-6 text-xs overflow-x-auto text-slate-400">
-  ✔ Use <code colspan> for massive UI reuse
-  ✔ HTMX hydration means instant UI updates, no JS
-  ✔ Global escaping via e() ensures UI safety
-    </pre>
-
-  </div>
 </section>
 
-<!-- ================================================================ -->
-<!-- 10. API ENDPOINTS (PRODUCTS EXAMPLE)                            -->
-<!-- ================================================================ -->
-<section id="api-endpoints" class="space-y-12">
-  <h2 class="text-4xl font-bold border-l-4 border-orange-500 pl-3">10. Products API Endpoints</h2>
-  
-  <p class="text-lg text-slate-400">
-    API endpoints in Bastion are not Controllers or classes — they are <strong>one file per folder returning closures</strong>
-    mapping HTTP verbs to logic, like FastAPI.
+<!-- ========================================================= -->
+<!-- 6. File-based Layout Nesting like Next.js                 -->
+<!-- ========================================================= -->
+<section id="layouts" class="space-y-6">
+  <h2 class="text-4xl font-bold border-l-4 border-green-500 pl-3">6. Layout Nesting</h2>
+
+  <p class="text-sm text-slate-300">
+    BastionPHP uses nested layouts automatically loaded by the router.
+    The title comes from DV engine to avoid manual plumbing between nested layouts.
   </p>
 
-  <!-- api/products/+server.php -->
-  <div>
-    <h3 class="text-2xl font-bold text-cyan-400">10.1 Collection Endpoint (<code>app/api/products/+server.php</code>)</h3>
-
-<pre class="bg-black/70 border border-slate-800 rounded-xl p-6 text-xs overflow-x-auto">
+<pre class="bg-black/80 border border-slate-900 rounded-xl p-4 text-xs overflow-x-auto">
 &lt;?php
-// FILE: app/api/products/+server.php
-// PURPOSE: handles /api/products (GET for list, POST for create).
+// FILE: app/admin/layout.php
+// PURPOSE: Wraps all `/admin/*` routes
 
-use App\Core\DB;
-use App\Core\Response;
+// Reads the shared title set by DV::set('title', ...) inside page.php
+$title = DV::get('title','Admin Panel');
+$nonce = req()-&gt;meta['csp_nonce'] ?? '';
 
-// `return []` ➤ this file returns an array where each key is an HTTP method,
-// and each value is a closure (anonymous function) that the router executes when matched.
+// Print HTML shell for admin pages (ALWAYS escape dynamic content)
+echo "&lt;title&gt;" . e($title) . "&lt;/title&gt;";
+?&gt;
+  </pre>
+</section>
 
-// Every closure receives a Bastion `$req` Request instance,
-// which wraps GET/POST/JSON/Form URL input logic and validation.
+<!-- ========================================================= -->
+<!-- 7. Generated page.php behavior                             -->
+<!-- ========================================================= -->
+<section id="pages" class="space-y-6">
+  <h2 class="text-4xl font-bold border-l-4 border-lime-400 pl-3">7. page.php Usage</h2>
+
+  <p class="text-sm text-slate-300">
+    page.php files render ONLY the body fragment.
+    They can set DV metadata safely.
+  </p>
+
+<pre class="bg-black/80 border border-slate-900 rounded-xl p-6 text-xs overflow-x-auto">
+&lt;?php
+// FILE: app/admin/products/[Id]/page.php
+// ROUTE: /admin/products/{Id}
+// BastionPHP auto-extracts `[Id]` from the folder and stores into Request meta.
+
+$GLOBALS['title'] = "Editing product {$req-&gt;meta['params']['Id']}";
+
+// DV Metadata
+DV::set('title','Product Details');
+?&gt;
+  </pre>
+</section>
+
+<!-- ========================================================= -->
+<!-- 8. REST API Endpoint examples (products)                  -->
+<!-- ========================================================= -->
+<section id="api-products" class="space-y-8">
+  <h2 class="text-4xl font-bold border-l-4 border-cyan-400 pl-3">8. API · FastAPI Style Endpoints</h2>
+
+  <h3 class="text-2xl font-bold text-cyan-300">8.1 Collection endpoint (<code>app/api/products/+server.php</code>)</h3>
+
+<pre class="bg-black border border-slate-900 rounded-xl p-5 text-xs overflow-x-auto">
+<span>&lt;?php</span>
+// ROUTE: /api/products
+// Bastion PHP endpoint returning JSON. Handled similar to FastAPI method map.
+// Uses req() and res() helpers, and DB QueryBuilder chains.
 
 return [
   'get' =&gt; function($req) {
-    // 1. `$req->input()` reads GET query (?limit=50), POST form-urlencoded, or JSON body.
-    $limit = $req->input('limit') ?? 50;
-
-    // 2. DB::table() acts like a mini ORM but is SQL explicit.
-    $rows = DB::table('products')
-      -&gt;orderBy('id','DESC')  // sorts products latest first
-      -&gt;limit((int)$limit)   // ensures integer
-      -&gt;get();               // executes query and fetches rows
-
-    // 3. Use Response helper to return JSON safely.
-    res()-&gt;json([
-      'data'  =&gt; $rows,
-      'count' =&gt; count($rows),
-      'limit' =&gt; (int)$limit,
-      'note'  =&gt; 'Data returned securely from collection endpoint'
-    ]);
+      // no e() here, because this is JSON, not HTML
+      $limit = (int)($req-&gt;input('limit') ?? 20);
+      $products = DB::table('products')-&gt;orderBy('id','DESC')-&gt;limit($limit)-&gt;get();
+      return res()-&gt;json([
+         'data'=>$products,
+         'count'=>count($products),
+         'limit'=>$limit,
+      ], 200);
   },
 
   'post' =&gt; function($req) {
-    try {
-      // 1. Input validation. If fails, throws ValidationException.
-      $data = $req->validate([
-        'name'  =&gt; 'required|min:2',
-        'price' =&gt; 'required|numeric|min:0',
-        'sku'   =&gt; 'required|min:3'
-      ]);
-
-      // 2. Insert validated data.
+      $json = $req-&gt;json(); 
       $id = DB::table('products')-&gt;insert([
-        'name'       =&gt; $data['name'],
-        'price'      =&gt; (float)$data['price'],
-        'sku'        =&gt; $data['sku'],
-        'created_at' =&gt; time(),
-        'created_by' =&gt; auth()['id'] ?? 0
+         'name'  =&gt; (string)$json['name'],
+         'price' =&gt; (float)$json['price'],
+         'created_at' =&gt; time(),
       ]);
-
-      // 3. Return structured JSON.
-      res()-&gt;json([
-        'id'=>$id,
-        'created'=>true,
-        'message'=>'Product created securely!'
-      ],201);
-
-    } catch(\App\Core\ValidationException $e) {
-      // Standardized 422 JSON if validation fails.
-      res()-&gt;json(['errors'=>$e-&gt;errors],422);
-    }
+      return res()-&gt;json(['id'=>$id],201);
   }
 ];
-?&gt;
+<span>?&gt;</span>
 </pre>
-  </div>
 
-  <!-- api/products/[Id]/+server.php -->
-  <div>
-    <h3 class="text-2xl font-bold text-amber-400">10.2 Dynamic Resource Endpoint (<code>app/api/products/[Id]/+server.php</code>)</h3>
+<h3 class="text-2xl font-bold text-lime-400">8.2 Single endpoint (<code>app/api/products/[Id]/+server.php</code>)</h3>
 
-<pre class="bg-black/70 border border-slate-800 rounded-xl p-6 text-xs overflow-x-auto">
-&lt;?php
-// FILE: app/api/products/[Id]/+server.php
-// PURPOSE: handles a single product: /api/products/{Id}
-
-use App\Core\DB;
-use App\Core\Response;
-
-// Router auto sets $req->meta['params']['Id'] from the folder name [Id].
-// So we can access it → $req->meta['params']['Id']
+<pre class="bg-black border border-slate-900 rounded-xl p-5 text-xs overflow-x-auto">
+<span>&lt;?php</span>
+// ROUTE: /api/products/{Id}
 
 return [
   'get' =&gt; function($req) {
-    $id = (int)$req->meta['params']['Id'];
-
-    $row = DB::table('products')->where('id',$id)->first();
-
-    if(!$row) res()->abort(404,'Product not found');
-
-    res()->json([
-      'data'=>$row,
-      'note'=>'Single product returned securely'
-    ]);
+      $id = (int) req()-&gt;meta['params']['Id'];
+      $product = DB::table('products')-&gt;where('id',$id)-&gt;first();
+      if(!$product) return res()-&gt;abort(404,'Product not found');
+      return res()-&gt;json(['data'=>$product],200);
   },
 
   'put' =&gt; function($req) {
-    $id = (int)$req->meta['params']['Id'];
-    try {
-      $data = $req->validate([
-        'name'  =&gt; 'sometimes|min:2',
-        'price' =&gt; 'sometimes|numeric|min:0'
-      ]);
-      if(!$data) return res()->json(['updated'=>false,'message'=>'No data'],400);
-      DB::table('products')->where('id',$id)->update($data);
-      res()->json(['id'=>$id,'updated'=>true]);
-    } catch(\App\Core\ValidationException $e) { res()->json(['errors'=>$e-&gt;errors],422); }
+      $id = (int)req()-&gt;meta['params']['Id'];
+      $json = $req-&gt;json();
+      DB::table('products')-&gt;where('id',$id)-&gt;update(['price'=>(float)$json['price']]);
+      return res()-&gt;json(['updated'=>true],200);
   },
 
-  'delete'=> function($req) {
-    $id = (int)$req->meta['params']['Id'];
-    DB::table('products')->where('id',$id)->delete();
-    res()->json(['id'=>$id,'deleted'=>true]);
+  'delete' =&gt; function($req) {
+      $id=(int)req()-&gt;meta['params']['Id'];
+      DB::table('products')-&gt;where('id',$id)-&gt;delete();
+      return res()-&gt;json(['deleted'=>true],200);
   }
 ];
-?&gt;
+<span>?&gt;</span>
 </pre>
-  </div>
+</section>
 
-  <!-- api/products/[Id]/+server.php -->
-  <div>
-    <h3 class="text-2xl font-bold text-lime-400">10.3 Dynamic Resource Endpoint for PAGES (<code>app/products/[Id]/page.php</code>)</h3>
-    <p class="text-sm text-slate-400">
-      Bastion dynamic PAGES work the same but return HTML fragments instead of JSON.
-      They still have `$req` input helpers available.
-      Layout files can inherit DV metadata.
-    </p>
+<!-- ========================================================= -->
+<!-- 9. How to consume JSON endpoints from PHP server side      -->
+<!-- ========================================================= -->
+<section id="consume-json-php" class="space-y-6">
+  <h2 class="text-4xl font-bold border-l-4 border-blue-500 pl-3">9. Consuming JSON API Endpoints from PHP</h2>
 
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-6 text-xs overflow-x-auto">
+  <p class="text-sm text-slate-300">
+    When you want your PHP backend to consume internal endpoints (BFF architecture), you call them like this internally:
+  </p>
+
+<pre class="bg-black/80 border border-slate-900 rounded-xl p-5 text-xs overflow-x-auto">
 &lt;?php
-// FILE: app/products/[Id]/page.php
-// PURPOSE: renders a product detail page using dynamic param [Id] for PAGES instead of API.
+// Internal PHP module/client consuming JSON from Bastion endpoint
+$response = file_get_contents('/api/products?limit=3');
 
-use App\Core\DB;
-use App\Core\DV;
-use App\Core\Response;
+// Convert JSON string to PHP array
+$payload = json_decode($response, true);
 
-// 1. Read dynamic route param from meta bag
-$id = (int) req()->meta['params']['Id'];
-
-// 2. Query database using ORM-like chain QueryBuilder
-$product = DB::table('products')->where('id',$id)->first();
-
-// 3. If product not found -> abort and show 404 fragment view
-if(!$product) {
-  res()->abort(404,'Product not found');
-  exit;
+// When rendering into HTML we MUST escape with e()
+foreach ($payload['data'] as $p) {
+    echo "&lt;div&gt;Product: " . e($p['name']) . " ($" . e((string)$p['price']) . ")&lt;/div&gt;";
 }
-
-// 4. Set page title via DV engine so layout can stack it
-DV::set('title', "Product #{$id} details");
-
-// 5. Return fragment HTML
-res()->html("
-&lt;section class='p-4 sm:p-6 rounded-2xl shadow-xl border border-slate-700 bg-slate-900/10 space-y-4'&gt;
-  &lt;h2 class='text-3xl font-bold text-cyan-300'&gt;".e($product['name'])."&lt;/h2&gt;
-  &lt;p class='text-sm text-slate-400'&gt;Part SKU: ".e($product['sku'])."&lt;/p&gt;
-  &lt;p class='text-sm text-slate-400'&gt;Price: \${".e((string)$product['price'])."}&lt;/p&gt;
-&lt;/section&gt;
-");
 ?&gt;
-</pre>
-
-  </div>
-</section>
-
-<!-- ================================================================ -->
-<!-- 11. MIGRATIONS & SEEDS                                         -->
-<!-- ================================================================ -->
-<section id="migrations-seeds" class="space-y-6">
-  <h2 class="text-4xl font-bold border-l-4 border-lime-500 pl-3">11. Migrations & Seeds</h2>
-
-  <p class="text-md text-slate-300">
-    Bastion runs migrations and seeders using CLI commands (no flags, always included).
-    Migrations are SQL, seeds are PHP files that hydrate initial data.
-  </p>
-
-  <h3 class="text-lg font-bold text-slate-400">11.1 Migration Example (SQL)</h3>
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-x-auto">
--- FILE: database/migrations/001_create_products.sql
-CREATE TABLE IF NOT EXISTS products (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  price REAL NOT NULL,
-  sku TEXT NOT NULL,
-  created_at INTEGER NOT NULL,
-  created_by INTEGER NOT NULL
-);
-</pre>
-
-  <p class="text-xs text-slate-500">To run migrations in order:</p>
-  <pre class="bg-black/20 border border-slate-900 rounded-xl p-3 text-xs">
-./bastion migrate
   </pre>
 
-  <h3 class="text-lg font-bold text-slate-400">11.2 Seed Example (hydrating users and products)</h3>
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-auto">
-&lt;?php
-// FILE: database/seeds/001_seed_users.php
-
-// PURPOSE:
-//  • Creates initial admin and user accounts in the SQLite database.
-//  • Uses password_hash() to hash plain passwords securely.
-//  • You can always extend this seed file to hydrate other modules.
-
-DB::table('users')-&gt;insert([
-  'email'      =&gt; 'admin@local.test',
-  'password'   =&gt; password_hash('AdminPass123', PASSWORD_BCRYPT),
-  'role'       =&gt; 'admin',
-  'created_at' =&gt; time(),
-  'created_by' =&gt; 0,
-]);
-
-DB::table('users')-&gt;insert([
-  'email'      =&gt; 'user@local.test',
-  'password'   =&gt; password_hash('UserPass123', PASSWORD_BCRYPT),
-  'role'       =&gt; 'user',
-  'created_at' =&gt; time(),
-  'created_by' =&gt; 0,
-]);
-
-// Example products hydration:
-DB::table('products')->insert([
-  'name'       => 'Hydrated Product Example',
-  'price'      => 10.5,
-  'sku'        => 'SKU-DEMO-001',
-  'created_at' => time(),
-  'created_by' => 0,
-]);
-?&gt;
-</pre>
-
-  <p class="text-xs text-slate-500">To run all seed files:</p>
-  <pre class="bg-black/20 border border-slate-900 rounded-xl p-3 text-xs">
-./bastion seed
-    </pre>
+  <p class="text-xs text-slate-500">✔ This is common inside Services or Controllers to avoid frontend JS calls.</p>
 </section>
 
-<!-- ================================================================ -->
-<!-- 12. CLI COMMANDS OVERVIEW                                       -->
-<!-- ================================================================ -->
-<section id="cli" class="space-y-6">
-  <h2 class="text-4xl font-bold border-l-4 border-red-500 pl-3">12. CLI Bastion Commands</h2>
-
+<!-- ========================================================= -->
+<!-- 10. Docs Routing Wizard UI                               -->
+<!-- ========================================================= -->
+<section id="routing-wizard-section" class="space-y-6">
+  <h2 class="text-3xl font-bold border-l-4 border-purple-500 pl-3">10. Docs Routing Wizard</h2>
   <p class="text-sm text-slate-300">
-    Bastion CLI allows developers to interact with their project runtime similar to Django's manage.py or a small subset of Artisan.
-    Commands are extendable and always enabled in every generated build.
+    This tool simulates filesystem routing resolution inside BastionPHP, including layout stacking,
+    API detection, and dynamic param extraction.
   </p>
 
-  <ul class="list-disc list-inside text-sm text-slate-400 space-y-2">
-    <li><code>./bastion run-dev</code> → starts dev server.</li>
-    <li><code>./bastion migrate</code> → runs migrations.</li>
-    <li><code>./bastion seed</code> → runs seeders.</li>
-    <li><code>./bastion key:generate</code> → generates APP_KEY.</li>
-    <li><code>./bastion jwt:secret</code> → rotates JWT_SECRET.</li>
-    <li><code>./bastion make:page Users</code> → scaffolds page.</li>
-    <li><code>./bastion make:api Products</code> → scaffolds API.</li>
-    <li><code>./bastion make:component ProductCard --server</code> → makes server-side component.</li>
-    <li><code>./bastion make:component ProductForm --client</code> → makes client with HTMX tags.</li>
-  </ul>
-
-<pre class="bg-black/60 border border-slate-800 rounded-xl p-4 text-xs overflow-auto">
-# Start dev server with Tailwind + LiveReload concurrency
-./bastion run-dev
-  </pre>
-</section>
-
-<!-- ================================================================ -->
-<!-- 13. ROUTING WIZARD                                              -->
-<!-- ================================================================ -->
-<section id="routing-wizard" class="space-y-6">
-  <h2 class="text-4xl font-bold border-l-4 border-purple-500 pl-3">13. Docs Routing Wizard</h2>
-  <p class="text-sm text-slate-300">
-      This section contains a tool to simulate and visualize route resolution for Bastion PHP apps.
-  </p>
-
-  <div class="bg-slate-900/40 border border-slate-700 rounded-xl p-6 shadow-xl space-y-3">
-    <label class="block text-xs text-slate-500 uppercase tracking-widest">Test a route</label>
+  <div class="bg-slate-900/20 border border-slate-800 rounded-xl p-5 shadow-xl space-y-3">
     <input type="text" id="routeInput" placeholder="/api/products/10"
-      class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm placeholder-slate-600 focus:ring-2 focus:ring-purple-500">
-
-    <button id="resolveRouteBtn"
-      class="w-full sm:w-auto px-4 py-2 bg-purple-500/10 border border-purple-500/40 text-purple-300 rounded-lg hover:bg-purple-500/20 transition text-sm font-medium">
-      Resolve Route
+      class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-sm placeholder-slate-500 focus:ring-2 focus:ring-purple-500">
+    
+    <button id="simulateBtn"
+      class="px-4 py-2 bg-purple-500/10 border border-purple-500/40 text-purple-300 rounded-lg hover:bg-purple-500/20 transition">
+      Simulate Route Resolution
     </button>
 
-    <pre id="wizardOutput" class="mt-3 bg-black/60 border border-slate-800 rounded-xl p-5 text-xs text-slate-400 overflow-auto"></pre>
+    <pre id="resolutionOutput" class="mt-3 bg-black/70 border border-slate-900 rounded-xl p-4 text-xs sm:text-sm text-slate-300 overflow-auto"></pre>
   </div>
 
   <script>
-    // ESCAPE HELPER FOR JS DOCS ONLY:
-    // This imitates Bastion’s e() helper but for documentation-only snippet usage.
-    const e = str => str.replace(/[&<>"']/g, c => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
-    }[c]));
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('simulateBtn');
+        const input = document.getElementById('routeInput');
+        const output = document.getElementById('resolutionOutput');
 
-    // SIMULATED ROUTE RESOLUTION:
-    function resolveRouteSimulated(path) {
-      // Remove leading slash and split
-      const clean = path.trim().replace(/^\/+/, '');
-      const segs  = clean === '' ? [] : clean.split('/').filter(Boolean);
-      let type = 'page';
-      let file = 'app/page.php';
+        btn.addEventListener('click', function() {
+            const path = input.value.trim();
+            const segments = path.replace(/^\/+/, '').split('/').filter(Boolean);
 
-      const layouts = ['app/layout.php']; // root layout always loads
-      let params = {};
+            let file = 'app/page.php';
+            const layouts = ['app/layout.php'];
+            let dynamicParams = [];
 
-      // If it's API route
-      if (segs[0] === 'api') {
-        type = 'api';
-        const resource = segs[1] ?? '';
-        if (resource === 'products') {
-          if (segs.length === 2) {
-            file = 'app/api/products/+server.php';
-          } else if (segs.length >= 3) {
-            file = 'app/api/products/[Id]/+server.php';
-            params['Id'] = segs[2];
-          }
-        } else {
-          file = 'app/api/' + resource + '/+server.php';
-        }
-      }
+            if (segments[0] === 'api') {
+                file = `app/api/${segments[1] || ''}/+server.php`;
+                if (segments[2]) {
+                    dynamicParams.push(`[${segments[2]}]`);
+                    file = `app/api/${segments[1]}/[${segments[2]}]/+server.php`;
+                }
+            } else {
+                let walker = 'app';
+                segments.forEach(seg => {
+                    walker += '/' + seg;
+                    layouts.push(walker + '/layout.php');
+                    dynamicParams.push(`[${seg}]`);
+                });
+                file = `app/${path}/page.php`;
+            }
 
-      // Walk to collect nested layouts like nextjs
-      let walker = 'app';
-      for (const s of segs) {
-        if (s === 'api') continue; // API not collecting page layouts by default
-        walker += '/' + s;
-        layouts.push(walker + '/layout.php');
-      }
-
-      // Remove duplicates
-      const uniqueLayouts = [...new Set(layouts)];
-
-      return { type, file, uniqueLayouts, params };
-    }
-
-    // BIND CLICK LISTENER
-    window.onload = () => {
-      const btn = document.getElementById('resolveRouteBtn');
-      const inp = document.getElementById('routeInput');
-      const out = document.getElementById('wizardOutput');
-
-      btn.onclick = () => {
-        const result = resolveRouteSimulated(inp.value);
-        out.textContent = `
-Route                 : ${inp.value}
-Detected route type   : ${result.type.toUpperCase()}
-Filesystem response   : ${result.file}
-Stacked page layouts  :
-  - ${result.uniqueLayouts.join('\n  - ')}
-Dynamic params found  : ${result.params['Id'] ?? 'none'} (folder param resolution)
-        `;
-      };
-    };
+            output.innerHTML = `
+✔ Type: ${ segments[0]==='api' ? 'API Endpoint' : 'Page' }
+✔ Resolved file: ${ file }
+✔ Layout stack:
+  ${ layouts.join('\n  ') }
+✔ Dynamic params found:
+  ${ dynamicParams.join(', ') }
+            `;
+        });
+    });
   </script>
 </section>
 
-<!-- ================================================================ -->
-<!-- 14. DEPLOYMENT                                                   -->
-<!-- ================================================================ -->
-<section id="deployment" class="space-y-6 pb-16">
-  <h2 class="text-4xl font-bold border-l-4 border-rose-500 pl-3">14. Deployment</h2>
+<!-- ========================================================= -->
+<!-- 11. Additional features your scaffold can support         -->
+<!-- ========================================================= -->
+<section id="future-section" class="space-y-6">
+  <h2 class="text-3xl font-bold border-l-4 border-lime-400 pl-3">11. Additional Framework Capabilities</h2>
 
-  <p class="text-lg text-slate-300">
-      After building the app with <code>./bastion run-build</code> your scaffold stays fixed forever for production
-      while security stays enabled.
-      Nothing is disabled. No options. No flags. Secure and complete.
+  <p class="text-sm text-slate-400">
+    These features are NOT required to run apps, but can be manually built *on top of the generated boilerplate*:
   </p>
 
-  <pre class="bg-black/20 border border-slate-900 rounded-xl p-3 text-xs overflow-x-auto">
-./bastion run-build
-  </pre>
+  <ul class="list-disc list-inside text-sm text-slate-300">
+    <li>Service container extensions (bind new dependencies)</li>
+    <li>Custom adapters to key-value stores or other DB engines</li>
+    <li>Collapsable admin panels for employees/parts/audits</li>
+    <li>Dynamic log dashboards with auto-refresh feeds</li>
+    <li>Live event listeners via WebSockets</li>
+  </ul>
+
+  <p class="text-xs text-slate-500">If you want, now we can also generate full Admin Panels or E2E tests.</p>
 </section>
 
+</main>
 </main>
 </body>
 </html>
