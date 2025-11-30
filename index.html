@@ -2,860 +2,397 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Bastion PHP Framework — Developer Documentation</title>
+  <title>Bastion PHP 0.1.0 – Developer Documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Pure CSS, no frameworks -->
+  <!-- Tailwind fully via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    :root {
-      --bg: #020617;
-      --card: #020617;
-      --card-soft: #020617;
-      --border: #1f2937;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --title: #f9fafb;
-      --accent: #38bdf8;
-      --accent-soft: rgba(56,189,248,0.08);
-      --accent-strong: #0ea5e9;
-      --danger: #f97373;
-      --success: #22c55e;
-      --warn: #eab308;
-      --code-bg: #020617;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: radial-gradient(circle at top, #020617 0%, #020617 45%, #020617 100%);
-      color: var(--text);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.6;
-    }
-
-    .shell {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 3rem;
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 2rem;
-    }
-
-    @media (max-width: 900px) {
-      .shell {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .sidebar {
-      position: sticky;
-      top: 1.5rem;
-      align-self: flex-start;
-      background: var(--card);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      padding: 1.5rem;
-      box-shadow: 0 18px 45px rgba(15,23,42,0.85);
-    }
-
-    .sidebar h1 {
-      font-size: 1.4rem;
-      margin: 0 0 0.5rem;
-      color: var(--title);
-    }
-
-    .sidebar .version {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 1rem;
-    }
-
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      font-size: 0.85rem;
-    }
-
-    .sidebar li {
-      margin: 0.25rem 0;
-    }
-
-    .sidebar a {
-      color: var(--muted);
-      text-decoration: none;
-      display: block;
-      padding: 0.25rem 0.25rem;
-      border-radius: 6px;
-      transition: all 0.15s ease;
-    }
-
-    .sidebar a:hover {
-      color: var(--accent);
-      background: rgba(15,23,42,0.8);
-    }
-
-    .sidebar a.active {
-      color: var(--accent);
-      background: rgba(15,23,42,0.95);
-      border-left: 2px solid var(--accent);
-      padding-left: 0.5rem;
-    }
-
-    .content {
-      display: flex;
-      flex-direction: column;
-      gap: 1.75rem;
-    }
-
-    .card {
-      background: radial-gradient(circle at top left, rgba(56,189,248,0.06) 0%, var(--card-soft) 40%, var(--card) 100%);
-      border-radius: 18px;
-      border: 1px solid rgba(15,23,42,0.9);
-      padding: 1.75rem 1.75rem 1.5rem;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.9);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: -1px;
-      border-radius: inherit;
-      border: 1px solid rgba(148,163,184,0.1);
-      pointer-events: none;
-    }
-
-    h2 {
-      margin-top: 0;
-      margin-bottom: 0.5rem;
-      font-size: 1.4rem;
-      letter-spacing: -0.02em;
-      color: var(--title);
-    }
-
-    h3 {
-      margin-top: 1.2rem;
-      margin-bottom: 0.4rem;
-      font-size: 1.05rem;
-      color: #e5e7eb;
-    }
-
-    h4 {
-      margin-top: 0.9rem;
-      margin-bottom: 0.2rem;
-      font-size: 0.98rem;
-      color: #e5e7eb;
-    }
-
-    p {
-      margin: 0.2rem 0 0.4rem;
-      color: var(--text);
-      font-size: 0.94rem;
-    }
-
-    ul {
-      margin: 0.25rem 0 0.5rem 1.2rem;
-      padding: 0;
-      font-size: 0.93rem;
-    }
-
-    li {
-      margin: 0.15rem 0;
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-
-    pre {
-      margin: 0.5rem 0 0.8rem;
-      padding: 0.85rem 0.95rem;
-      background: var(--code-bg);
-      border-radius: 10px;
-      border: 1px solid #1e293b;
-      overflow-x: auto;
-      font-size: 0.82rem;
-      line-height: 1.5;
-    }
-
-    code {
-      font-family: Menlo, Monaco, Consolas, "Fira Code", monospace;
-      color: #93c5fd;
-    }
-
-    .highlight {
-      padding: 0.7rem 0.9rem;
-      border-radius: 10px;
-      border: 1px solid rgba(148,163,184,0.35);
-      background: radial-gradient(circle at top, rgba(56,189,248,0.08) 0%, rgba(15,23,42,0.95) 55%, rgba(15,23,42,1) 100%);
-      font-size: 0.9rem;
-    }
-
-    .tagline {
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin-bottom: 0.25rem;
-    }
-
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-top: 0.4rem;
-      font-size: 0.7rem;
-    }
-
-    .badge {
-      padding: 0.18rem 0.55rem;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.6);
-      background: rgba(15,23,42,0.85);
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-    }
-
-    .badge.accent {
-      border-color: rgba(56,189,248,0.8);
-      color: var(--accent);
-      background: rgba(8,47,73,0.9);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 0.6rem;
-      font-size: 0.8rem;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    th, td {
-      padding: 0.45rem 0.65rem;
-      border-bottom: 1px solid rgba(30,64,175,0.4);
-    }
-    th {
-      background: rgba(15,23,42,0.95);
-      color: #bae6fd;
-      text-align: left;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-    tr:nth-child(even) td {
-      background: rgba(15,23,42,0.75);
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 0.1rem 0.5rem;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.9);
-      border: 1px solid rgba(148,163,184,0.5);
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-right: 0.3rem;
-    }
-
-    .pill.good {
-      border-color: rgba(34,197,94,0.7);
-      color: var(--success);
-    }
-
-    .pill.danger {
-      border-color: rgba(248,113,113,0.7);
-      color: var(--danger);
-    }
-
-    .pill.warn {
-      border-color: rgba(234,179,8,0.7);
-      color: var(--warn);
-    }
-
-    .section-title-small {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      margin-bottom: 0.1rem;
-    }
+    html, body { scroll-behavior: smooth; }
+    pre, code { font-family: ui-monospace, monospace; }
   </style>
-
-  <!-- Vanilla JS: only UX helpers (no frameworks) -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // Smooth scroll for sidebar links
-      const links = document.querySelectorAll('.sidebar a[href^="#"]');
-      links.forEach(link => {
-        link.addEventListener("click", function (e) {
-          e.preventDefault();
-          const target = document.querySelector(this.getAttribute("href"));
-          if (target) {
-            target.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        });
-      });
-
-      // Simple highlight of current section on scroll
-      const sections = document.querySelectorAll('section[id]');
-      function updateActiveLink() {
-        let best = null;
-        let bestOffset = Infinity;
-        sections.forEach(sec => {
-          const rect = sec.getBoundingClientRect();
-          if (rect.top >= -80 && rect.top < bestOffset) {
-            bestOffset = rect.top;
-            best = sec;
-          }
-        });
-        if (best) {
-          const id = best.getAttribute("id");
-          document.querySelectorAll(".sidebar a").forEach(a => {
-            a.classList.toggle("active", a.getAttribute("href") === "#" + id);
-          });
-        }
-      }
-      document.addEventListener("scroll", updateActiveLink);
-      updateActiveLink();
-    });
-  </script>
 </head>
-<body>
-  <div class="shell">
-    <aside class="sidebar">
-      <h1>Bastion PHP</h1>
-      <div class="version">Framework version: <strong>0.1.0</strong></div>
-      <div class="tagline">Internal tools framework with file-based routing, nested layouts, DV engine, HTMX components and FastAPI-style endpoints.</div>
-
-      <ul>
-        <li><a href="#intro">Introduction</a></li>
-        <li><a href="#routing">Routing & Layouts</a></li>
-        <li><a href="#dv-engine">DV Engine (Data View)</a></li>
-        <li><a href="#endpoints">Endpoints & QueryBuilder (FastAPI-style)</a></li>
-        <li><a href="#components">Components (Server & HTMX)</a></li>
-        <li><a href="#request-response">Request & Response</a></li>
-        <li><a href="#db-layer">Database Layer</a></li>
-        <li><a href="#auth">Authentication</a></li>
-        <li><a href="#middlewares">Middlewares</a></li>
-        <li><a href="#cli">CLI & Workflow</a></li>
-      </ul>
-    </aside>
-
-    <main class="content">
-
-      <!-- 1. INTRO -->
-      <section id="intro" class="card">
-        <div class="section-title-small">Section 1</div>
-        <h2>Introduction & Philosophy</h2>
-
-        <p><strong>Bastion PHP</strong> is a file-based PHP framework for building internal tools with:</p>
-        <ul>
-          <li>Next.js-style routing and nested layouts (<code>page.php</code> + <code>layout.php</code>)</li>
-          <li>FastAPI-style endpoints via <code>+server.php</code> with method maps and validation</li>
-          <li>DV Engine (Data View) to pass data to pages and layouts, like a minimal view-layer</li>
-          <li>A simple QueryBuilder (<code>DB::table()</code>) instead of a heavy ORM</li>
-          <li>Components in <code>app/components</code>:
-            <ul>
-              <li>Server-side components (no HTMX)</li>
-              <li>HTMX-enabled interactive components for partial updates</li>
-            </ul>
-          </li>
-        </ul>
-
-        <div class="highlight">
-          <strong>Core mental model:</strong>  
-          <span class="pill good">Filesystem = Router</span>
-          <span class="pill good">Layouts = Shells around content</span>
-          <span class="pill good">DV Engine = Data bridge to views</span>
-          <span class="pill good">+server.php = Endpoint per folder</span>
-        </div>
-      </section>
-
-      <!-- 2. ROUTING & LAYOUTS -->
-      <section id="routing" class="card">
-        <div class="section-title-small">Section 2</div>
-        <h2>Routing & Layouts</h2>
-
-        <h3>2.1 File-based Routing</h3>
-        <p>No route arrays. URL ➜ folder structure:</p>
-
-        <table>
-          <tr><th>URL</th><th>Resolves file</th></tr>
-          <tr><td><code>/</code></td><td><code>app/page.php</code></td></tr>
-          <tr><td><code>/login</code></td><td><code>app/login/page.php</code></td></tr>
-          <tr><td><code>/admin</code></td><td><code>app/admin/page.php</code></td></tr>
-          <tr><td><code>/admin/users</code></td><td><code>app/admin/users/page.php</code></td></tr>
-          <tr><td><code>/api/users</code></td><td><code>app/api/users/+server.php</code></td></tr>
-          <tr><td><code>/api/users/12</code></td><td><code>app/api/users/[id]/+server.php</code> (param <code>id=12</code>)</td></tr>
-        </table>
-
-        <h3>2.2 Layout stacking (Next.js-style)</h3>
-        <p>Every folder can have a <code>layout.php</code> file. When you request <code>/admin/users</code>:</p>
-
-        <pre><code>Stack:
-1. app/admin/users/layout.php (if present)
-2. app/admin/layout.php (if present)
-3. app/layout.php (root layout, always)</code></pre>
-
-        <p>They are executed from root to leaf, each calling a <code>$content()</code> closure to render inner content.</p>
-
-        <h4>Root layout: <code>app/layout.php</code></h4>
-        <pre><code>&lt;?php
-use App\Core\DV;
-
-$title = DV::get('title', 'Bastion PHP');
-?&gt;
-&lt;!doctype html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;
-  &lt;meta charset="utf-8"&gt;
-  &lt;title&gt;&lt;?= htmlspecialchars($title) ?&gt;&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;header&gt;Global navbar goes here&lt;/header&gt;
-
-  &lt;main&gt;
-    &lt;?php $content(); ?&gt;
-  &lt;/main&gt;
-
-  &lt;footer&gt;Bastion PHP 0.1.0&lt;/footer&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-
-        <h4>Admin layout: <code>app/admin/layout.php</code></h4>
-        <pre><code>&lt;section class="admin-wrapper"&gt;
-  &lt;aside&gt;Admin sidebar&lt;/aside&gt;
-  &lt;div class="admin-main"&gt;
-    &lt;?php $content(); ?&gt;
-  &lt;/div&gt;
-&lt;/section&gt;</code></pre>
-
-        <h4>Admin users page: <code>app/admin/users/page.php</code></h4>
-        <pre><code>&lt;?php
-use App\Core\DB;
-use App\Core\DV;
-
-DV::set('title', 'Admin · Users');
-
-$users = DB::table('users')
-  -&gt;orderBy('id', 'DESC')
-  -&gt;limit(20)
-  -&gt;get();
-?&gt;
-
-&lt;h1&gt;User list&lt;/h1&gt;
-
-&lt;ul&gt;
-  &lt;?php foreach ($users as $user): ?&gt;
-    &lt;li&gt;&lt;?= htmlspecialchars($user['email']) ?&gt;&lt;/li&gt;
-  &lt;?php endforeach; ?&gt;
-&lt;/ul&gt;</code></pre>
-      </section>
-
-      <!-- 3. DV ENGINE -->
-      <section id="dv-engine" class="card">
-        <div class="section-title-small">Section 3</div>
-        <h2>DV Engine (Data View)</h2>
-
-        <p>The DV Engine is a small internal class that acts as a **data bridge** between:</p>
-        <ul>
-          <li>Controllers / pages / endpoints</li>
-          <li>Layouts and reusable views</li>
-        </ul>
-
-        <h3>3.1 What DV Engine does</h3>
-        <ul>
-          <li>Stores global values like page title, user info, theme</li>
-          <li>Provides <code>DV::set()</code> and <code>DV::get()</code> helpers</li>
-          <li>Lets layouts read common data without passing variables through every file</li>
-        </ul>
-
-        <h3>3.2 Basic usage</h3>
-        <pre><code>&lt;?php
-use App\Core\DV;
-
-// In a page:
-DV::set('title', 'Dashboard');
-DV::set('breadcrumbs', ['Admin', 'Dashboard']);
-
-// Later in layout:
-$title = DV::get('title', 'Bastion PHP');
-$breadcrumbs = DV::get('breadcrumbs', []);
-?&gt;</code></pre>
-
-        <h3>3.3 Use cases</h3>
-        <ul>
-          <li>Page titles / meta titles</li>
-          <li>Breadcrumbs shared by nested pages</li>
-          <li>Layout-level toggles (e.g. hide sidebar, compact layout)</li>
-          <li>Global flash messages or notifications</li>
-        </ul>
-
-        <h3>3.4 DV with components</h3>
-        <p>You can also use DV to pass data to components that are included from layouts:</p>
-        <pre><code>&lt;?php
-// In page
-DV::set('page_actions', [
-  ['label' =&gt; 'Add user', 'href' =&gt; '/admin/users/new'],
-]);
-
-// In layout
-$actions = DV::get('page_actions', []);
-?&gt;
-
-&lt;?php include __DIR__ . '/../components/PageActions.php'; ?&gt;</code></pre>
-      </section>
-
-      <!-- 4. ENDPOINTS & QUERYBUILDER -->
-      <section id="endpoints" class="card">
-        <div class="section-title-small">Section 4</div>
-        <h2>Endpoints & QueryBuilder (FastAPI-style)</h2>
-
-        <p>Endpoints live in <code>app/api</code> as <code>+server.php</code> files. Each file returns an array of handlers keyed by HTTP method.</p>
-
-        <h3>4.1 Basic GET endpoint with QueryBuilder</h3>
-        <p>File: <code>app/api/users/+server.php</code></p>
-
-        <pre><code>&lt;?php
-use App\Core\DB;
-use App\Core\Response;
-
-return [
-
-  'get' =&gt; function($req) {
-      // Optional query param "role"
-      $role = $req-&gt;input('role');
-
-      $query = DB::table('users')
-          -&gt;orderBy('id', 'DESC')
-          -&gt;limit(50);
-
-      if ($role) {
-          $query = $query-&gt;where('role', $role);
-      }
-
-      $users = $query-&gt;get();
-
-      Response::json($users);
-  },
-
-];</code></pre>
-
-        <h3>4.2 POST endpoint (create user) with validation</h3>
-        <pre><code>&lt;?php
-use App\Core\DB;
-use App\Core\Response;
-use App\Core\ValidationException;
-
-return [
-
-  'post' =&gt; function($req) {
-      try {
-          $data = $req-&gt;validate([
-              'email'    =&gt; 'required|email',
-              'name'     =&gt; 'required',
-              'password' =&gt; 'required|min:8',
-          ]);
-
-          $id = DB::table('users')-&gt;insert([
-              'name'       =&gt; $data['name'],
-              'email'      =&gt; $data['email'],
-              'password'   =&gt; password_hash($data['password'], PASSWORD_DEFAULT),
-              'role'       =&gt; 'user',
-              'created_at' =&gt; time(),
-          ]);
-
-          Response::json(['id' =&gt; $id], 201);
-      } catch (ValidationException $e) {
-          Response::json(['errors' =&gt; $e-&gt;errors], 422);
-      }
-  },
-
-];</code></pre>
-
-        <h3>4.3 Dynamic endpoint with [id] folder</h3>
-        <p>File: <code>app/api/users/[id]/+server.php</code></p>
-
-        <pre><code>&lt;?php
-use App\Core\DB;
-use App\Core\Response;
-
-return [
-
-  'get' =&gt; function($req) {
-      $id = $req-&gt;meta['params']['id'] ?? null;
-      if (!$id) {
-          Response::json(['error' =&gt; 'Missing id'], 400);
-      }
-
-      $user = DB::table('users')
-          -&gt;where('id', $id)
-          -&gt;first();
-
-      if (!$user) {
-          Response::json(['error' =&gt; 'Not found'], 404);
-      }
-
-      Response::json($user);
-  },
-
-  'delete' =&gt; function($req) {
-      $id = $req-&gt;meta['params']['id'] ?? null;
-      if (!$id) {
-          Response::json(['error' =&gt; 'Missing id'], 400);
-      }
-
-      DB::table('users')-&gt;where('id', $id)-&gt;delete();
-
-      Response::json(['deleted' =&gt; true]);
-  },
-
-];</code></pre>
-
-        <p>This pattern is intentionally similar to FastAPI: one file per resource, handlers grouped by method.</p>
-      </section>
-
-      <!-- 5. COMPONENTS (SERVER + HTMX) -->
-      <section id="components" class="card">
-        <div class="section-title-small">Section 5</div>
-        <h2>Components: Server-side & HTMX</h2>
-
-        <p>Components live in <code>app/components</code> as plain PHP functions. Bastion encourages <strong>functional components</strong> instead of complex template engines.</p>
-
-        <h3>5.1 Server-side components (no HTMX)</h3>
-        <p>File: <code>app/components/UserCard.php</code></p>
-
-        <pre><code>&lt;?php
-// app/components/UserCard.php
-
-function UserCard(array $user): string {
-    $name  = htmlspecialchars($user['name']);
-    $email = htmlspecialchars($user['email']);
-
-    return &lt;&lt;&lt;HTML
-    &lt;article class="user-card"&gt;
-      &lt;h3&gt;$name&lt;/h3&gt;
-      &lt;p&gt;$email&lt;/p&gt;
-    &lt;/article&gt;
-    HTML;
-}</code></pre>
-
-        <p>Usage in a page: <code>app/admin/users/page.php</code></p>
-        <pre><code>&lt;?php
-require_once __DIR__ . '/../../components/UserCard.php';
-
-$users = DB::table('users')-&gt;limit(10)-&gt;get();
-?&gt;
-
-&lt;section&gt;
-  &lt;h1&gt;Users&lt;/h1&gt;
-  &lt;?php foreach ($users as $user): ?&gt;
-    &lt;?= UserCard($user) ?&gt;
-  &lt;?php endforeach; ?&gt;
-&lt;/section&gt;</code></pre>
-
-        <h3>5.2 HTMX components (client-side interactive)</h3>
-        <p>This style uses HTMX attributes in the returned HTML to make components interactive.</p>
-
-        <p>Interactive component file: <code>app/components/UserRow.php</code></p>
-        <pre><code>&lt;?php
-// app/components/UserRow.php
-
-function UserRow(array $user): string {
-    $id    = (int)$user['id'];
-    $name  = htmlspecialchars($user['name']);
-    $email = htmlspecialchars($user['email']);
-
-    return &lt;&lt;&lt;HTML
-    &lt;tr id="user-$id"&gt;
-      &lt;td&gt;$name&lt;/td&gt;
-      &lt;td&gt;$email&lt;/td&gt;
-      &lt;td&gt;
-        &lt;button
-          hx-delete="/api/users/$id"
-          hx-target="#user-$id"
-          hx-swap="outerHTML"
-        &gt;Delete&lt;/button&gt;
-      &lt;/td&gt;
-    &lt;/tr&gt;
-    HTML;
-}</code></pre>
-
-        <h4>Using HTMX component in an endpoint</h4>
-        <p>In <code>app/api/users/+server.php</code>, return a partial HTML table if the request comes from HTMX:</p>
-
-        <pre><code>&lt;?php
-use App\Core\DB;
-use App\Core\Response;
-
-require_once __DIR__ . '/../../components/UserRow.php';
-
-return [
-  'get' =&gt; function($req) {
-      $users = DB::table('users')-&gt;orderBy('id','DESC')-&gt;get();
-
-      // If request is from HTMX, return HTML partial
-      if (isset($_SERVER['HTTP_HX_REQUEST'])) {
-          ob_start();
-          ?&gt;
-          &lt;table&gt;
-            &lt;tbody&gt;
-              &lt;?php foreach ($users as $user): ?&gt;
-                &lt;?= UserRow($user) ?&gt;
-              &lt;?php endforeach; ?&gt;
-            &lt;/tbody&gt;
-          &lt;/table&gt;
-          &lt;?php
-          $html = ob_get_clean();
-          Response::html($html);
-      }
-
-      // Default: JSON
-      Response::json($users);
-  },
-];</code></pre>
-
-        <h4>Calling HTMX component from a page</h4>
-        <p>Example page <code>app/admin/users/page.php</code>:</p>
-
-        <pre><code>&lt;h1&gt;Users&lt;/h1&gt;
-
-&lt;button
-  hx-get="/api/users"
-  hx-target="#users-table"
-  hx-swap="innerHTML"
-&gt;
-  Reload users
-&lt;/button&gt;
-
-&lt;div id="users-table"&gt;
-  &lt;!-- HTMX will inject the table component here --&gt;
-&lt;/div&gt;</code></pre>
-
-        <p>Result: first click loads the HTML table from the API; delete buttons call <code>hx-delete</code> to remove rows without full page reload.</p>
-      </section>
-
-      <!-- 6. REQUEST & RESPONSE -->
-      <section id="request-response" class="card">
-        <div class="section-title-small">Section 6</div>
-        <h2>Request & Response</h2>
-
-        <h3>6.1 Request basics</h3>
-        <p>Every endpoint receives a Request object with:</p>
-        <ul>
-          <li><code>$req-&gt;method</code> — HTTP method (GET, POST, ...)</li>
-          <li><code>$req-&gt;path</code> — normalized path (e.g. <code>admin/users</code>)</li>
-          <li><code>$req-&gt;query</code> — query parameters</li>
-          <li><code>$req-&gt;body</code> — parsed body (form or JSON)</li>
-          <li><code>$req-&gt;meta['params']</code> — dynamic route params like <code>[id]</code></li>
-        </ul>
-
-        <h3>6.2 Getting data</h3>
-        <pre><code>$email = $req-&gt;input('email');          // body or query
-$isJson = $req-&gt;isJson();              // bool
-$data   = $req-&gt;json();                // array
-$params = $req-&gt;meta['params'] ?? [];  // route params</code></pre>
-
-        <h3>6.3 Validation</h3>
-        <pre><code>&lt;?php
-use App\Core\ValidationException;
-
-try {
-    $data = $req-&gt;validate([
-        'email' =&gt; 'required|email',
-        'name'  =&gt; 'required',
-    ]);
-} catch (ValidationException $e) {
-    Response::json(['errors' =&gt; $e-&gt;errors], 422);
-}</code></pre>
-
-        <h3>6.4 Response helpers</h3>
-        <pre><code>Response::json(['ok' =&gt; true]);
-Response::html($html);
-Response::redirect('/admin');
-Response::abort(403, 'Forbidden');</code></pre>
-      </section>
-
-      <!-- 7. DB LAYER -->
-      <section id="db-layer" class="card">
-        <div class="section-title-small">Section 7</div>
-        <h2>Database Layer (QueryBuilder)</h2>
-
-        <p>Configured via <code>config/database.php</code>. Default is SQLite, but anything PDO-based can be adapted.</p>
-
-        <h3>7.1 Typical queries</h3>
-        <pre><code>$users = DB::table('users')
-    -&gt;where('role', 'admin')
-    -&gt;orderBy('id', 'DESC')
-    -&gt;limit(20)
-    -&gt;get();
-
-$user = DB::table('users')
-    -&gt;where('id', 1)
-    -&gt;first();
-
-$id = DB::table('users')
-    -&gt;insert([
-        'name' =&gt; 'Sunset',
-        'email' =&gt; 'sunset@example.com',
-        'password' =&gt; password_hash('secret123', PASSWORD_DEFAULT),
-    ]);
-
-DB::table('users')-&gt;where('id', $id)-&gt;update(['role' =&gt; 'admin']);
-DB::table('users')-&gt;where('id', $id)-&gt;delete();</code></pre>
-      </section>
-
-      <!-- 8. AUTH -->
-      <section id="auth" class="card">
-        <div class="section-title-small">Section 8</div>
-        <h2>Authentication (JWT + Refresh)</h2>
-
-        <p>Bastion uses:</p>
-        <ul>
-          <li>JWT access token — short-lived</li>
-          <li>Refresh token — stored in DB, rotated every use</li>
-        </ul>
-
-        <h3>8.1 Accessing current user</h3>
-        <pre><code>$user = auth();
-if ($user) {
-    // $user['email'], $user['role'], etc.
-}</code></pre>
-      </section>
-
-      <!-- 9. MIDDLEWARES -->
-      <section id="middlewares" class="card">
-        <div class="section-title-small">Section 9</div>
-        <h2>Middlewares</h2>
-
-        <p>Order:</p>
-        <pre><code>SecurityHeaders → RateLimit → AuthMiddleware → AdminOnly → Router → Handler</code></pre>
-
-        <p><strong>SecurityHeaders</strong> sets CSP and other security headers.<br>
-           <strong>AuthMiddleware</strong> validates JWT and CSRF for unsafe methods.<br>
-           <strong>AdminOnly</strong> protects <code>/admin</code> routes.</p>
-      </section>
-
-      <!-- 10. CLI -->
-      <section id="cli" class="card">
-        <div class="section-title-small">Section 10</div>
-        <h2>CLI & Workflow</h2>
-
-        <p>Common commands:</p>
-        <pre><code>./bastion run-dev   # start dev server
-./bastion migrate   # run migrations
-./bastion seed      # run seeders</code></pre>
-      </section>
-
-    </main>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+<header class="border-b border-slate-800 bg-slate-900/80 px-4 py-3 sticky top-0 z-40 backdrop-blur">
+  <div class="max-w-6xl mx-auto flex items-center gap-3">
+    <div class="h-8 w-8 bg-blue-500/10 border border-blue-500/40 text-blue-400 flex items-center justify-center rounded-lg text-xs font-semibold">BP</div>
+    <div>
+      <h1 class="text-lg font-bold">Bastion PHP <span class="text-xs font-normal text-slate-400">v0.1.0</span></h1>
+      <p class="text-xs text-slate-400">A secure, fast, zero-magic PHP framework</p>
+    </div>
   </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8 space-y-12">
+
+<!-- OVERVIEW -->
+<section class="space-y-6">
+  <h2 class="text-3xl font-bold" id="overview">Overview</h2>
+
+  <p class="text-base text-slate-300">
+    Bastion PHP is a <strong>framework generator + runtime engine</strong> that produces a secure app scaffold with:
+    <strong>Next.js-style filesystem routing</strong>, <strong>FastAPI-like `+server.php` endpoints</strong>, 
+    a <strong>PDO QueryBuilder ORM-like facade</strong>, DV engine for state-sharing, and HTML components that behave similarly to
+    React components (server and client interactive via HTMX).
+  </p>
+
+  <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 text-sm">
+    Key guarantees:
+    <ul class="list-disc list-inside mt-2 space-y-1 text-slate-400">
+      <li>Security always enabled (CSP nonce, CSRF, SameSite, HttpOnly)</li>
+      <li>SQLite + WAL default for concurrency</li>
+      <li>No frameworks in front, no template engines, no silent errors</li>
+      <li>Readable viewport: code is the documentation</li>
+    </ul>
+  </div>
+</section>
+
+<!-- PROJECT STRUCTURE -->
+<section class="space-y-4">
+  <h2 class="text-3xl font-bold" id="structure">Generated Structure</h2>
+  <p class="text-slate-400 text-sm">
+    What the generator scaffolds is opinionated and extremely modular. Here is the blueprint and what each layer is for:
+  </p>
+
+  <pre class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 overflow-x-auto text-xs">
+app/                        → All routable features & API resources.
+  layout.php                → Root HTML shell. Injects <title> from DV and defines global <script nonce> & components.
+  page.php                  → Route "/" page body. Only prints the inner content (HTML fragment), no <html/head>.
+  Core/                    → Framework foundation (container + facades):
+    App.php                → Bootstraps container, session, middlewares, router dispatch.
+    Router.php             → Filesystem router. Supports static pages, [param] folders, and +server.php endpoints.
+    DB.php                → PDO wrapper + QueryBuilder. Facade-like chains. Holds WAL pragmas for SQLite.
+    DV.php                → Data View Engine. Used to set layout state (e.g., title, breadcrumbs, flags).
+    Request.php           → Normalized HTTP request payload. Central input parser + validation errors.
+    Response.php          → Response utilities (JSON, HTML, redirects, abort codes).
+    Auth.php              → JWT handling + DB refresh tokens rotation + role helpers.
+    CSRF.php              → Token issue & compare. Middleware uses this for unsafe methods.
+    Logger.php             → Structured logging. Writes to storage/logs/app.log.
+    Theme.php             → UI flags like dark/light toggle, structured CSS helpers.
+    helpers.php             → Global security helpers e(), env(), auth(), logger(), csrf_token(), csrf_field()...
+  Middleware/              → Wrappers that enforce security before routing:
+    SecurityHeaders.php   → Creates CSP nonce, X-Frame-Options, NoSniff, Coco-enforced script blocking.
+    RateLimit.php         → Stub for throttling API or IP quotas (ready for extension).
+    AuthMiddleware.php     → Injects user from JWT & CSRF compare if enabled.
+    AdminOnly.php         → Guard for admin modules or sensitive routes.
+  Models/                  → Domain models (server side business entities, no HTML, pure PHP):
+    User.php              → Static model. Has find, findByEmail, all, create, updateUser, deleteUser.
+  Services/                → Place for your own business services, external API connectors, adapters.
+  admin/                   → Routable admin module, Next.js-like layout inheritance.
+  login/                   → Shows form, uses csrf_field(), POSTs to /api/auth/login
+  logout/                  → Clears cookies, can call Response::json() or redirect.
+public/
+  index.php                → Front controller. Entry point of every HTTP request.
+public/css/fallback.css    → Minimal CSS if CDN styles aren't used in prod.
+database/
+  migrations/*.sql         → Plain SQL migrations executed sequentially.
+  seeds/*.php             → Seeders that hydrate default users/parts/calibrations.
+storage/
+  db/app.db               → SQLite file created by generator.
+  logs/app.log             → Framework logs.
+bastion                    → CLI commands: run-dev, build, migrate, seed, make:* scaffolding...</pre>
+</section>
+
+<!-- DV ENGINE -->
+<section class="space-y-4">
+  <h2 class="text-3xl font-bold" id="dv">DV Engine (Data View)</h2>
+  <p class="text-slate-400">
+    DV allows pages to push layout state into a shared “view bag” readable by layouts, API endpoints, or components.
+    It is the recommended way to set structural parameters like <strong>page titles</strong> or <strong>UI flags</strong>.
+  </p>
+
+  <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 text-sm text-slate-300">
+    <strong>Why DV::set('title', ...) matters:</strong>
+    <ul class="list-disc list-inside mt-2">
+      <li>All layouts call <code>$title = DV::get('title', 'Fallback')</code> to render <code>&lt;title&gt;</code></li>
+      <li>You never manually echo or pass <code>$title</code> into nested layouts</li>
+      <li>Breadcrumbs, admin flags, and screen metadata can be stored the exact same way</li>
+    </ul>
+  </div>
+
+  <pre class="bg-slate-950/80 rounded-xl p-4 text-xs overflow-x-auto"><code>&lt;?php
+// In a page:
+DV::set('title', 'Admin · Users');
+DV::set('breadcrumbs', ['Admin', 'Users']);
+DV::set('hideSidebar', false);
+
+// In any layout:
+$title = DV::get('title', $GLOBALS['title'] ?? 'Bastion PHP');
+echo "&lt;title&gt;" . e($title) . "&lt;/title&gt;";</code></pre>
+
+  <p class="text-sm text-slate-400">
+    Notice: layouts sanitize output using <code>e()</code> to prevent XSS or HTML injection.
+  </p>
+</section>
+
+<!-- QUERYBUILDER ORM -->
+<section class="space-y-4">
+  <h2 class="text-3xl font-bold" id="db">DB Layer & QueryBuilder (ORM-like chains)</h2>
+
+  <p class="text-base text-slate-300">
+    Bastion never hides SQL from you. It wraps PDO and simulates Django/FastAPI model ergonomics:
+  </p>
+
+  <ul class="list-disc list-inside text-slate-400 text-sm space-y-1 mb-3">
+    <li><code>DB::table('users')->where('role','admin')->limit(10)->get()</code></li>
+    <li><code>DB::table('parts')->insert([...])</code></li>
+    <li><code>DB::table('calibrations')->where('id',$id)->update([...])</code></li>
+  </ul>
+
+  <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 text-sm text-slate-300">
+    <strong>Concurrency Best Practices (SQLite default):</strong>
+    <ul class="list-disc list-inside mt-2">
+      <li>Database created with WAL for parallel writes</li>
+      <li><code>PRAGMA journal_mode=WAL;</code> always enabled internally by DB service</li>
+      <li>Use <code>first()</code> instead of <code>get()</code> if you only expect one row</li>
+      <li>Every value echo'd into HTML must pass through <code>e()</code> or <code>htmlspecialchars()</code></li>
+    </ul>
+  </div>
+</section>
+
+<!-- COMPONENTS LIKE REACT -->
+<section class="space-y-6">
+  <h2 class="text-3xl font-bold" id="components">Components (Server-Side &amp; Client-Interactive)</h2>
+
+  <p class="text-base text-slate-300">
+    Bastion simulates React component ergonomics <strong>purely using PHP functions</strong> and <strong>HTMX for client interactivity</strong>.
+    Two official types:
+  </p>
+
+  <h3 class="text-xl font-semibold">1. Server-side components (pure PHP, no HTMX)</h3>
+  <p class="text-slate-400 text-sm mb-1">Stateless pieces, used for reusable HTML fragments:</p>
+  <pre class="bg-slate-950/80 rounded-xl p-4 text-xs overflow-x-auto"><code>// resources/views/components/UserCard.php
+function UserCard(array $user): string {
+  return "
+  &lt;article class='p-4 border border-slate-700 rounded-xl shadow-lg'&gt;
+    &lt;h3&gt;".e($user['name'])."&lt;/h3&gt;
+    &lt;p&gt;".e($user['email'])."&lt;/p&gt;
+  &lt;/article&gt;";
+}</code></pre>
+
+  <p class="text-sm text-slate-400">
+    Use case examples:
+    <ul class="list-disc list-inside">
+      <li>Tables and repeated UI rows</li>
+      <li>Email/name cards in dashboards</li>
+      <li>Fragments used inside multiple layouts</li>
+      <li>Pre-sanitized output using <code>e()</code> ensures XSS safety</li>
+    </ul>
+  </p>
+
+  <h3 class="text-xl font-semibold">2. Client-side interactive components (HTMX-powered)</h3>
+  <p class="text-slate-400 text-sm mb-1">UI that updates without JS:</p>
+  <pre class="bg-slate-950/80 rounded-xl p-4 text-xs overflow-x-auto"><code>// resources/views/components/UserRow.php
+function UserRow($user) {
+  return "
+  &lt;tr id='user-{$user['id']}'&gt;
+    &lt;td&gt;".e($user['name'])."&lt;/td&gt;
+    &lt;td&gt;".e($user['email'])."&lt;/td&gt;
+    &lt;td&gt;
+      &lt;button 
+        hx-delete='/api/users/{$user['id']}' 
+        hx-target='#user-{$user['id']}' 
+        hx-swap='outerHTML'
+        class='px-2 py-1 bg-red-500/10 text-red-400 border border-red-500/40 rounded-md hover:bg-red-500/20'
+      &gt;
+        Delete
+      &lt;/button&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;";
+}</code></pre>
+
+  <p class="text-sm text-slate-400">
+    Use case examples:
+    <ul class="list-disc list-inside">
+      <li>Live tables reloaded by inspector data</li>
+      <li>Buttons that trigger DELETE/PUT endpoints</li>
+      <li>Conditional UI (show/hide admin section flags)</li>
+      <li>Forms with <code>hx-post</code> + CSRF headers for secure partial updates</li>
+    </ul>
+  </p>
+</section>
+
+<section class="space-y-4" id="api">
+  <h2 class="text-3xl font-bold">API Endpoints (FastAPI Style via <code>+server.php</code>)</h2>
+
+  <p class="text-base text-slate-300">
+    Endpoints return <strong>method maps</strong> similar to FastAPI route functions. Inside handlers you can use QueryBuilder:
+  </p>
+
+  <h3 class="text-xl font-semibold">Example: new API resource endpoint</h3>
+  <p class="text-sm text-slate-400">You can create endpoints like <code>app/api/calibrations/+server.php</code>.</p>
+
+  <pre class="bg-slate-950/80 rounded-xl p-4 text-xs overflow-x-auto"><code>&lt;?php
+use App\Core\DB;
+use App\Core\Response;
+use App\Core\ValidationException;
+
+return [
+  'get' => function($req) {
+    $rows = DB::table('calibrations')->orderBy('created_at','DESC')->get();
+    Response::json($rows);
+  },
+
+  'post' => function($req) {
+    try {
+      $data = $req->validate([
+        'part_number' => 'required',
+        'work_center' => 'required',
+      ]);
+
+      $id = DB::table('calibrations')->insert([
+        'part_number' => $data['part_number'],
+        'work_center' => $data['work_center'],
+        'created_at' => time(),
+        'created_by' => $GLOBALS['auth_user']['id'] ?? 0,
+      ]);
+
+      Response::json(['id'=>$id],201);
+    } catch (ValidationException $e) {
+      Response::json(['errors'=>$e->errors],422);
+    }
+  }
+];</code></pre>
+
+  <p class="text-xs text-slate-500">
+    Note: <code>$req->validate()</code> throws a <code>ValidationException</code> to return 422 errors cleanly. The chain <code>e()</code> ensures safe HTML output on UI.
+  </p>
+</section>
+
+<!-- TITLES (DV + GLOBALS) -->
+<section class="space-y-4">
+  <h2 class="text-3xl font-bold" id="titles">Title System and Best Practice</h2>
+  <p class="text-sm text-slate-300">
+    You can set the HTML title for each route using <strong>DV</strong> or <strong>global variables</strong> for legacy code.<br>
+    Because this is a security-first scaffold, the layout defines a <code>fallback</code> that always runs and always sanitizes via <strong>e()</strong>.
+  </p>
+
+  <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-xs text-slate-400">
+    <strong>Supported title patterns:</strong>
+    <ul class="list-disc list-inside">
+      <li><code>DV::set('title', 'Admin · Users')</code> ← recommended, structured, shared across nested layouts</li>
+      <li><code>$GLOBALS['title'] = 'Admin · Users'</code> ← legacy, supported, always falls back to DV</li>
+    </ul>
+  </div>
+
+  <pre class="bg-slate-950/80 rounded-xl p-4 text-xs overflow-x-auto"><code>&lt;?php
+// Root layout example (already included by generator)
+$title = DV::get('title', $GLOBALS['title'] ?? 'Bastion PHP');
+?&gt;
+&lt;title&gt;&lt;?= e($title) ?&gt;&lt;/title&gt;</code></pre>
+</section>
+
+<!-- COMPONENT CREATION -->
+<section class="space-y-4" id="cli">
+  <h2 class="text-3xl font-bold">CLI Commands Overview & Workflow</h2>
+
+  <p class="text-base text-slate-300 mb-4">
+    Bastion CLI (<code>bastion</code>) includes commands that mimic a mix of Django's manage.py, Artisan feel, and custom scaffolds:
+  </p>
+
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs sm:text-sm">
+
+    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 shadow-lg space-y-2">
+      <p class="font-semibold text-blue-400">run-dev</p>
+      <ul class="text-slate-400 space-y-1 list-disc list-inside">
+        <li>Starts PHP dev server pointing to <code>public/</code></li>
+        <li>Forces CSP nonce regeneration per request</li>
+        <li>Errors printed in terminal, never swallowed</li>
+        <li>Pairs well with BrowserSync proxy <code>:9876</code></li>
+      </ul>
+    </div>
+
+    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+      <p class="font-semibold text-purple-400">migrate</p>
+      <ul class="text-slate-400 space-y-1 list-disc list-inside">
+        <li>Reads <code>database/migrations/*.sql</code> in order</li>
+        <li>Executes each using PDO + WAL</li>
+        <li>No silent fails; stops on SQL errors</li>
+      </ul>
+    </div>
+
+    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+      <p class="font-semibold text-emerald-400">seed</p>
+      <ul class="text-slate-400 space-y-1 list-disc list-inside">
+        <li>Runs <code>database/seeds/*.php</code></li>
+        <li>Perfect for hydrating initial admin/users/parts</li>
+        <li>Can be extended to seed multiple modules</li>
+      </ul>
+    </div>
+
+    <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-4">
+      <p class="font-semibold text-yellow-400">key:generate</p>
+      <ul class="text-slate-400 space-y-1 list-disc list-inside">
+        <li>Generates <code>APP_KEY</code> for the <code>.env</code> file</li>
+        <li>Can secure internal encrypt helpers</li>
+      </ul>
+    </div>
+
+    <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-4">
+      <p class="font-semibold text-orange-400">jwt:secret</p>
+      <ul class="text-slate-400 space-y-1 list-disc list-inside">
+        <li>Regenerates <code>JWT_SECRET</code></li>
+        <li>Forces logout of all issued JWTs when rotated</li>
+        <li>Important for key compromise recovery</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6">Extendable code generation commands</h3>
+  <p class="text-sm text-slate-400 mb-2">You can add these in future versions:</p>
+
+  <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-1 text-xs text-slate-300">
+    <li><code>make:page</code> → scaffolds a folder + <code>page.php</code> + optional <code>Client component imports</code></li>
+    <li><code>make:api</code> → scaffolds a folder + <code>+server.php</code> with boilerplate GET/POST maps</li>
+    <li><code>make:module</code> → scaffolds a high-level folder under <code>app/</code> with default layout stacking enabled</li>
+    <li><code>make:component</code> → scaffolds server component or client HTMX component in <code>resources/views/components</code></li>
+    <li><code>make:migration</code> → injects a new raw SQL migration with numeric prefix order</li>
+    <li><code>make:seed</code> → injects a new seed file</li>
+  </ul>
+</section>
+
+<!-- ENDPOINT CREATION -->
+<section id="endpoint-creation" class="doc-section space-y-4">
+  <h2 class="text-3xl font-bold">How to create endpoints (FastAPI-style, ORM-inside)</h2>
+  <p class="text-base text-slate-400">
+    Endpoints are created by adding folders under <code>app/api/&lt;resource&gt;</code> with a single <code>+server.php</code> file that returns the HTTP method map.
+  </p>
+
+  <p class="text-sm text-slate-300">
+    The QueryBuilder (<code>DB::table('resource')</code>) can be used directly inside the handler closures to compose SQL-backed queries without writing manual PDO boilerplate.
+    Validation lives in the Request object, and responses are standardized with the Response helper.
+  </p>
+</section>
+
+<!-- RESPONSIVE TAILWIND UI SNIPPET -->
+<section id="responsive-snippet" class="doc-section space-y-4">
+  <h2 class="text-2xl sm:text-3xl font-bold">Responsive UI using Tailwind CDN</h2>
+  <p class="text-sm text-slate-400">
+    Because the layout includes Tailwind from CDN, every page can use utility classes like <code>grid</code>, <code>flex</code>, <code>p-*</code>, <code>rounded-*</code>, and responsive prefixes (<code>sm:</code>, <code>lg:</code>, etc) without any extra build step.
+  </p>
+
+  <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-4 text-sm text-slate-300">
+    <strong>Responsive design tips:</strong>
+    <ul class="list-disc list-inside mt-2 text-slate-400 space-y-1">
+      <li>Use <code>sm:</code> for mobile-first breakpoints</li>
+      <li>Use <code>grid sm:grid-cols-2 lg:grid-cols-3</code> for responsive cards</li>
+      <li>Use <code>rounded-2xl shadow-xl p-4 sm:p-6</code> for readable UI</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 100% FINISH -->
+<section id="deployment" class="doc-section space-y-4 pb-10">
+  <h2 class="text-3xl font-bold">Deployment mindset</h2>
+  <p class="text-md text-slate-400">
+    Running build would freeze your scaffold for prod entirely.  
+    But in dev: YOU see interactive parts with htmx, and server components render raw PHP safely.
+  </p>
+</section>
+
+</main>
 </body>
 </html>
