@@ -1,1399 +1,826 @@
 #!/usr/bin/env bash
-#==============================================================================
-# Bastion PHP GENERATOR v1.0 (Enterprise Complete) - create-bastion-app
-#
-# Generates a Bastion PHP project with:
-#  - Service Container, DV view engine, Theme helpers
-#  - DB facade (SQLite default) with QueryBuilder
-#  - Logger, Response helpers, enhanced Request
-#  - Auth (JWT with refresh tokens), CSRF middleware, SecurityHeaders, RateLimit
-#  - Admin panel scaffold, migrations, seeders
-#  - bastion CLI (replaces artisan) and artisan compatibility shim
-#  - API endpoints properly structured (auth + users)
-#
-# Usage:
-#   bash create-bastion-app my-app
-#
-#==============================================================================
-
 set -euo pipefail
 
-#--- COLORS ---
-BLUE='\033[0;34m'
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m'
+APP_NAME="${1:-bastion-app}"
+ROOT="$(pwd)/$APP_NAME"
 
-info() { echo -e "${BLUE}ℹ${NC} $1"; }
-success() { echo -e "${GREEN}✓${NC} $1"; }
-error() { echo -e "${RED}✗${NC} $1"; exit 1; }
+echo "Creating Bastion PHP app at $ROOT ..."
 
-#--- ARGS ---
-if [ "$#" -lt 1 ]; then
-    echo "Usage: $0 <project-name>"
-    exit 1
-fi
-
-PROJECT="$1"
-ROOT="$(pwd)/$PROJECT"
-
-#--- INIT ---
-info "Creating Bastion Enterprise Project: $PROJECT"
-
-if [ -e "$ROOT" ]; then
-    error "Directory '$ROOT' already exists. Remove or choose another name."
-fi
-
+# Helpers
 mkdir -p "$ROOT"
 cd "$ROOT"
 
-# Directories
-mkdir -p app/Core app/Middleware app/Models app/Services
-mkdir -p app/admin/users app/admin/settings app/admin/database
-mkdir -p app/api/auth/login app/api/auth/logout app/api/users/[id]
-mkdir -p resources/views/layouts resources/views/errors resources/css
-mkdir -p config database/migrations database/seeds
-mkdir -p public/css storage/db storage/logs storage/uploads
-touch storage/db/app.db || true
-touch storage/logs/.gitkeep || true
+info(){ echo -e "\033[1;34m[INFO]\033[0m $1"; }
+success(){ echo -e "\033[1;32m[OK]\033[0m $1"; }
+warn(){ echo -e "\033[1;33m[WARN]\033[0m $1"; }
 
-# Keys
-if command -v openssl >/dev/null 2>&1; then
-    APP_KEY=$(openssl rand -base64 32)
-    JWT_SECRET=$(openssl rand -base64 32)
-else
-    APP_KEY=$(php -r "echo base64_encode(random_bytes(32));")
-    JWT_SECRET=$(php -r "echo base64_encode(random_bytes(32));")
-fi
+# Basic dirs
+mkdir -p app app/core app/middleware app/models app/api app/views app/views/errors app/views/partials app/layouts app/register app/login app/admin
+mkdir -p public public/css resources/css resources/js storage/db storage/logs database/migrations database/seeds vendor
+mkdir -p config
 
-# ==============================================================================
-# 1. CONFIG
-# ==============================================================================
-info "Generating configuration files..."
-
-cat > .env <<ENV
-APP_NAME="Bastion Enterprise"
-APP_ENV=local
-APP_DEBUG=true
-APP_URL=http://localhost:9876
-APP_KEY=$APP_KEY
-
-DB_CONNECTION=sqlite
-DB_PATH=storage/db/app.db
-
-JWT_SECRET=$JWT_SECRET
-JWT_TTL=3600
-JWT_REFRESH_TTL=604800
-
-CSRF_ENABLED=true
-SECURE_COOKIES=false
-LOG_LEVEL=debug
-ENV
-
+####################
+# .env.example
+####################
 cat > .env.example <<'ENV'
-APP_NAME="Bastion Enterprise"
+APP_NAME=BastionPHP
 APP_ENV=local
 APP_DEBUG=true
-APP_URL=http://localhost:9876
-APP_KEY=base64:REPLACE_ME
-
+APP_KEY=
+JWT_SECRET=
 DB_CONNECTION=sqlite
 DB_PATH=storage/db/app.db
-
-JWT_SECRET=REPLACE_ME
-JWT_TTL=3600
-JWT_REFRESH_TTL=604800
-
-CSRF_ENABLED=true
 SECURE_COOKIES=false
-LOG_LEVEL=debug
+JWT_ACCESS_EXP=900
+JWT_REFRESH_EXP=604800
+APP_TIMEZONE=UTC
+APP_URL=http://127.0.0.1:9876
 ENV
 
-cat > config/style.php <<'PHP'
-<?php
-return [
-    'theme' => getenv('THEME_MODE') ?: 'system',
-    'useTailwind' => true,
-    'tailwindMode' => 'build',
-    'fallbackCss' => '/css/fallback.css',
-];
-PHP
+cp .env.example .env || true
 
+####################
+# composer.json
+####################
 cat > composer.json <<'JSON'
 {
-    "name": "bastion/app",
-    "description": "Bastion PHP v1 Enterprise",
-    "type": "project",
-    "require": {
-        "php": "^8.1",
-        "firebase/php-jwt": "^6.0"
-    },
-    "autoload": {
-        "psr-4": { "App\\": "app/" },
-        "files": ["app/Core/helpers.php"]
+  "name": "bastion/php-app",
+  "description": "Bastion PHP generated app",
+  "autoload": {
+    "psr-4": {
+      "App\\\\": "app/"
     }
+  },
+  "require": {
+    "firebase/php-jwt": "^6.0"
+  }
 }
 JSON
 
-# ==============================================================================
-# 2. CORE ARCHITECTURE
-# ==============================================================================
-info "Building Core Architecture..."
-
-cat > app/Core/Container.php <<'PHP'
-<?php
-namespace App\Core;
-class Container {
-    protected array $bindings = [];
-    protected array $instances = [];
-    public function bind(string $key, callable $resolver): void { $this->bindings[$key] = $resolver; }
-    public function singleton(string $key, callable $resolver): void {
-        $this->bindings[$key] = function ($c) use ($resolver) {
-            static $object;
-            if (!$object) $object = $resolver($c);
-            return $object;
-        };
-    }
-    public function resolve(string $key): mixed {
-        if (isset($this->instances[$key])) return $this->instances[$key];
-        if (isset($this->bindings[$key])) return $this->bindings[$key]($this);
-        if (class_exists($key)) return new $key();
-        throw new \Exception("Cannot resolve: $key");
-    }
+####################
+# package.json (tailwind minimal)
+####################
+cat > package.json <<'JSON'
+{
+  "private": true,
+  "scripts": {
+    "dev": "npx tailwindcss -i ./resources/css/app.css -o ./public/css/app.css --watch",
+    "build": "npx tailwindcss -i ./resources/css/app.css -o ./public/css/app.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.0.0-alpha",
+    "browser-sync": "^2.27.10"
+  }
 }
-PHP
+JSON
 
-cat > app/Core/App.php <<'PHP'
-<?php
-namespace App\Core;
-class App extends Container {
-    private static App $instance;
-    private Router $router;
-    private array $middlewares = [];
-
-    public function __construct(string $rootPath) {
-        self::$instance = $this;
-        $this->router = new Router($rootPath . '/app');
-        $this->registerServices();
-    }
-    public static function getInstance(): App { return self::$instance; }
-    
-    private function registerServices(): void {
-        $this->singleton(DB::class, fn() => new DB());
-        $this->singleton(Auth::class, fn() => new Auth());
-        $this->singleton(Logger::class, fn() => new Logger());
-    }
-    
-    public function use(callable|string $middleware): void {
-        $this->middlewares[] = $middleware;
-    }
-    
-    public function run(): void {
-        $request = new Request();
-        $this->instances[Request::class] = $request;
-        
-        $handler = fn($req) => $this->router->dispatch($req);
-        
-        foreach (array_reverse($this->middlewares) as $mw) {
-            $next = $handler;
-            $handler = function($req) use ($mw, $next) {
-                if (is_string($mw)) {
-                    $instance = new $mw();
-                    return $instance->handle($req, $next);
-                }
-                return $mw($req, $next);
-            };
-        }
-        $handler($request);
-    }
+####################
+# tailwind config (minimal)
+####################
+cat > tailwind.config.js <<'JS'
+module.exports = {
+  content: ["./app/**/*.php","./resources/**/*.php","./resources/**/*.html"],
+  theme: { extend: {} },
+  plugins: []
 }
-PHP
-
-cat > app/Core/Logger.php <<'PHP'
-<?php
-namespace App\Core;
-class Logger {
-    private string $logFile;
-    public function __construct() {
-        $this->logFile = __DIR__ . '/../../storage/logs/app.log';
-    }
-    private function write(string $level, string $message, array $ctx = []): void {
-        $date = date('Y-m-d H:i:s');
-        $ctxJson = !empty($ctx) ? ' ' . json_encode($ctx, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) : '';
-        $line = "[$date] " . strtoupper($level) . ": $message$ctxJson" . PHP_EOL;
-        $dir = dirname($this->logFile);
-        if (!is_dir($dir)) @mkdir($dir, 0755, true);
-        @file_put_contents($this->logFile, $line, FILE_APPEND | LOCK_EX);
-    }
-    public function debug(string $m, array $c = []): void { $this->write('debug', $m, $c); }
-    public function info(string $m, array $c = []): void { $this->write('info', $m, $c); }
-    public function warning(string $m, array $c = []): void { $this->write('warning', $m, $c); }
-    public function error(string $m, array $c = []): void { $this->write('error', $m, $c); }
-}
-PHP
-
-cat > app/Core/Request.php <<'PHP'
-<?php
-namespace App\Core;
-class Request {
-    public string $path = '';
-    public string $method = 'GET';
-    public array $headers = [];
-    public array $cookies = [];
-    public array $query = [];
-    public array $body = [];
-    public array $files = [];
-    public array $meta = [];
-
-    public function __construct() {
-        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
-        $this->path = ltrim(trim($uri, '/'), '/');
-        $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        $this->headers = $this->getAllHeaders();
-        $this->cookies = $_COOKIE ?? [];
-        $this->query = $_GET ?? [];
-        $this->body = $_POST ?? [];
-        $this->files = $_FILES ?? [];
-    }
-
-    private function getAllHeaders(): array {
-        if (function_exists('getallheaders')) return getallheaders() ?: [];
-        $headers = [];
-        foreach ($_SERVER as $name => $value) {
-            if (strpos($name, 'HTTP_') === 0) {
-                $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
-                $headers[$key] = $value;
-            }
-        }
-        return $headers;
-    }
-
-    public function input(string $key, mixed $default = null): mixed {
-        if ($this->isJson()) {
-            $data = $this->json();
-            return $data[$key] ?? $default;
-        }
-        return $this->body[$key] ?? $this->query[$key] ?? $default;
-    }
-
-    public function json(): array {
-        $input = file_get_contents('php://input');
-        return json_decode($input, true) ?? [];
-    }
-
-    public function isJson(): bool {
-        return stripos($this->headers['Content-Type'] ?? '', 'application/json') !== false;
-    }
-    
-    public function validate(array $rules): array {
-        $errors = [];
-        $data = $this->isJson() ? $this->json() : $this->body;
-        foreach ($rules as $field => $ruleStr) {
-            $val = $data[$field] ?? null;
-            $ruleList = explode('|', $ruleStr);
-            foreach ($ruleList as $rule) {
-                if ($rule === 'required' && (is_null($val) || $val === '')) {
-                    $errors[$field][] = "$field is required";
-                }
-                if (str_starts_with($rule, 'min:')) {
-                    $min = (int)substr($rule, 4);
-                    if (strlen((string)$val) < $min) $errors[$field][] = "$field must be at least $min characters";
-                }
-                if ($rule === 'email' && !empty($val) && !filter_var($val, FILTER_VALIDATE_EMAIL)) {
-                    $errors[$field][] = "$field must be a valid email";
-                }
-            }
-        }
-        if (!empty($errors)) {
-            throw new \App\Core\ValidationException('Validation failed', $errors);
-        }
-        return $data;
-    }
-}
-PHP
-
-cat > app/Core/ValidationException.php <<'PHP'
-<?php
-namespace App\Core;
-class ValidationException extends \Exception {
-    public array $errors = [];
-    public function __construct(string $message = "Validation failed", array $errors = [], int $code = 422) {
-        parent::__construct($message, $code);
-        $this->errors = $errors;
-    }
-}
-PHP
-
-cat > app/Core/Response.php <<'PHP'
-<?php
-namespace App\Core;
-class Response {
-    public static function json($data, int $status = 200): never {
-        http_response_code($status);
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($data, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
-        exit;
-    }
-    public static function html(string $content, int $status = 200): never {
-        http_response_code($status);
-        header('Content-Type: text/html; charset=UTF-8');
-        echo $content;
-        exit;
-    }
-    public static function redirect(string $url, int $code = 302): never {
-        $url = str_replace(["\r","\n"], '', $url);
-        header("Location: $url", true, $code);
-        exit;
-    }
-    public static function abort(int $code, string $msg = ''): never {
-        http_response_code($code);
-        $file = __DIR__ . "/../../resources/views/errors/{$code}.php";
-        if (file_exists($file)) {
-            echo DV::render($file, ['message' => $msg]);
-        } else {
-            if (stripos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
-                echo json_encode(['error' => $msg ?: "Error {$code}"]);
-            } else {
-                echo "<h1>Error {$code}</h1><p>" . htmlentities($msg) . "</p>";
-            }
-        }
-        exit;
-    }
-}
-PHP
-
-cat > app/Core/DB.php <<'PHP'
-<?php
-namespace App\Core;
-use PDO;
-class DB {
-    private PDO $pdo;
-    public function __construct() {
-        $path = env('DB_PATH', 'storage/db/app.db');
-        $full = __DIR__ . '/../../' . ltrim($path, '/');
-        $dir = dirname($full);
-        if (!is_dir($dir)) @mkdir($dir, 0755, true);
-        if (!file_exists($full)) @touch($full);
-        $this->pdo = new PDO("sqlite:$full");
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        $this->pdo->exec('PRAGMA journal_mode=WAL');
-    }
-    public function query(string $table): QueryBuilder { return new QueryBuilder($this->pdo, $table); }
-    public function getPdo(): PDO { return $this->pdo; }
-    
-    public static function __callStatic($method, $args) {
-        $instance = App::getInstance()->resolve(self::class);
-        if ($method === 'table') return $instance->query(...$args);
-        return $instance->$method(...$args);
-    }
-}
-
-class QueryBuilder {
-    private PDO $pdo;
-    private string $table;
-    private array $wheres = [];
-    private array $bindings = [];
-    private ?int $limit = null;
-    private ?int $offset = null;
-    private array $orderBy = [];
-
-    public function __construct(PDO $pdo, string $table) { $this->pdo = $pdo; $this->table = $table; }
-    public function where($col, $val): self { $this->wheres[] = "$col = ?"; $this->bindings[] = $val; return $this; }
-    public function limit(int $l): self { $this->limit = $l; return $this; }
-    public function offset(int $o): self { $this->offset = $o; return $this; }
-    public function orderBy($col, $dir='ASC'): self { $this->orderBy[] = "$col $dir"; return $this; }
-    
-    public function get(): array {
-        $sql = "SELECT * FROM {$this->table}";
-        if ($this->wheres) $sql .= " WHERE " . implode(' AND ', $this->wheres);
-        if ($this->orderBy) $sql .= " ORDER BY " . implode(', ', $this->orderBy);
-        if ($this->limit) $sql .= " LIMIT {$this->limit}";
-        if ($this->offset) $sql .= " OFFSET {$this->offset}";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($this->bindings);
-        return $stmt->fetchAll();
-    }
-    
-    public function first(): ?array { $this->limit(1); $r = $this->get(); return $r[0] ?? null; }
-    
-    public function insert(array $data): int {
-        $cols = implode(',', array_keys($data));
-        $vals = implode(',', array_fill(0, count($data), '?'));
-        $stmt = $this->pdo->prepare("INSERT INTO {$this->table} ($cols) VALUES ($vals)");
-        $stmt->execute(array_values($data));
-        return (int)$this->pdo->lastInsertId();
-    }
-    
-    public function update(array $data): bool {
-        $set = implode(',', array_map(fn($k)=>"$k=?", array_keys($data)));
-        $sql = "UPDATE {$this->table} SET $set";
-        if($this->wheres) $sql .= " WHERE " . implode(' AND ', $this->wheres);
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([...array_values($data), ...$this->bindings]);
-    }
-    
-    public function delete(): bool {
-        $sql = "DELETE FROM {$this->table}";
-        if($this->wheres) $sql .= " WHERE " . implode(' AND ', $this->wheres);
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($this->bindings);
-    }
-    
-    public function count(): int {
-        $sql = "SELECT COUNT(*) FROM {$this->table}";
-        if($this->wheres) $sql .= " WHERE " . implode(' AND ', $this->wheres);
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($this->bindings);
-        return (int)$stmt->fetchColumn();
-    }
-}
-PHP
-
-cat > app/Core/DV.php <<'PHP'
-<?php
-namespace App\Core;
-class DV {
-    protected static array $data = [];
-    public static function set(string $key, mixed $value): void { self::$data[$key] = $value; }
-    public static function render(string $path, array $local = []): string {
-        $data = array_merge(self::$data, $local);
-        extract($data, EXTR_SKIP);
-        ob_start();
-        $file = file_exists($path) ? $path : __DIR__ . '/../../resources/views/' . $path . '.php';
-        if (file_exists($file)) include $file;
-        return ob_get_clean();
-    }
-}
-PHP
-
-cat > app/Core/CSRF.php <<'PHP'
-<?php
-namespace App\Core;
-class CSRF {
-    public static function token(): string {
-        if (session_status() !== PHP_SESSION_ACTIVE && PHP_SAPI !== 'cli') session_start();
-        if (empty($_SESSION['_csrf'])) $_SESSION['_csrf'] = bin2hex(random_bytes(32));
-        return $_SESSION['_csrf'];
-    }
-
-    public static function handle(Request $req, callable $next): mixed {
-        if (in_array(strtoupper($req->method), ['POST','PUT','PATCH','DELETE'])) {
-            if (!$req->isJson()) {
-                $sent = $req->input('_csrf') ?? $req->headers['X-CSRF-TOKEN'] ?? $req->headers['X-Csrf-Token'] ?? '';
-                $sess = $_SESSION['_csrf'] ?? '';
-                if (!is_string($sent) || !hash_equals((string)$sess, (string)$sent)) {
-                    logger()->warning('CSRF token mismatch', ['path'=>$req->path ?? '']);
-                    return Response::json(['error'=>'CSRF token mismatch'], 403);
-                }
-            }
-        }
-        return $next($req);
-    }
-}
-PHP
-
-cat > app/Core/Router.php <<'PHP'
-<?php
-namespace App\Core;
-class Router {
-    private string $root;
-    public function __construct($r) { $this->root = rtrim($r,'/'); }
-    
-    public function dispatch(Request $req) {
-        if ($this->apiRoute($req)) return;
-        $this->pageRoute($req);
-    }
-
-    private function apiRoute($req) {
-        $resolved = $this->resolveWithParams($req->path);
-        $path = $resolved[0] ?? null;
-        $params = $resolved[1] ?? [];
-        if (!$path) return false;
-        $file = "$path/+server.php";
-        if (file_exists($file)) {
-            $req->meta['params'] = $params;
-            $h = require $file;
-            $m = strtolower($req->method);
-            if(isset($h[$m])) $h[$m]($req);
-            else Response::json(['error'=>'Method not allowed'], 405);
-            return true;
-        }
-        return false;
-    }
-
-    private function pageRoute($req) {
-        $resolved = $this->resolveWithParams($req->path);
-        $path = $resolved[0] ?? null;
-        $params = $resolved[1] ?? [];
-        if (!$path) { Response::abort(404); }
-        $file = "$path/page.php";
-        if (file_exists($file)) {
-            DV::set('params', $params);
-            $content = DV::render($file);
-            $layout = __DIR__.'/../../resources/views/layouts/main.php';
-            echo DV::render($layout, ['content' => $content]);
-        } else {
-            Response::abort(404);
-        }
-    }
-
-    private function resolveWithParams($uri) {
-        $segs = ($uri === '' || $uri === '/') ? [] : explode('/', trim($uri, '/'));
-        $curr = $this->root;
-        $params = [];
-        foreach($segs as $seg) {
-            $direct = "$curr/$seg";
-            if (is_dir($direct)) { $curr = $direct; continue; }
-            $found = false;
-            foreach (glob("$curr/*", GLOB_ONLYDIR) as $dir) {
-                if (preg_match('/^\[(.+)\]$/', basename($dir), $m)) {
-                    $params[$m[1]] = $seg;
-                    $curr = $dir;
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) return [null, []];
-        }
-        return [$curr, $params];
-    }
-}
-PHP
-
-cat > app/Core/Theme.php <<'PHP'
-<?php
-namespace App\Core;
-class Theme {
-    public static function apply(): string {
-        $c = require __DIR__ . '/../../config/style.php';
-        $m = $c['theme'] ?? 'system';
-        if ($m === 'dark') return 'class="dark"';
-        if ($m === 'light') return '';
-        return 'onload="(function(){if(localStorage.theme===\'dark\'||(!(\'theme\' in localStorage)&&window.matchMedia(\'(prefers-color-scheme: dark)\').matches)){document.documentElement.classList.add(\'dark\');}})()"';
-    }
-}
-PHP
-
-cat > app/Core/helpers.php <<'PHP'
-<?php
-use App\Core\DV;
-use App\Core\Auth;
-use App\Core\CSRF;
-use App\Core\Logger;
-
-if (!function_exists('env')) {
-    function env(string $k, $d = null) {
-        $v = getenv($k);
-        if ($v === false) return $d;
-        if (preg_match('/^([\'"])(.*)\1$/', $v, $m)) return $m[2];
-        return $v;
-    }
-}
-
-if (!function_exists('view')) {
-    function view($p, $d = []) { return DV::render($p, $d); }
-}
-
-if (!function_exists('e')) {
-    function e($s) { return htmlspecialchars($s ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
-}
-
-if (!function_exists('csrf_token')) {
-    function csrf_token(): string { return CSRF::token(); }
-}
-
-if (!function_exists('csrf_field')) {
-    function csrf_field(): string { return '<input type="hidden" name="_csrf" value="'.csrf_token().'">'; }
-}
-
-if (!function_exists('auth')) {
-    function auth() { return Auth::user() ?? null; }
-}
-
-if (!function_exists('logger')) {
-    function logger(): \App\Core\Logger {
-        static $instance = null;
-        if ($instance === null) $instance = new \App\Core\Logger();
-        return $instance;
-    }
-}
-PHP
-
-# ==============================================================================
-# 3. MIDDLEWARE
-# ==============================================================================
-info "Creating Middleware..."
-
-cat > app/Middleware/SecurityHeaders.php <<'PHP'
-<?php
-namespace App\Middleware;
-use App\Core\Request;
-class SecurityHeaders {
-    public function handle(Request $req, callable $next) {
-        $nonce = base64_encode(random_bytes(16));
-        $req->meta['csp_nonce'] = $nonce;
-        header("X-Frame-Options: SAMEORIGIN");
-        header("X-Content-Type-Options: nosniff");
-        header("Referrer-Policy: strict-origin-when-cross-origin");
-        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-{$nonce}' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;");
-        return $next($req);
-    }
-}
-PHP
-
-cat > app/Middleware/RateLimit.php <<'PHP'
-<?php
-namespace App\Middleware;
-use App\Core\Request;
-class RateLimit {
-    public function handle(Request $req, callable $next) {
-        return $next($req);
-    }
-}
-PHP
-
-cat > app/Middleware/AuthMiddleware.php <<'PHP'
-<?php
-namespace App\Middleware;
-use App\Core\Auth;
-use App\Core\CSRF;
-class AuthMiddleware {
-    public function handle($req, $next) {
-        Auth::check($req);
-        if (filter_var(getenv('CSRF_ENABLED') ?: 'true', FILTER_VALIDATE_BOOLEAN)) {
-            return \App\Core\CSRF::handle($req, $next);
-        }
-        return $next($req);
-    }
-}
-PHP
-
-cat > app/Middleware/AdminOnly.php <<'PHP'
-<?php
-namespace App\Middleware;
-use App\Core\Response;
-class AdminOnly {
-    public function handle($req, $next) {
-        $user = auth();
-        if (!$user || ($user['role'] ?? '') !== 'admin') {
-            Response::abort(403, 'Admin Access Required');
-        }
-        return $next($req);
-    }
-}
-PHP
-# ==============================================================================
-# 4. MODELS & AUTH
-# ==============================================================================
-info "Creating Models & Auth..."
-
-cat > app/Models/User.php <<'PHP'
-<?php
-namespace App\Models;
-use App\Core\DB;
-
-class User {
-    public static function find($id) { return DB::table('users')->where('id', $id)->first(); }
-    public static function findByEmail($email) { return DB::table('users')->where('email', $email)->first(); }
-    public static function all() { return DB::table('users')->get(); }
-    public static function create($data) {
-        $data['created_at'] = time();
-        return DB::table('users')->insert($data);
-    }
-    public static function update($id, $data) { return DB::table('users')->where('id', $id)->update($data); }
-    public static function delete($id) { return DB::table('users')->where('id', $id)->delete(); }
-}
-PHP
-
-cat > app/Core/Auth.php <<'PHP'
-<?php
-namespace App\Core;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
-use App\Models\User;
-
-class Auth {
-    public static function issueTokens(int|string $userId): array {
-        $now = time();
-        $secret = env('JWT_SECRET');
-        if (!$secret) throw new \RuntimeException('JWT_SECRET not configured');
-        $accessExp = (int)env('JWT_TTL', 3600);
-        $refreshExp = (int)env('JWT_REFRESH_TTL', 604800);
-
-        $accessPayload = [
-            'sub' => $userId,
-            'iat' => $now,
-            'exp' => $now + $accessExp,
-            'type' => 'access'
-        ];
-        $access = JWT::encode($accessPayload, $secret, 'HS256');
-
-        $selector = bin2hex(random_bytes(12));
-        $validator = bin2hex(random_bytes(32));
-        $validatorHash = hash('sha256', $validator);
-        $expiresAt = $now + $refreshExp;
-
-        DB::getPdo()->prepare('INSERT INTO refresh_tokens (user_id, selector, validator_hash, expires_at) VALUES (?, ?, ?, ?)')
-            ->execute([$userId, $selector, $validatorHash, $expiresAt]);
-
-        return [
-            'access' => $access,
-            'refresh' => $selector . ':' . $validator,
-            'expires' => $accessPayload['exp']
-        ];
-    }
-
-    public static function validate(string $token): ?object {
-        try {
-            $secret = env('JWT_SECRET');
-            if (!$secret) return null;
-            return JWT::decode($token, new Key($secret, 'HS256'));
-        } catch (\Throwable $e) {
-            logger()->debug('JWT validate failed: ' . $e->getMessage());
-            return null;
-        }
-    }
-
-    public static function validateRefreshToken(string $token): ?int {
-        $parts = explode(':', $token);
-        if (count($parts) !== 2) return null;
-        [$selector, $validator] = $parts;
-        $stmt = DB::getPdo()->prepare('SELECT * FROM refresh_tokens WHERE selector = ?');
-        $stmt->execute([$selector]);
-        $row = $stmt->fetch();
-        if (!$row) return null;
-        DB::getPdo()->prepare('DELETE FROM refresh_tokens WHERE selector = ?')->execute([$selector]);
-        if (time() > (int)$row['expires_at']) return null;
-        if (!hash_equals($row['validator_hash'], hash('sha256', $validator))) return null;
-        return (int)$row['user_id'];
-    }
-
-    public static function attempt($email, $password) {
-        $user = User::findByEmail($email);
-        if (!$user || !password_verify($password, $user['password'] ?? '')) return false;
-        return self::issueTokens($user['id']);
-    }
-
-    public static function check(Request $req) {
-        $token = $req->headers['Authorization'] ?? null;
-        if (!$token) $token = $_COOKIE['access'] ?? null;
-        if ($token && preg_match('/Bearer\s+(.+)/', (string)$token, $m)) $token = $m[1];
-        if (!$token) return null;
-        $decoded = self::validate($token);
-        if ($decoded && isset($decoded->sub)) {
-            $user = User::find($decoded->sub);
-            $GLOBALS['auth_user'] = $user;
-            $req->meta['user'] = $user;
-            return $user;
-        }
-        return null;
-    }
-
-    public static function user() { return $GLOBALS['auth_user'] ?? null; }
-}
-PHP
-
-# ==============================================================================
-# 5. VIEWS & ENTRY POINTS
-# ==============================================================================
-info "Creating Views and Entry Points..."
-
-cat > resources/views/layouts/main.php <<'PHP'
-<?php use App\Core\Theme; ?>
-<!DOCTYPE html>
-<html lang="en" <?= Theme::apply() ?>>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title><?= $title ?? 'Bastion' ?></title>
-    <link href="/css/app.css" rel="stylesheet">
-</head>
-<body class="bg-gray-50 dark:bg-gray-900">
-    <nav class="bg-white dark:bg-gray-800 shadow">
-        <div class="max-w-7xl mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <a href="/" class="font-bold text-xl">Bastion v1</a>
-                <div class="flex gap-4">
-                    <?php if (auth()): ?>
-                        <span>Hi, <?= e(auth()['name']) ?></span>
-                        <?php if ((auth()['role'] ?? '') === 'admin'): ?>
-                            <a href="/admin" class="text-blue-600">Admin</a>
-                        <?php endif; ?>
-                        <a href="/logout" class="text-red-600">Logout</a>
-                    <?php else: ?>
-                        <a href="/login" class="text-blue-600">Login</a>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <main class="max-w-7xl mx-auto px-4 py-8">
-        <?= $content ?>
-    </main>
-</body>
-</html>
-PHP
-
-cat > app/page.php <<'PHP'
-<?php
-use App\Core\DV;
-DV::set('title', 'Home');
-?>
-<div class="text-center py-20">
-    <h1 class="text-5xl font-bold mb-4">Bastion Enterprise</h1>
-    <p class="text-xl text-gray-600 dark:text-gray-400 mb-8">
-        Container • DV • Auth • Admin • Security
-    </p>
-    <div class="flex gap-4 justify-center">
-        <a href="/login" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-            Login Demo
-        </a>
-        <a href="/api/users" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700">
-            Test API
-        </a>
-    </div>
-</div>
-PHP
-
-cat > app/login/page.php <<'PHP'
-<?php 
-use App\Core\DV;
-DV::set('title', 'Login'); 
-?>
-<div class="max-w-md mx-auto">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        <h1 class="text-3xl font-bold mb-6">Login</h1>
-        
-        <?php if (isset($_GET['error'])): ?>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            Invalid credentials. Please try again.
-        </div>
-        <?php endif; ?>
-        
-        <form method="POST" action="/api/auth/login">
-            <div class="mb-4">
-                <label class="block mb-2 font-semibold">Email</label>
-                <input name="email" value="admin@example.com" 
-                       class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2">
-            </div>
-            <div class="mb-6">
-                <label class="block mb-2 font-semibold">Password</label>
-                <input name="password" type="password" value="password" 
-                       class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2">
-            </div>
-            <?= csrf_field() ?>
-            <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
-                Sign In
-            </button>
-        </form>
-    </div>
-</div>
-PHP
-
-cat > app/logout/page.php <<'PHP'
-<?php
-setcookie('access', '', time()-3600, '/');
-setcookie('refresh', '', time()-3600, '/');
-\App\Core\Response::redirect('/');
-PHP
-
-cat > app/admin/page.php <<'PHP'
-<?php
-use App\Core\DV;
-use App\Core\DB;
-
-DV::set('title', 'Admin Dashboard');
-
-$userCount = DB::table('users')->count();
-$adminCount = DB::table('users')->where('role', 'admin')->count();
-$recentUsers = DB::table('users')->orderBy('id', 'DESC')->limit(5)->get();
-?>
-
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-    <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
-    
-    <div class="grid grid-cols-2 gap-6 mb-8">
-        <div class="bg-blue-100 dark:bg-blue-900 p-6 rounded-lg">
-            <h2 class="text-4xl font-bold"><?= e($userCount) ?></h2>
-            <p class="text-gray-600 dark:text-gray-400">Total Users</p>
-        </div>
-        <div class="bg-green-100 dark:bg-green-900 p-6 rounded-lg">
-            <h2 class="text-4xl font-bold"><?= e($adminCount) ?></h2>
-            <p class="text-gray-600 dark:text-gray-400">Admins</p>
-        </div>
-    </div>
-    
-    <h2 class="text-2xl font-bold mb-4">Recent Users</h2>
-    <table class="w-full">
-        <thead class="bg-gray-100 dark:bg-gray-700">
-            <tr>
-                <th class="px-4 py-2 text-left">Name</th>
-                <th class="px-4 py-2 text-left">Email</th>
-                <th class="px-4 py-2 text-left">Role</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach($recentUsers as $u): ?>
-            <tr class="border-b dark:border-gray-700">
-                <td class="px-4 py-2"><?= e($u['name']) ?></td>
-                <td class="px-4 py-2"><?= e($u['email']) ?></td>
-                <td class="px-4 py-2">
-                    <span class="px-2 py-1 rounded text-sm <?= $u['role'] === 'admin' ? 'bg-red-200' : 'bg-gray-200' ?>">
-                        <?= e($u['role']) ?>
-                    </span>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
-PHP
-
-# ==============================================================================
-# 6. API ENDPOINTS
-# ==============================================================================
-info "Creating API Endpoints..."
-
-# Auth Login
-cat > app/api/auth/login/+server.php <<'PHP'
-<?php
-use App\Core\Auth;
-use App\Core\Response;
-
-return [
-    'post' => function($req) {
-        $email = $req->input('email');
-        $password = $req->input('password');
-        
-        $tokens = Auth::attempt($email, $password);
-        
-        if ($tokens === false) {
-            Response::redirect('/login?error=1');
-        }
-        
-        $secure = filter_var(getenv('SECURE_COOKIES') ?: 'false', FILTER_VALIDATE_BOOLEAN);
-        
-        setcookie('access', $tokens['access'], [
-            'expires' => $tokens['expires'],
-            'path' => '/',
-            'secure' => $secure,
-            'httponly' => false,
-            'samesite' => 'Lax'
-        ]);
-        
-        setcookie('refresh', $tokens['refresh'], [
-            'expires' => time() + (int)(getenv('JWT_REFRESH_TTL') ?: 604800),
-            'path' => '/',
-            'secure' => $secure,
-            'httponly' => true,
-            'samesite' => 'Lax'
-        ]);
-        
-        Response::redirect('/admin');
-    }
-];
-PHP
-
-# Auth Logout
-cat > app/api/auth/logout/+server.php <<'PHP'
-<?php
-use App\Core\Response;
-
-return [
-    'post' => function($req) {
-        setcookie('access', '', time()-3600, '/');
-        setcookie('refresh', '', time()-3600, '/');
-        Response::json(['success' => true]);
-    }
-];
-PHP
-
-# Users List/Create
-cat > app/api/users/+server.php <<'PHP'
-<?php
-use App\Core\Response;
-use App\Models\User;
-
-return [
-    'get' => function($req) {
-        $users = User::all();
-        Response::json($users);
-    },
-
-    'post' => function($req) {
-        try {
-            $data = $req->validate([
-                'email' => 'required|email',
-                'name' => 'required',
-                'password' => 'required|min:8'
-            ]);
-            
-            $userId = User::create([
-                'email' => $data['email'],
-                'name' => $data['name'],
-                'password' => password_hash($data['password'], PASSWORD_DEFAULT),
-                'role' => 'user'
-            ]);
-            
-            Response::json(['id' => $userId, 'message' => 'User created'], 201);
-            
-        } catch (\App\Core\ValidationException $e) {
-            Response::json(['errors' => $e->errors], 422);
-        }
-    }
-];
-PHP
-
-# Users Get/Update/Delete
-cat > app/api/users/[id]/+server.php <<'PHP'
-<?php
-use App\Core\Response;
-use App\Models\User;
-
-return [
-    'get' => function($req) {
-        $userId = $req->meta['params']['id'] ?? null;
-        
-        if (!$userId) {
-            Response::json(['error' => 'Invalid ID'], 400);
-        }
-        
-        $user = User::find($userId);
-        
-        if (!$user) {
-            Response::json(['error' => 'User not found'], 404);
-        }
-        
-        Response::json($user);
-    },
-
-    'put' => function($req) {
-        $userId = $req->meta['params']['id'] ?? null;
-        
-        if (!$userId) {
-            Response::json(['error' => 'Invalid ID'], 400);
-        }
-        
-        $data = $req->json();
-        
-        if (isset($data['password'])) {
-            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-        }
-        
-        User::update($userId, $data);
-        
-        Response::json(['success' => true, 'message' => 'User updated']);
-    },
-
-    'delete' => function($req) {
-        $userId = $req->meta['params']['id'] ?? null;
-        
-        if (!$userId) {
-            Response::json(['error' => 'Invalid ID'], 400);
-        }
-        
-        User::delete($userId);
-        
-        http_response_code(200);
-        echo "";
-        exit;
-    }
-];
-PHP
-
-# ==============================================================================
-# 7. BOOTSTRAP & INDEX
-# ==============================================================================
-info "Creating Bootstrap..."
-
-cat > app/bootstrap.php <<'PHP'
-<?php
-$envFile = __DIR__ . '/../.env';
-if (file_exists($envFile)) {
-    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line === '' || strpos($line, '#') === 0) continue;
-        if (strpos($line, '=') === false) continue;
-        list($k, $v) = explode('=', $line, 2);
-        $v = trim($v);
-        if (preg_match('/^([\'"])(.*)\1$/', $v, $m)) $v = $m[2];
-        putenv(trim($k) . '=' . $v);
-        $_ENV[trim($k)] = $v;
-    }
-}
-if (session_status() === PHP_SESSION_NONE && PHP_SAPI !== 'cli') {
-    session_start([
-        'cookie_httponly' => true,
-        'cookie_samesite' => 'Lax',
-        'cookie_secure' => filter_var(getenv('SECURE_COOKIES') ?: 'false', FILTER_VALIDATE_BOOLEAN)
-    ]);
-}
-date_default_timezone_set(getenv('APP_TIMEZONE') ?: 'UTC');
-PHP
-
-cat > public/index.php <<'PHP'
-<?php
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../app/bootstrap.php';
-
-use App\Core\App;
-
-$app = new App(__DIR__ . '/..');
-
-$app->use(\App\Middleware\SecurityHeaders::class);
-$app->use(\App\Middleware\AuthMiddleware::class);
-
-$req = new \App\Core\Request();
-if ($req->path === 'admin' || str_starts_with($req->path, 'admin/')) {
-    $app->use(\App\Middleware\AdminOnly::class);
-}
-
-$app->run();
-PHP
-
-cat > public/.htaccess <<'HTACCESS'
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [L]
-</IfModule>
-HTACCESS
-
+JS
+
+####################
+# resources css entry
+####################
 cat > resources/css/app.css <<'CSS'
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 CSS
 
-# ==============================================================================
-# 8. MIGRATIONS & SEEDERS
-# ==============================================================================
-info "Creating Migrations & Seeders..."
-
-cat > database/migrations/001_create_users_table.php <<'PHP'
+####################
+# PUBLIC INDEX, FRONT CONTROLLER
+####################
+cat > public/index.php <<'PHP'
 <?php
-use App\Core\DB;
-$pdo = DB::getPdo();
-$pdo->exec("CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    email TEXT UNIQUE,
-    password TEXT,
-    role TEXT DEFAULT 'user',
-    created_at INTEGER
-)");
-echo "✓ Users table created\n";
+declare(strict_types=1);
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use App\Core\Request;
+use App\Core\Router;
+use App\Core\App;
+
+$app = new App(__DIR__ . '/..'); // app root
+$req = Request::capture();
+$router = new Router(realpath(__DIR__ . '/../app'));
+$router->dispatch($req);
 PHP
 
-cat > database/migrations/002_create_migrations_table.php <<'PHP'
+####################
+# CORE: App bootstrap
+####################
+cat > app/core/App.php <<'PHP'
 <?php
-use App\Core\DB;
-$pdo = DB::getPdo();
-$pdo->exec("CREATE TABLE IF NOT EXISTS migrations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    migration TEXT UNIQUE NOT NULL,
-    executed_at INTEGER NOT NULL
-)");
-echo "✓ Migrations table created\n";
-PHP
+namespace App\Core;
 
-cat > database/migrations/003_create_refresh_tokens_table.php <<'PHP'
-<?php
-use App\Core\DB;
-$pdo = DB::getPdo();
-$pdo->exec("CREATE TABLE IF NOT EXISTS refresh_tokens (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    selector TEXT UNIQUE NOT NULL,
-    validator_hash TEXT NOT NULL,
-    expires_at INTEGER NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-)");
-echo "✓ Refresh tokens table created\n";
-PHP
-
-cat > database/seeds/UserSeeder.php <<'PHP'
-<?php
-use App\Models\User;
-$pass = password_hash('password', PASSWORD_DEFAULT);
-try {
-    User::create(['name'=>'Admin','email'=>'admin@example.com','password'=>$pass,'role'=>'admin']);
-    echo "✓ Admin created (admin@example.com / password)\n";
-} catch(Exception $e) {}
-try {
-    User::create(['name'=>'Demo','email'=>'user@example.com','password'=>$pass,'role'=>'user']);
-    echo "✓ Demo user created (user@example.com / password)\n";
-} catch(Exception $e) {}
-PHP
-
-# ==============================================================================
-# 9. CLI TOOLS
-# ==============================================================================
-info "Creating CLI tools..."
-
-cat > artisan <<'PHP'
-#!/usr/bin/env php
-<?php
-require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/app/bootstrap.php';
-
-$cmd = $argv[1] ?? 'help';
-
-if ($cmd === 'migrate') {
-    foreach (glob(__DIR__ . '/database/migrations/*.php') as $f) require $f;
-    echo "Migrations run.\n";
-} elseif ($cmd === 'db:seed') {
-    foreach (glob(__DIR__ . '/database/seeds/*.php') as $f) require $f;
-    echo "Seeders run.\n";
-} elseif ($cmd === 'key:generate') {
-    $k = base64_encode(random_bytes(32));
-    $env = file_get_contents(__DIR__ . '/.env');
-    if (strpos($env, 'APP_KEY=') !== false) $env = preg_replace('/APP_KEY=.*/', "APP_KEY={$k}", $env);
-    else $env .= PHP_EOL . "APP_KEY={$k}\n";
-    file_put_contents(__DIR__ . '/.env', $env);
-    echo "APP_KEY generated and written to .env\n";
-} else {
-    echo "Usage: php artisan [migrate|db:seed|key:generate]\n";
+class App {
+    public string $root;
+    public array $bindings = [];
+    public function __construct(string $root) {
+        \$this->root = realpath(\$root);
+        // Load helpers
+        require_once \$this->root . '/core/helpers.php';
+        // Load core classes autoloaded by composer (PSR-4) or require manually if needed
+    }
+    public function bind(string \$key, \$resolver) {
+        \$this->bindings[\$key] = \$resolver;
+    }
+    public function resolve(string \$key) {
+        if (!isset(\$this->bindings[\$key])) throw new \\RuntimeException("Service not bound: \$key");
+        return call_user_func(\$this->bindings[\$key]);
+    }
 }
 PHP
-chmod +x artisan
 
-cat > bastion <<'PHP'
-#!/usr/bin/env php
+####################
+# CORE: Helpers
+####################
+cat > app/core/helpers.php <<'PHP'
 <?php
-$HOST = '127.0.0.1';
-$PORT_PUBLIC = 9876;
-$PORT_INTERNAL = 8000;
+use App\Core\DV;
 
-$cmd = $argv[1] ?? 'help';
+if (!function_exists('env')) {
+    function env(string \$k, \$d = null) {
+        \$v = getenv(\$k);
+        if (\$v === false) return \$d;
+        if (strtolower(\$v) === 'true') return true;
+        if (strtolower(\$v) === 'false') return false;
+        return \$v;
+    }
+}
 
-if ($cmd === 'run-dev') {
-    echo "[BASTION] Starting development environment...\n";
-    $php = "php -S $HOST:$PORT_INTERNAL -t public";
-    $tw = "npx @tailwindcss/cli -i resources/css/app.css -o public/css/app.css --watch";
-    $bs = "npx browser-sync start --proxy '$HOST:$PORT_INTERNAL' --files 'app/**/*.php, resources/**/*.php, public/css/*.css' --port $PORT_PUBLIC --no-open --no-ui";
+if (!function_exists('e')) {
+    function e(\$v){ return htmlspecialchars((string)\$v, ENT_QUOTES, 'UTF-8'); }
+}
 
-    $descriptors = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
-    $procs = [
-        ['cmd'=>$php,'name'=>'PHP','col'=>"\033[90m"],
-        ['cmd'=>$tw,'name'=>'CSS','col'=>"\033[36m"],
-        ['cmd'=>$bs,'name'=>'SYN','col'=>"\033[32m"]
-    ];
+if (!function_exists('view')) {
+    function view(string \$path, array \$data = []) {
+        \$file = __DIR__ . '/../views/' . \$path . '.php';
+        if (!file_exists(\$file)) throw new \\RuntimeException('View not found: ' . \$path);
+        ob_start();
+        extract(\$data, EXTR_SKIP);
+        include \$file;
+        return ob_get_clean();
+    }
+}
 
-    $running = [];
-    foreach ($procs as $p) {
-        $r = proc_open($p['cmd'], $descriptors, $pipes);
-        if (is_resource($r)) {
-            stream_set_blocking($pipes[1], 0);
-            stream_set_blocking($pipes[2], 0);
-            $running[] = ['res'=>$r,'pipes'=>$pipes,'data'=>$p];
+if (!function_exists('logger')) {
+    function logger() {
+        return new class {
+            public function info(\$m, \$ctx=[]){ file_put_contents(__DIR__ . '/../../storage/logs/app.log', date('c') . ' INFO ' . json_encode(['msg'=>\$m,'ctx'=>\$ctx]) . PHP_EOL, FILE_APPEND); }
+            public function warning(\$m, \$ctx=[]){ file_put_contents(__DIR__ . '/../../storage/logs/app.log', date('c') . ' WARN ' . json_encode(['msg'=>\$m,'ctx'=>\$ctx]) . PHP_EOL, FILE_APPEND); }
+            public function error(\$m, \$ctx=[]){ file_put_contents(__DIR__ . '/../../storage/logs/app.log', date('c') . ' ERROR ' . json_encode(['msg'=>\$m,'ctx'=>\$ctx]) . PHP_EOL, FILE_APPEND); }
+        };
+    }
+}
+PHP
+
+####################
+# CORE: Request
+####################
+cat > app/core/Request.php <<'PHP'
+<?php
+namespace App\Core;
+
+class Request {
+    public string \$method;
+    public string \$uri;
+    public string \$path;
+    public array \$headers = [];
+    public array \$query = [];
+    public array \$body = [];
+    public array \$meta = [];
+
+    public static function capture(): self {
+        \$r = new self();
+        \$r->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        \$r->uri = $_SERVER['REQUEST_URI'] ?? '/';
+        \$r->path = trim(parse_url(\$r->uri, PHP_URL_PATH), '/');
+        foreach (\$_SERVER as \$k => \$v) {
+            if (strpos(\$k,'HTTP_')===0) {
+                \$r->headers[strtolower(str_replace('_','-',substr(\$k,5)))] = \$v;
+            }
         }
+        // parse input
+        if (in_array(\$r->method, ['POST','PUT','PATCH','DELETE'])) {
+            if (strpos(\$_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
+                \$r->body = json_decode(file_get_contents('php://input'), true) ?? [];
+            } else {
+                \$r->body = \$_POST;
+            }
+        } else {
+            \$r->body = \$_GET;
+        }
+        \$r->query = \$_GET;
+        return \$r;
     }
 
-    echo "[READY] Server at http://$HOST:$PORT_PUBLIC\n";
-    while (count($running) > 0) {
-        foreach ($running as $k => $r) {
-            foreach ([1,2] as $pipe) {
-                $content = stream_get_contents($r['pipes'][$pipe]);
-                if ($content) {
-                    foreach (explode("\n", $content) as $line) {
-                        if (trim($line)) echo "{$r['data']['col']}[{$r['data']['name']}]\033[0m $line\n";
-                    }
+    public function input(string \$k, \$d = null) {
+        return \$this->body[\$k] ?? \$this->query[\$k] ?? \$d;
+    }
+
+    public function json() {
+        return \$this->body;
+    }
+
+    public function isJson(): bool {
+        return strpos(\$_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false;
+    }
+}
+PHP
+
+####################
+# CORE: Response
+####################
+cat > app/core/Response.php <<'PHP'
+<?php
+namespace App\Core;
+
+class Response {
+    public static function json(\$data, int \$status=200) {
+        http_response_code(\$status);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(\$data, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+    public static function html(string \$html, int \$status=200) {
+        http_response_code(\$status);
+        header('Content-Type: text/html; charset=utf-8');
+        echo \$html;
+        exit;
+    }
+    public static function redirect(string \$url, int \$code=302) {
+        header('Location: ' . str_replace(["\r","\n"],'',$url), true, \$code);
+        exit;
+    }
+    public static function abort(int \$code, string \$msg='') {
+        http_response_code(\$code);
+        // Use view errors if exists
+        \$errView = __DIR__ . '/../../app/views/errors/' . \$code . '.php';
+        if (file_exists(\$errView)) {
+            echo (function() use (\$errView, \$msg) {
+                ob_start(); include \$errView; return ob_get_clean();
+            })();
+        } else {
+            if (strpos(\$_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
+                echo json_encode(['error' => \$msg ?: 'Error ' . \$code]);
+            } else {
+                echo \"<h1>Error {\$code}</h1><p>\" . htmlspecialchars(\$msg) . \"</p>\";
+            }
+        }
+        exit;
+    }
+}
+PHP
+
+####################
+# CORE: DV template engine (children/slot support)
+####################
+cat > app/core/DV.php <<'PHP'
+<?php
+namespace App\Core;
+
+class DV {
+    public static array \$shared = [];
+
+    public static function set(string \$k, \$v) { self::\$shared[\$k] = \$v; }
+
+    public static function render(string \$file, array \$data = []): string {
+        // file is absolute path expected
+        \$data = array_merge(self::\$shared, \$data);
+        if (!isset(\$data['children'])) \$data['children'] = '';
+        if (!isset(\$data['slot'])) \$data['slot'] = '';
+        extract(\$data, EXTR_SKIP);
+        ob_start();
+        include \$file;
+        return ob_get_clean();
+    }
+}
+PHP
+
+####################
+# CORE: DB + QueryBuilder minimal
+####################
+cat > app/core/DB.php <<'PHP'
+<?php
+namespace App\Core;
+
+use PDO;
+
+class DB {
+    private PDO \$pdo;
+    public function __construct() {
+        \$path = env('DB_PATH', 'storage/db/app.db');
+        \$full = __DIR__ . '/../../' . ltrim(\$path, '/');
+        if (!is_dir(dirname(\$full))) @mkdir(dirname(\$full), 0755, true);
+        if (!file_exists(\$full)) @touch(\$full);
+        \$this->pdo = new PDO('sqlite:' . \$full);
+        \$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        \$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    }
+    public function pdo(): PDO { return \$this->pdo; }
+    public function table(string \$t): QueryBuilder { return new QueryBuilder(\$this->pdo, \$t); }
+    public static function instance(): self { static \$i; if (!\$i) \$i = new self(); return \$i; }
+}
+
+class QueryBuilder {
+    private PDO \$pdo;
+    private string \$table;
+    private array \$wheres = [];
+    private array \$bindings = [];
+    private int \$limit = 0;
+    public function __construct(PDO \$pdo, string \$table) { \$this->pdo=\$pdo; \$this->table=\$table; }
+    public function where(string \$col, \$val): self { \$this->wheres[] = \"\\\"\$col\\\" = ?\"; \$this->bindings[] = \$val; return \$this;}
+    public function first() {
+        \$sql = \"SELECT * FROM \\\"\$this->table\\\"\" . (\$this->wheres ? ' WHERE ' . implode(' AND ', \$this->wheres) : '') . ' LIMIT 1';
+        \$stmt = \$this->pdo->prepare(\$sql);
+        \$stmt->execute(\$this->bindings);
+        return \$stmt->fetch();
+    }
+    public function get() {
+        \$sql = \"SELECT * FROM \\\"\$this->table\\\"\" . (\$this->wheres ? ' WHERE ' . implode(' AND ', \$this->wheres) : '');
+        \$stmt = \$this->pdo->prepare(\$sql);
+        \$stmt->execute(\$this->bindings);
+        return \$stmt->fetchAll();
+    }
+    public function insert(array \$data) {
+        \$cols = array_keys(\$data);
+        \$place = implode(',', array_fill(0,count(\$cols),'?'));
+        \$sql = \"INSERT INTO \\\"\$this->table\\\" (\" . implode(',', array_map(fn(\$c)=>\"\\\"\$c\\\"\",\$cols)) . \") VALUES ({\$place})\";
+        \$stmt = \$this->pdo->prepare(\$sql);
+        \$stmt->execute(array_values(\$data));
+        return (int)\$this->pdo->lastInsertId();
+    }
+    public function update(array \$data, array \$where = []) {
+        \$sets = implode(',', array_map(fn(\$c)=>\"\\\"\$c\\\" = ?\", array_keys(\$data)));
+        \$sql = \"UPDATE \\\"\$this->table\\\" SET {\$sets}\" . (\$this->wheres ? ' WHERE ' . implode(' AND ', \$this->wheres) : '');
+        \$stmt = \$this->pdo->prepare(\$sql);
+        \$stmt->execute(array_merge(array_values(\$data), \$this->bindings));
+        return \$stmt->rowCount();
+    }
+    public function delete() {
+        \$sql = \"DELETE FROM \\\"\$this->table\\\"\" . (\$this->wheres ? ' WHERE ' . implode(' AND ', \$this->wheres) : '');
+        \$stmt = \$this->pdo->prepare(\$sql);
+        \$stmt->execute(\$this->bindings);
+        return \$stmt->rowCount();
+    }
+}
+PHP
+
+####################
+# MODEL: User (example)
+####################
+cat > app/models/User.php <<'PHP'
+<?php
+namespace App\Models;
+
+use App\Core\DB;
+
+class User {
+    public static function find(int \$id) { return DB::instance()->table('users')->where('id', \$id)->first(); }
+    public static function findByEmail(string \$email) { return DB::instance()->table('users')->where('email', \$email)->first(); }
+    public static function all() { return DB::instance()->table('users')->get(); }
+    public static function create(array \$data) {
+        return DB::instance()->table('users')->insert(\$data);
+    }
+    public static function update(int \$id, array \$data) {
+        return DB::instance()->table('users')->where('id', \$id)->update(\$data);
+    }
+    public static function delete(int \$id) {
+        return DB::instance()->table('users')->where('id', \$id)->delete();
+    }
+}
+PHP
+
+####################
+# Middleware: SecurityHeaders, CSRF, Auth skeleton, RateLimit, AdminOnly
+####################
+cat > app/middleware/SecurityHeaders.php <<'PHP'
+<?php
+namespace App\Middleware;
+use App\Core\Request;
+
+class SecurityHeaders {
+    public static function handle(Request \$req, callable \$next) {
+        \$nonce = base64_encode(random_bytes(16));
+        \$req->meta['csp_nonce'] = \$nonce;
+        header(\"X-Frame-Options: SAMEORIGIN\");
+        header(\"X-Content-Type-Options: nosniff\");
+        header(\"Referrer-Policy: strict-origin-when-cross-origin\");
+        header(\"Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-{\$nonce}' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:;\");
+        return \$next(\$req);
+    }
+}
+PHP
+
+cat > app/middleware/CSRF.php <<'PHP'
+<?php
+namespace App\Middleware;
+use App\Core\Request;
+use App\Core\Response;
+
+class CSRF {
+    public static function token(): string {
+        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+        if (empty(\$_SESSION['_csrf'])) \$_SESSION['_csrf'] = bin2hex(random_bytes(16));
+        return \$_SESSION['_csrf'];
+    }
+    public static function verify(Request \$req, callable \$next) {
+        if (in_array(strtoupper(\$req->method), ['POST','PUT','PATCH','DELETE'])) {
+            \$sent = \$req->input('_csrf', '') ?: (\$req->headers['x-csrf-token'] ?? '');
+            if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+            \$stored = \$_SESSION['_csrf'] ?? '';
+            if (!is_string(\$sent) || !hash_equals((string)\$stored, (string)\$sent)) {
+                return Response::json(['error'=>'CSRF token mismatch'], 403);
+            }
+        }
+        return \$next(\$req);
+    }
+}
+PHP
+
+cat > app/middleware/RateLimit.php <<'PHP'
+<?php
+namespace App\Middleware;
+use App\Core\Request;
+use App\Core\Response;
+
+class RateLimit {
+    private static array \$attempts = [];
+    public static function limit(Request \$req, callable \$next, int \$max=60, int \$decay=60) {
+        \$ip = \$_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        \$key = md5(\$ip . '|' . \$req->path);
+        \$now = time();
+        self::\$attempts[\$key] = array_filter(self::\$attempts[\$key] ?? [], fn(\$t)=> \$t > \$now - \$decay);
+        if (count(self::\$attempts[\$key]) >= \$max) {
+            return Response::json(['error'=>'Too many requests'], 429);
+        }
+        self::\$attempts[\$key][] = \$now;
+        return \$next(\$req);
+    }
+}
+PHP
+
+cat > app/middleware/Auth.php <<'PHP'
+<?php
+namespace App\Middleware;
+use App\Core\Request;
+use App\Core\Response;
+use App\Models\User;
+use Firebase\JWT\JWT;
+
+class Auth {
+    public static function guard(Request \$req, callable \$next) {
+        \$token = \$_COOKIE['access'] ?? (\$req->headers['authorization'] ?? '');
+        if (str_starts_with((string)\$token,'Bearer ')) \$token = substr((string)\$token,7);
+        if (!\$token) return Response::json(['error'=>'Unauthorized'], 401);
+        try {
+            \$secret = env('JWT_SECRET', '');
+            \$payload = (array) JWT::decode(\$token, \$secret, ['HS256']);
+            // attach user
+            \$user = User::find((int)\$payload['sub']);
+            if (!\$user) return Response::json(['error'=>'Unauthorized'], 401);
+            \$req->meta['user'] = \$user;
+            return \$next(\$req);
+        } catch (\\Throwable \$e) {
+            return Response::json(['error'=>'Invalid token'], 401);
+        }
+    }
+}
+PHP
+
+cat > app/middleware/AdminOnly.php <<'PHP'
+<?php
+namespace App\Middleware;
+use App\Core\Request;
+use App\Core\Response;
+
+class AdminOnly {
+    public static function handle(Request \$req, callable \$next) {
+        \$user = \$req->meta['user'] ?? null;
+        if (!\$user || (\$user['role'] ?? '') !== 'admin') {
+            return Response::json(['error'=>'Forbidden'], 403);
+        }
+        return \$next(\$req);
+    }
+}
+PHP
+
+####################
+# Router with layout resolver + API /page dispatch
+####################
+cat > app/core/Router.php <<'PHP'
+<?php
+namespace App\Core;
+
+use App\Core\Request;
+use App\Core\Response;
+
+class Router {
+    private string \$appDir;
+    public function __construct(string \$appDir) {
+        \$this->appDir = rtrim(\$appDir, '/');
+    }
+
+    private function resolveWithParams(string \$uri): array {
+        \$segs = (\$uri === '' || \$uri === '/') ? [] : explode('/', trim(\$uri,'/'));
+        \$curr = \$this->appDir;
+        \$params = [];
+        foreach (\$segs as \$seg) {
+            \$direct = \$curr . '/' . \$seg;
+            if (is_dir(\$direct)) { \$curr = \$direct; continue; }
+            // try dynamic folder [id]
+            \$found = false;
+            foreach (glob(\$curr . '/*', GLOB_ONLYDIR) as \$d) {
+                if (preg_match('/^\\[(.+)\\]$/', basename(\$d), \$m)) {
+                    \$params[\$m[1]] = \$seg;
+                    \$curr = \$d;
+                    \$found = true;
+                    break;
                 }
             }
-            if (!proc_get_status($r['res'])['running']) {
-                @fclose($r['pipes'][0]); @fclose($r['pipes'][1]); @fclose($r['pipes'][2]);
-                proc_close($r['res']);
-                unset($running[$k]);
+            if (!\$found) return [null, []];
+        }
+        return [\$curr, \$params];
+    }
+
+    private function resolveLayoutsFor(string \$pagePath): array {
+        \$layouts = [];
+        \$dir = dirname(\$pagePath);
+        while (\$dir !== dirname(\$dir)) {
+            \$layoutFile = \$dir . '/layout.php';
+            if (file_exists(\$layoutFile)) \$layouts[] = \$layoutFile;
+            \$dir = dirname(\$dir);
+        }
+        // root app/layout.php
+        \$rootLayout = \$this->appDir . '/layout.php';
+        if (file_exists(\$rootLayout)) \$layouts[] = \$rootLayout;
+        return array_reverse(\$layouts);
+    }
+
+    private function renderFile(string \$file, array \$vars = []): string {
+        extract(\$vars, EXTR_SKIP);
+        ob_start(); include \$file; return ob_get_clean();
+    }
+
+    public function dispatch(Request \$req) {
+        // Attempt API route resolution first
+        [\$path, \$params] = \$this->resolveWithParams(\$req->path);
+        if (!\$path) return Response::abort(404);
+
+        \$req->meta['params'] = \$params;
+
+        // API: +server.php exists?
+        \$serverFile = \$path . '/+server.php';
+        if (file_exists(\$serverFile)) {
+            \$handler = require \$serverFile;
+            if (is_callable(\$handler)) {
+                return \$handler(\$req);
+            } elseif (is_array(\$handler)) {
+                \$method = strtolower(\$req->method);
+                if (isset(\$handler[\$method]) && is_callable(\$handler[\$method])) {
+                    return \$handler[\$method](\$req);
+                } else {
+                    return Response::json(['error'=>'Method not allowed'], 405);
+                }
+            } else {
+                return Response::json(['error'=>'Invalid server handler'], 500);
             }
         }
-        usleep(100000);
+
+        // Page dispatch
+        \$pageFile = \$path . '/page.php';
+        if (!file_exists(\$pageFile)) return Response::abort(404);
+
+        // Render page via DV
+        \$content = DV::render(\$pageFile, ['params'=>\$params, 'nonce'=> \$req->meta['csp_nonce'] ?? '']);
+        // Resolve layouts
+        \$layouts = \$this->resolveLayoutsFor(\$pageFile);
+        foreach (\$layouts as \$layout) {
+            \$content = DV::render(\$layout, ['children' => \$content, 'params'=>\$params, 'nonce'=> \$req->meta['csp_nonce'] ?? '']);
+        }
+        // Output
+        echo \$content;
     }
-} elseif ($cmd === 'run-build') {
-    echo "[BASTION] Building assets...\n";
-    passthru("npx @tailwindcss/cli -i resources/css/app.css -o public/css/app.css --minify", $ret);
-    echo $ret === 0 ? "[OK] Build complete\n" : "[ERROR] Build failed\n";
-} elseif ($cmd === 'migrate') {
-    require_once __DIR__ . '/vendor/autoload.php';
-    require_once __DIR__ . '/app/bootstrap.php';
-    foreach (glob(__DIR__ . '/database/migrations/*.php') as $f) { echo "-> $f\n"; require $f; }
-    echo "Migrations executed.\n";
-} elseif ($cmd === 'db:seed') {
-    require_once __DIR__ . '/vendor/autoload.php';
-    require_once __DIR__ . '/app/bootstrap.php';
-    foreach (glob(__DIR__ . '/database/seeds/*.php') as $f) { echo "-> $f\n"; require $f; }
-    echo "Seeders executed.\n";
-} elseif ($cmd === 'key:generate') {
-    $k = base64_encode(random_bytes(32));
-    $env = file_get_contents(__DIR__ . '/.env');
-    if (strpos($env, 'APP_KEY=') !== false) $env = preg_replace('/APP_KEY=.*/', "APP_KEY={$k}", $env);
-    else $env .= PHP_EOL . "APP_KEY={$k}\n";
-    file_put_contents(__DIR__ . '/.env', $env);
-    echo "APP_KEY generated\n";
-} else {
-    echo "Usage: ./bastion [run-dev|run-build|migrate|db:seed|key:generate]\n";
 }
 PHP
-chmod +x bastion
 
-cat > package.json <<'JSON'
-{
-  "private": true,
-  "scripts": {
-    "dev": "./bastion run-dev",
-    "build": "./bastion run-build"
-  },
-  "devDependencies": {
-    "tailwindcss": "^4.0.0-alpha",
-    "@tailwindcss/cli": "^4.0.0-alpha",
-    "browser-sync": "^3.0.0"
+####################
+# Example pages, layouts, partials, errors, and htmx usage
+####################
+# Root layout (app/layout.php)
+cat > app/layout.php <<'PHP'
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title><?= e($title ?? 'Bastion') ?></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="/css/app.css">
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <header class="p-4 bg-white shadow-sm">
+    <div class="max-w-6xl mx-auto">
+      <a href="/">Bastion</a>
+    </div>
+  </header>
+  <main class="max-w-6xl mx-auto p-6">
+    <?= $children ?>
+  </main>
+  <footer class="p-4 text-center text-sm text-gray-500">© <?= date('Y') ?> Bastion</footer>
+</body>
+</html>
+PHP
+
+# Admin layout (app/admin/layout.php)
+cat > app/admin/layout.php <<'PHP'
+<div class="grid grid-cols-6 gap-6">
+  <aside class="col-span-1 bg-white p-4 rounded">Admin Menu<br/><a href="/admin">Dashboard</a></aside>
+  <section class="col-span-5">
+    <?= $children ?>
+  </section>
+</div>
+PHP
+
+# Home page (app/page.php)
+cat > app/page.php <<'PHP'
+<?php \App\Core\DV::set('title','Welcome'); ?>
+<h1 class="text-3xl font-bold mb-4">Welcome to Bastion PHP</h1>
+<p>Start building — pages are file-based. Try <a href="/admin">/admin</a>.</p>
+PHP
+
+# Admin page
+cat > app/admin/page.php <<'PHP'
+<?php \App\Core\DV::set('title','Admin Home'); ?>
+<h2 class="text-2xl font-bold">Admin Home</h2>
+<p>Protected area example (use middleware to protect).</p>
+PHP
+
+# Error pages
+cat > app/views/errors/404.php <<'PHP'
+<!doctype html><html><head><meta charset="utf-8"><title>404</title></head><body><h1>404 Not Found</h1><p>La página no existe.</p></body></html>
+PHP
+cat > app/views/errors/500.php <<'PHP'
+<!doctype html><html><head><meta charset="utf-8"><title>500</title></head><body><h1>Server error</h1><p>Hubo un error interno.</p></body></html>
+PHP
+
+####################
+# API examples (+server.php)
+####################
+cat > app/api/auth/+server.php <<'PHP'
+<?php
+use App\Core\Response;
+use App\Models\User;
+use Firebase\JWT\JWT;
+
+return [
+  'post' => function($req){
+    \$email = \$req->input('email');
+    \$pass = \$req->input('password');
+    \$user = User::findByEmail(\$email);
+    if (!\$user || !password_verify(\$pass, \$user['password'])) {
+        return Response::json(['error'=>'Invalid credentials'], 401);
+    }
+    \$secret = env('JWT_SECRET', '');
+    \$payload = ['sub' => (int)\$user['id'], 'iat' => time(), 'exp' => time() + (int)env('JWT_ACCESS_EXP',900)];
+    \$access = JWT::encode(\$payload, \$secret, 'HS256');
+    \$refresh = bin2hex(random_bytes(32));
+    // store refresh token logic omitted for brevity
+    setcookie('access', \$access, ['httponly'=>false,'samesite'=>'Lax','path'=>'/']);
+    setcookie('refresh', \$refresh, ['httponly'=>true,'samesite'=>'Lax','path'=>'/']);
+    return Response::json(['access' => \$access, 'refresh' => \$refresh]);
   }
+];
+PHP
+
+cat > app/api/users/+server.php <<'PHP'
+<?php
+use App\Core\Response;
+use App\Models\User;
+
+return [
+  'get' => function($req) {
+      return Response::json(User::all());
+  },
+  'post' => function($req) {
+      \$data = \$req->json();
+      if (empty(\$data['email']) || empty(\$data['password'])) {
+          return Response::json(['error'=>'email/password required'], 422);
+      }
+      \$data['password'] = password_hash(\$data['password'], PASSWORD_DEFAULT);
+      \$data['created_at'] = time();
+      \$id = User::create(\$data);
+      return Response::json(['id'=>\$id], 201);
+  }
+];
+PHP
+
+####################
+# Migration example
+####################
+cat > database/migrations/001_create_users.php <<'PHP'
+<?php
+\$db = new PDO('sqlite:' . __DIR__ . '/../..' . '/storage/db/app.db');
+\$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+\$db->exec('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT "user", created_at INTEGER)');
+PHP
+
+####################
+# Seeder
+####################
+cat > database/seeds/001_users.php <<'PHP'
+<?php
+\$db = new PDO('sqlite:' . __DIR__ . '/../..' . '/storage/db/app.db');
+\$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+\$exists = \$db->query(\"SELECT count(1) as c FROM sqlite_master WHERE type='table' AND name='users'\")->fetch();
+if (!\$exists) {
+    // migration will create table
 }
-JSON
+\$stmt = \$db->prepare('INSERT OR IGNORE INTO users (id,name,email,password,role,created_at) VALUES (?,?,?,?,?,?)');
+\$stmt->execute([1,'Admin','admin@example.com', password_hash('password', PASSWORD_DEFAULT),'admin', time()]);
+\$stmt->execute([2,'User','user@example.com', password_hash('password', PASSWORD_DEFAULT),'user', time()]);
+PHP
 
-# ==============================================================================
-# 10. INSTALL & FINISH
-# ==============================================================================
-info "Installing dependencies..."
+####################
+# CLI: artisan (php) and bastion (bash)
+####################
+cat > artisan <<'BASH'
+#!/usr/bin/env php
+<?php
+require __DIR__ . '/vendor/autoload.php';
+\$cmd = \$argv[1] ?? 'help';
+if (\$cmd === 'migrate') {
+    foreach (glob(__DIR__ . '/database/migrations/*.php') as \$m) {
+        echo \"Running {\$m}\\n\";
+        require \$m;
+    }
+    echo \"Migrations done\\n\";
+} elseif (\$cmd === 'db:seed') {
+    foreach (glob(__DIR__ . '/database/seeds/*.php') as \$s) {
+        echo \"Seeding {\$s}\\n\";
+        require \$s;
+    }
+    echo \"Seeding done\\n\";
+} elseif (\$cmd === 'serve') {
+    \$host = \$argv[2] ?? '127.0.0.1';
+    \$port = \$argv[3] ?? '9876';
+    echo \"Serving on http://{\$host}:{\$port}\\n\";
+    passthru(PHP_BINARY . \" -S {\$host}:{\$port} -t public\");
+} elseif (\$cmd === 'key:generate') {
+    \$k = base64_encode(random_bytes(32));
+    file_put_contents(__DIR__ . '/.env', str_replace(\"APP_KEY=\", \"APP_KEY={$k}\", file_get_contents(__DIR__ . '/.env')));
+    echo \"Generated APP_KEY\\n\";
+} else {
+    echo \"Usage: php artisan [migrate|db:seed|serve|key:generate]\\n\";
+}
+PHP
+chmod +x artisan || true
 
-if command -v composer >/dev/null 2>&1; then
-    composer install --no-interaction --quiet || echo "composer install failed (run manually)"
+cat > bastion <<'BASH'
+#!/usr/bin/env bash
+CMD="$1"
+if [ "$CMD" = "run-dev" ]; then
+  echo "Starting dev: php server + tailwind watcher"
+  php artisan serve 127.0.0.1 9876 &
+  npx tailwindcss -i ./resources/css/app.css -o ./public/css/app.css --watch &
+  wait
+elif [ "$CMD" = "run-build" ]; then
+  npx tailwindcss -i ./resources/css/app.css -o ./public/css/app.css --minify
+elif [ "$CMD" = "migrate" ]; then
+  php artisan migrate
+elif [ "$CMD" = "db:seed" ]; then
+  php artisan db:seed
 else
-    echo "composer not found; skip composer install"
+  echo "Usage: ./bastion [run-dev|run-build|migrate|db:seed]"
 fi
+BASH
+chmod +x bastion || true
 
-if command -v npm >/dev/null 2>&1; then
-    npm install --silent || echo "npm install failed (run manually)"
-else
-    echo "npm not found; skip npm install"
-fi
+####################
+# Autoloader hint (composer will generate)
+####################
+mkdir -p vendor
+echo "<?php // placeholder for composer autoload ?>" > vendor/autoload.php
 
-info "Running migrations..."
-php artisan migrate || true
-php artisan db:seed || true
-
-chmod +x artisan bastion || true
-
+####################
+# Final messages
+####################
+success "Scaffold complete."
 echo ""
-success "Bastion v1 Enterprise ($PROJECT) created successfully!"
+echo "Next steps:"
+echo "  cd $APP_NAME"
+echo "  composer install   # requires composer"
+echo "  npm install        # requires node"
+echo "  ./artisan migrate"
+echo "  ./artisan db:seed"
+echo "  ./bastion run-dev"
 echo ""
-echo -e "${BLUE}Start:${NC} cd $PROJECT && ./bastion run-dev"
-echo -e "${BLUE}Login:${NC} http://localhost:9876/login"
-echo -e "${BLUE}Admin:${NC} admin@example.com / password (⚠️  change immediately)"
-echo -e "${BLUE}API:${NC} curl http://localhost:9876/api/users"
-echo ""
-echo -e "${GREEN}API Endpoints Available:${NC}"
-echo "  POST   /api/auth/login     - Login (form or JSON)"
-echo "  POST   /api/auth/logout    - Logout"
-echo "  GET    /api/users          - List all users"
-echo "  POST   /api/users          - Create user"
-echo "  GET    /api/users/:id      - Get user"
-echo "  PUT    /api/users/:id      - Update user"
-echo "  DELETE /api/users/:id      - Delete user"
-echo ""
-info "Security: Set SECURE_COOKIES=true, rotate keys before production"
-
-exit 0
+echo "Default credentials: admin@example.com / password"
