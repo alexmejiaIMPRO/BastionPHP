@@ -2,825 +2,814 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="utf-8">
-  <title>Bastion PHP Documentation - Security-First PHP Framework</title>
+  <title>Bastion PHP Documentation - The Complete Guide</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Bastion PHP is a security-first PHP framework with Next.js-style routing, FastAPI endpoints, and DV engine for rapid internal tool development.">
+  <meta name="description" content="Comprehensive documentation for Bastion PHP. Security-first framework generator for internal tools.">
 
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <style>
-    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  <style>
+    :root {
+      --scroll-padding: 6rem;
+    }
+    
+    html { 
+      scroll-behavior: smooth; 
+      scroll-padding-top: var(--scroll-padding); 
     }
 
-    pre, code {
-      font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Mono', 'Roboto Mono', Consolas, 'Courier New', monospace;
-      font-size: 0.875rem;
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #020617; /* slate-950 */
+      color: #e2e8f0; /* slate-200 */
+    }
+
+    /* Code Blocks */
+    pre, code, kbd {
+      font-family: 'JetBrains Mono', monospace;
     }
 
     code:not(pre code) {
-      background: rgb(15 23 42 / 0.8);
+      background: rgba(30, 41, 59, 0.5); /* slate-800/50 */
+      color: #38bdf8; /* sky-400 */
       padding: 0.125rem 0.375rem;
       border-radius: 0.25rem;
-      border: 1px solid rgb(51 65 85 / 0.6);
       font-size: 0.875em;
-      color: #38bdf8; /* cyan-400 */
+      border: 1px solid rgba(51, 65, 85, 0.5);
     }
 
-    details > summary::-webkit-details-marker { display: none; }
-    details > summary { list-style: none; }
-
-    .gradient-text {
-      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .feature-card {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .feature-card:hover {
-      transform: translateY(-2px);
-    }
-
-    .nav-link-active {
-      background: rgb(30 41 59);
-      color: rgb(6 182 212);
-      border-left: 2px solid rgb(6 182 212);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .animate-fade-in {
-      animation: fadeIn 0.5s ease-out;
-    }
-
-    .mobile-nav {
-      transform: translateX(-100%);
-      transition: transform 0.3s ease-out;
-    }
-
-    .mobile-nav.open {
-      transform: translateX(0);
-    }
-
-    /* Custom Scrollbar for TOC */
-    .table-of-contents::-webkit-scrollbar { width: 4px; }
-    .table-of-contents::-webkit-scrollbar-track { background: rgb(15 23 42); }
-    .table-of-contents::-webkit-scrollbar-thumb { background: rgb(51 65 85); border-radius: 2px; }
-
-    .hero-grid {
-      background-image:
-        linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
-      background-size: 50px 50px;
-    }
-
-    .doc-code {
-      position: relative;
-      margin-bottom: 2rem;
-    }
-
-    .doc-code pre {
-      overflow-x: auto;
-      padding: 1rem;
-      background: rgb(15 23 42);
-      border-radius: 0 0 0.75rem 0.75rem;
-      border: 1px solid rgb(51 65 85);
-      border-top: none;
-      color: #e2e8f0;
+    .doc-code-block {
+      background: #0f172a; /* slate-900 */
+      border: 1px solid #1e293b; /* slate-800 */
+      border-radius: 0.75rem;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
     }
 
     .doc-code-header {
+      background: #1e293b; /* slate-800 */
+      padding: 0.5rem 1rem;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 0.75rem 1rem;
-      background: rgb(30 41 59);
-      border-radius: 0.75rem 0.75rem 0 0;
-      border: 1px solid rgb(51 65 85);
-      border-bottom: 1px solid rgb(51 65 85);
-    }
-
-    .copy-btn {
-      padding: 0.25rem 0.75rem;
-      font-size: 0.75rem;
-      border-radius: 0.375rem;
-      border: 1px solid rgb(51 65 85);
-      background: rgb(15 23 42);
-      color: rgb(148 163 184);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .copy-btn:hover {
-      background: rgb(30 41 59);
-      color: rgb(6 182 212);
-      border-color: rgb(6 182 212);
-    }
-
-    .badge {
-      display: inline-flex;
       align-items: center;
-      padding: 0.125rem 0.5rem;
-      font-size: 0.65rem;
-      font-weight: 600;
-      border-radius: 0.25rem;
-      letter-spacing: 0.025em;
-      text-transform: uppercase;
-      font-family: monospace;
+      border-bottom: 1px solid #334155;
+      font-size: 0.75rem;
+      color: #94a3b8;
     }
 
-    .badge-void { background: rgba(148, 163, 184, 0.1); color: rgb(148, 163, 184); border: 1px solid rgba(148, 163, 184, 0.2); }
-    .badge-string { background: rgba(251, 146, 60, 0.1); color: rgb(251, 146, 60); border: 1px solid rgba(251, 146, 60, 0.2); }
-    .badge-bool { background: rgba(167, 139, 250, 0.1); color: rgb(167, 139, 250); border: 1px solid rgba(167, 139, 250, 0.2); }
-    .badge-mixed { background: rgba(6, 182, 212, 0.1); color: rgb(6, 182, 212); border: 1px solid rgba(6, 182, 212, 0.2); }
+    .doc-code-content {
+      padding: 1rem;
+      overflow-x: auto;
+      color: #e2e8f0;
+      font-size: 0.875rem;
+      line-height: 1.7;
+    }
 
-    .method-card {
-        border-left: 3px solid rgba(6, 182, 212, 0.3);
+    /* Gradients */
+    .text-gradient {
+      background: linear-gradient(to right, #22d3ee, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Sidebar Navigation */
+    .nav-link {
+      display: block;
+      padding: 0.5rem 0.75rem;
+      color: #94a3b8; /* slate-400 */
+      border-radius: 0.375rem;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+    }
+    .nav-link:hover {
+      color: #38bdf8;
+      background: rgba(30, 41, 59, 0.5);
+    }
+    .nav-link.active {
+      color: #38bdf8;
+      background: rgba(6, 182, 212, 0.1);
+      border-left: 2px solid #06b6d4;
+    }
+
+    /* Headings */
+    h1, h2, h3, h4 { scroll-margin-top: var(--scroll-padding); }
+    
+    .section-title {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .subsection-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid #1e293b;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+    }
+
+    /* Mobile Menu Animation */
+    #sidebar {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sidebar-closed { transform: translateX(-100%); }
+    .sidebar-open { transform: translateX(0); }
+    
+    @media (min-width: 1024px) {
+      .sidebar-closed { transform: none; }
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100">
+<body class="antialiased selection:bg-cyan-500/30">
 
-<!-- Mobile Menu Toggle -->
-<button id="mobile-menu-toggle" class="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-cyan-400 transition shadow-lg">
-  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-  </svg>
-</button>
-
-<!-- Top Navigation Bar -->
-<header class="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 backdrop-blur supports-[backdrop-filter]:bg-slate-950/80">
-  <div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
-
-      <!-- Logo -->
-      <div class="flex items-center gap-3 pl-12 lg:pl-0">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-          <span class="text-white font-bold text-lg">BP</span>
-        </div>
-        <div>
-          <h1 class="text-lg font-bold gradient-text">Bastion PHP</h1>
-          <p class="text-[0.65rem] text-slate-400 -mt-0.5">v0.1.0</p>
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 h-16">
+    <div class="max-w-[90rem] mx-auto px-4 h-full flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button id="menu-btn" class="lg:hidden p-2 text-slate-400 hover:text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white text-sm">BP</div>
+          <span class="font-bold text-lg tracking-tight">Bastion<span class="text-cyan-400">PHP</span></span>
         </div>
       </div>
-
-      <!-- Right Actions -->
-      <div class="flex items-center gap-3">
-        <a href="#quickstart" class="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-slate-950 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition">
-          Get Started
-        </a>
-        <a href="https://github.com/alexmejiaIMPRO/BastionPHP" target="_blank" class="p-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-900 transition">
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-          </svg>
-        </a>
+      <div class="flex items-center gap-4 text-sm">
+        <span class="text-slate-500 hidden sm:inline">v0.1.0</span>
+        <a href="https://github.com/alexmejiaIMPRO/BastionPHP" target="_blank" class="text-slate-400 hover:text-white transition">GitHub</a>
       </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<!-- Main Layout -->
-<div class="max-w-[90rem] mx-auto">
-  <div class="lg:flex">
-
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar-nav" class="mobile-nav lg:transform-none fixed lg:sticky top-16 left-0 h-[calc(100vh-4rem)] w-72 bg-slate-950 lg:bg-transparent border-r border-slate-800 lg:border-0 z-40 lg:z-auto overflow-y-auto">
-      <nav class="p-6 space-y-6">
-
-        <!-- Quick Links -->
+  <div class="max-w-[90rem] mx-auto flex pt-16 min-h-screen">
+    
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar-closed fixed lg:sticky top-16 left-0 z-40 w-72 h-[calc(100vh-4rem)] bg-slate-950 border-r border-slate-800 overflow-y-auto lg:translate-x-0">
+      <nav class="p-6 space-y-8">
         <div>
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Quick Start</h3>
-          <ul class="space-y-1 text-sm">
-            <li><a href="#hero" class="doc-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900 transition">Home</a></li>
-            <li><a href="#quickstart" class="doc-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900 transition">Quick Start</a></li>
-            <li><a href="#structure" class="doc-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900 transition">Project Structure</a></li>
+          <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Getting Started</h5>
+          <ul class="space-y-1">
+            <li><a href="#intro" class="nav-link">Introduction</a></li>
+            <li><a href="#installation" class="nav-link">Installation</a></li>
+            <li><a href="#structure" class="nav-link">Project Structure</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Configuration</h5>
+          <ul class="space-y-1">
+            <li><a href="#config-files" class="nav-link">Config Files</a></li>
+            <li><a href="#env-vars" class="nav-link">Environment (.env)</a></li>
           </ul>
         </div>
 
-        <!-- Reference -->
         <div>
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Core Reference</h3>
-          <ul class="space-y-1 text-sm">
-            <li><a href="#global-helpers" class="doc-nav-link block px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900 transition">Global Helpers</a></li>
-            <li><a href="#request-response" class="doc-nav-link block px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900 transition">Request & Response</a></li>
-            <li><a href="#dv-engine" class="doc-nav-link block px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900 transition">DV Engine</a></li>
+          <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Core Engine</h5>
+          <ul class="space-y-1">
+            <li><a href="#routing" class="nav-link">Routing & Layouts</a></li>
+            <li><a href="#dv-engine" class="nav-link text-cyan-400">DV Engine (5 Patterns)</a></li>
+            <li><a href="#api-server" class="nav-link">API & Endpoints</a></li>
+            <li><a href="#middleware" class="nav-link">Middleware Pipeline</a></li>
           </ul>
         </div>
 
-        <!-- Features -->
         <div>
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Features</h3>
-          <ul class="space-y-1 text-sm">
-            <li><a href="#api-endpoints" class="doc-nav-link block px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900 transition">API Endpoints</a></li>
-            <li><a href="#database" class="doc-nav-link block px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900 transition">Database & ORM</a></li>
-            <li><a href="#auth-csrf" class="doc-nav-link block px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900 transition">Auth & Security</a></li>
+          <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Tools & Helpers</h5>
+          <ul class="space-y-1">
+            <li><a href="#db-querybuilder" class="nav-link">Database & ORM</a></li>
+            <li><a href="#auth-security" class="nav-link">Auth & Security</a></li>
+            <li><a href="#request-response" class="nav-link">Request & Response</a></li>
+            <li><a href="#logging" class="nav-link">Logging</a></li>
+            <li><a href="#global-helpers" class="nav-link">Global Helpers</a></li>
           </ul>
         </div>
 
-        <!-- Ops -->
         <div>
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Ops</h3>
-          <ul class="space-y-1 text-sm">
-            <li><a href="#cli" class="doc-nav-link block px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-400 hover:bg-slate-900 transition">CLI Commands</a></li>
+          <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">CLI & Deploy</h5>
+          <ul class="space-y-1">
+            <li><a href="#cli-reference" class="nav-link">Bastion CLI</a></li>
+            <li><a href="#deployment" class="nav-link">Deployment</a></li>
           </ul>
         </div>
       </nav>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8 lg:py-12 min-w-0">
-
-      <!-- Hero Section -->
-      <section id="hero" class="doc-section mb-20 animate-fade-in">
-        <div class="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 p-8 sm:p-12 lg:p-16 hero-grid">
-          <div class="relative z-10 max-w-3xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 text-xs font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-full">
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
-              </svg>
-              Security-First Framework
-            </div>
-
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Build secure internal tools
-              <span class="gradient-text block">at lightning speed</span>
-            </h1>
-
-            <p class="text-lg sm:text-xl text-slate-400 mb-8 leading-relaxed">
-              Bastion PHP combines Next.js-style routing, FastAPI endpoints, and enterprise security
-              to help you ship production-ready internal dashboards and APIs in hours, not weeks.
-            </p>
-
-            <div class="flex flex-wrap gap-4">
-              <a href="#quickstart" class="inline-flex items-center px-6 py-3 text-sm font-semibold text-slate-950 bg-cyan-500 rounded-lg hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20">
-                Get Started
-                <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                </svg>
-              </a>
-            </div>
+    <main class="flex-1 min-w-0 px-4 sm:px-8 py-10">
+      
+      <!-- Intro -->
+      <section id="intro" class="mb-16">
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-6">
+          Bastion <span class="text-gradient">PHP</span>
+        </h1>
+        <p class="text-xl text-slate-400 leading-relaxed max-w-3xl mb-8">
+          A security-first, opinionated framework generator for building internal tools. 
+          It combines <strong>Next.js-style file-based routing</strong>, <strong>FastAPI-like endpoints</strong>, 
+          and a robust <strong>SQLite QueryBuilder</strong> into a single, cohesive package.
+        </p>
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div class="card bg-cyan-950/20 border-cyan-900/50">
+            <div class="text-cyan-400 font-bold mb-1">Security First</div>
+            <div class="text-sm text-slate-400">CSP Nonces, CSRF, and XSS protection enabled by default.</div>
           </div>
-          <div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-cyan-500/10 to-transparent pointer-events-none"></div>
+          <div class="card">
+            <div class="text-purple-400 font-bold mb-1">Developer Experience</div>
+            <div class="text-sm text-slate-400">Tailwind v4, Live Reload, and logical project structure.</div>
+          </div>
+          <div class="card">
+            <div class="text-emerald-400 font-bold mb-1">Zero Magic</div>
+            <div class="text-sm text-slate-400">Explicit routing and configuration. No hidden behaviors.</div>
+          </div>
         </div>
       </section>
 
-      <!-- Quick Start -->
-      <section id="quickstart" class="doc-section mb-20">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-3xl font-bold text-slate-100">Quick Start</h2>
-            <p class="text-sm text-slate-400 mt-1">Get up and running in under 5 minutes</p>
-          </div>
-        </div>
+      <!-- Installation -->
+      <section id="installation" class="mb-20">
+        <h2 class="section-title">Installation</h2>
+        <p class="mb-4 text-slate-400">Requires PHP 8.1+, Composer, and optionally Node.js for development.</p>
+        
+        <div class="doc-code-block">
+          <div class="doc-code-header">Terminal</div>
+          <div class="doc-code-content">
+<pre><code># 1. Clone the generator
+git clone https://github.com/alexmejiaIMPRO/BastionPHP.git
+cd BastionPHP
 
-        <div class="prose prose-invert max-w-none">
-          <div class="doc-code mb-8" data-code-block>
-            <div class="doc-code-header">
-              <span class="text-xs text-slate-400 font-medium">Terminal</span>
-              <button type="button" class="copy-btn">Copy</button>
-            </div>
-<pre><code># Create project
-bash create-bastion-app MyApp
-cd MyApp
+# 2. Create your project
+bash create-bastion-app MySecureApp
 
-# Install deps
+# 3. Enter and install
+cd MySecureApp
 composer install
 npm install
 
-# Setup
+# 4. Setup Database
 ./bastion migrate
 ./bastion seed
 
-# Run
-./bastion run-dev
-</code></pre>
+# 5. Start Dev Server
+./bastion run-dev</code></pre>
           </div>
         </div>
       </section>
 
-      <!-- Structure -->
-      <section id="structure" class="doc-section mb-20">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-3xl font-bold text-slate-100">Project Structure</h2>
-            <p class="text-sm text-slate-400 mt-1">Understanding your generated project</p>
-          </div>
-        </div>
-
-        <div class="doc-code" data-code-block>
-          <div class="doc-code-header">
-            <span class="text-xs text-slate-400 font-medium">Directory Tree</span>
-            <button type="button" class="copy-btn">Copy</button>
-          </div>
-<pre><code>MyApp/
-├── app/                         # Routes & Layouts
-│   ├── layout.php               # Root Layout
-│   ├── page.php                 # Home (/)
-│   ├── api/                     # API routes (+server.php)
-│   └── Core/                    # Framework Internals
-│
-├── config/                      # Config (app, db, security)
-├── database/                    # SQL migrations & seeds
-├── public/                      # Web root (index.php)
-└── bastion                      # CLI tool
-</code></pre>
-        </div>
-      </section>
-
-      <!-- Global Helpers -->
-      <section id="global-helpers" class="doc-section mb-20">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-3xl font-bold text-slate-100">Global Helpers</h2>
-            <p class="text-sm text-slate-400 mt-1">Available in all Views, Layouts, and Controllers</p>
-          </div>
-        </div>
-
-        <div class="grid gap-6">
-            
-            <!-- e() -->
-            <div class="bg-slate-900/50 border border-slate-800 rounded-lg p-5 method-card">
-                <div class="flex items-center gap-3 mb-2">
-                    <code class="text-cyan-400 font-bold text-lg">e($value)</code>
-                    <span class="badge badge-string">string</span>
-                </div>
-                <p class="text-sm text-slate-300 mb-3">Safe HTML escape. Wrapper for <code>htmlspecialchars</code>.</p>
-                <div class="bg-slate-950 p-3 rounded border border-slate-800 font-mono text-xs text-slate-400">
-                    <span class="text-purple-400">&lt;?=</span> e($user['name']) <span class="text-purple-400">?&gt;</span>
-                </div>
-                <p class="text-xs text-slate-500 mt-2"><strong class="text-slate-400">Use Case:</strong> Always use this when rendering user input to prevent XSS attacks.</p>
-            </div>
-
-            <!-- env() -->
-            <div class="bg-slate-900/50 border border-slate-800 rounded-lg p-5 method-card">
-                <div class="flex items-center gap-3 mb-2">
-                    <code class="text-cyan-400 font-bold text-lg">env($key, $default = null)</code>
-                    <span class="badge badge-mixed">mixed</span>
-                </div>
-                <p class="text-sm text-slate-300 mb-3">Retrieves values from <code>.env</code> file or system environment.</p>
-                <div class="bg-slate-950 p-3 rounded border border-slate-800 font-mono text-xs text-slate-400">
-                    $debug = env(<span class="text-green-400">'APP_DEBUG'</span>, <span class="text-blue-400">false</span>);
-                </div>
-                <p class="text-xs text-slate-500 mt-2"><strong class="text-slate-400">Use Case:</strong> Fetching API keys or configuration flags securely.</p>
-            </div>
-
-            <!-- config() -->
-            <div class="bg-slate-900/50 border border-slate-800 rounded-lg p-5 method-card">
-                <div class="flex items-center gap-3 mb-2">
-                    <code class="text-cyan-400 font-bold text-lg">config($key, $default = null)</code>
-                    <span class="badge badge-mixed">mixed</span>
-                </div>
-                <p class="text-sm text-slate-300 mb-3">Reads arrays from <code>config/*.php</code> files using dot notation.</p>
-                <div class="bg-slate-950 p-3 rounded border border-slate-800 font-mono text-xs text-slate-400">
-                    <span class="text-slate-500">// Reads config/database.php -> connections -> mysql</span><br>
-                    $conf = config(<span class="text-green-400">'database.connections.mysql'</span>);
-                </div>
-            </div>
-
-            <!-- csrf_field() -->
-            <div class="bg-slate-900/50 border border-slate-800 rounded-lg p-5 method-card">
-                <div class="flex items-center gap-3 mb-2">
-                    <code class="text-cyan-400 font-bold text-lg">csrf_field()</code>
-                    <span class="badge badge-string">string</span>
-                </div>
-                <p class="text-sm text-slate-300 mb-3">Generates a hidden HTML input with the session CSRF token.</p>
-                <div class="bg-slate-950 p-3 rounded border border-slate-800 font-mono text-xs text-slate-400">
-                    &lt;form method="POST"&gt;<br>
-                    &nbsp;&nbsp;<span class="text-purple-400">&lt;?=</span> csrf_field() <span class="text-purple-400">?&gt;</span><br>
-                    &nbsp;&nbsp;...<br>
-                    &lt;/form&gt;
-                </div>
-                <p class="text-xs text-slate-500 mt-2"><strong class="text-slate-400">Use Case:</strong> Mandatory for all POST/PUT/DELETE forms.</p>
-            </div>
-
-        </div>
-      </section>
-
-      <!-- Request & Response -->
-      <section id="request-response" class="doc-section mb-20">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-3xl font-bold text-slate-100">Request & Response</h2>
-            <p class="text-sm text-slate-400 mt-1">Handling HTTP IO in <code>+server.php</code></p>
-          </div>
-        </div>
-
-        <div class="grid lg:grid-cols-2 gap-6 mb-8">
-            <!-- Request -->
-            <div class="space-y-4">
-                <h3 class="text-xl font-semibold text-indigo-300">Request Object</h3>
-                <p class="text-sm text-slate-400">Passed as the first argument to API handlers.</p>
-                
-                <div class="bg-slate-900/50 border border-slate-800 rounded p-4 text-sm font-mono space-y-3">
-                    <div>
-                        <div class="text-cyan-400">$req->input('key', 'default')</div>
-                        <div class="text-slate-500 text-xs">Unified access to $_GET and $_POST/JSON body.</div>
-                    </div>
-                    <div>
-                        <div class="text-cyan-400">$req->method</div>
-                        <div class="text-slate-500 text-xs">HTTP verb (GET, POST, etc).</div>
-                    </div>
-                    <div>
-                        <div class="text-cyan-400">$req->path_param_id</div>
-                        <div class="text-slate-500 text-xs">Captured from folder `[id]`.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Response -->
-            <div class="space-y-4">
-                <h3 class="text-xl font-semibold text-indigo-300">Response Static</h3>
-                <p class="text-sm text-slate-400">Static methods to terminate execution.</p>
-
-                <div class="bg-slate-900/50 border border-slate-800 rounded p-4 text-sm font-mono space-y-3">
-                    <div>
-                        <div class="text-cyan-400">Response::json($data, $status)</div>
-                        <div class="text-slate-500 text-xs">Returns JSON and exits. Default status 200.</div>
-                    </div>
-                    <div>
-                        <div class="text-cyan-400">Response::redirect($url)</div>
-                        <div class="text-slate-500 text-xs">Sends 302 header and exits.</div>
-                    </div>
-                    <div>
-                        <div class="text-cyan-400">Response::abort($code, $msg)</div>
-                        <div class="text-slate-500 text-xs">Stops execution with HTTP error code.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-      </section>
-
-      <!-- DV Engine -->
-      <section id="dv-engine" class="doc-section mb-20">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-3xl font-bold text-slate-100">DV Engine</h2>
-            <p class="text-sm text-slate-400 mt-1">Data View: Passing data from Page to Layout</p>
-          </div>
-        </div>
-
-        <p class="text-slate-300 mb-4">
-            Since <code>page.php</code> runs <em>before</em> <code>layout.php</code>, you can use the DV engine to "bubble up" data like page titles, breadcrumbs, or active menu states.
+      <!-- Config Files -->
+      <section id="config-files" class="mb-20">
+        <h2 class="section-title">Configuration Files</h2>
+        <p class="mb-6 text-slate-400">
+          All configuration lives in the <code>config/</code> directory. Bastion loads these files lazily using the <code>config('filename.key')</code> helper.
         </p>
 
-        <div class="grid md:grid-cols-2 gap-4">
-            <div class="bg-slate-900 border border-slate-800 rounded-lg p-4">
-                <div class="text-xs text-slate-500 mb-2 font-mono uppercase">app/page.php</div>
-                <pre class="!bg-transparent !p-0 !border-0 text-xs"><code>use App\Core\DV;
-
-// Set data for the layout
-DV::set('title', 'My Dashboard');
-DV::set('show_sidebar', true);
-
-// Render page content...
-echo "&lt;h1&gt;Welcome&lt;/h1&gt;";</code></pre>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 rounded-lg p-4">
-                <div class="text-xs text-slate-500 mb-2 font-mono uppercase">app/layout.php</div>
-                <pre class="!bg-transparent !p-0 !border-0 text-xs"><code>use App\Core\DV;
-
-// Retrieve data (with default)
-$title = DV::get('title', 'Default App');
-?&gt;
-
-&lt;html&gt;
-  &lt;title&gt;&lt;?= e($title) ?&gt;&lt;/title&gt;
-  &lt;body&gt;
-     &lt;?php $content(); ?&gt;
-  &lt;/body&gt;
-&lt;/html&gt;</code></pre>
-            </div>
-        </div>
-      </section>
-
-      <!-- API Endpoints (Existing content preserved/enhanced) -->
-      <section id="api-endpoints" class="doc-section mb-20">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-          </div>
+        <div class="space-y-8">
+          <!-- App Config -->
           <div>
-            <h2 class="text-3xl font-bold text-slate-100">API Endpoints</h2>
-            <p class="text-sm text-slate-400 mt-1">FastAPI-style server files</p>
-          </div>
-        </div>
-
-        <div class="doc-code" data-code-block>
-          <div class="doc-code-header">
-            <span class="text-xs text-slate-400 font-medium">app/api/users/[id]/+server.php</span>
-            <button type="button" class="copy-btn">Copy</button>
-          </div>
-<pre><code>&lt;?php
-use App\Core\Request;
-use App\Core\Response;
-use App\Core\DB;
-
-return [
-    // GET /api/users/123
-    'get' => function (Request $req) {
-        $id = $req->path_param_id;
-        $user = DB::table('users')->where('id', $id)->first();
-        
-        if (!$user) {
-            Response::json(['error' => 'Not found'], 404);
-            return; // Important: return after Response calls
-        }
-        
-        Response::json(['data' => $user]);
-    },
-
-    // DELETE /api/users/123
-    'delete' => function (Request $req) {
-        DB::table('users')->where('id', $req->path_param_id)->delete();
-        Response::json(['success' => true]);
-    }
+            <h3 class="text-xl font-bold text-slate-200 mb-2"><code>config/app.php</code></h3>
+            <p class="text-sm text-slate-400 mb-3">General application identity and environment settings.</p>
+            <div class="doc-code-block">
+              <div class="doc-code-content">
+<pre><code>return [
+    'name'     => env('APP_NAME', 'Bastion App'),
+    'env'      => env('APP_ENV', 'local'),      // 'local' or 'production'
+    'debug'    => (bool) env('APP_DEBUG', false),
+    'timezone' => env('APP_TIMEZONE', 'UTC'),   // Sets PHP default timezone
 ];</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- DB Config -->
+          <div>
+            <h3 class="text-xl font-bold text-slate-200 mb-2"><code>config/database.php</code></h3>
+            <p class="text-sm text-slate-400 mb-3">Database connections. SQLite is the default.</p>
+            <div class="doc-code-block">
+              <div class="doc-code-content">
+<pre><code>return [
+    'default' => env('DB_CONNECTION', 'sqlite'),
+
+    'connections' => [
+        'sqlite' => [
+            'driver' => 'sqlite',
+            'path'   => env('DB_PATH', 'storage/db/app.db'),
+        ],
+        // MySQL configuration is also available here
+    ],
+];</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security Config -->
+          <div>
+            <h3 class="text-xl font-bold text-slate-200 mb-2"><code>config/security.php</code></h3>
+            <p class="text-sm text-slate-400 mb-3">Toggles for the <code>SecurityHeaders</code> and <code>CsrfMiddleware</code>.</p>
+            <div class="doc-code-block">
+              <div class="doc-code-content">
+<pre><code>return [
+    'csrf_enabled'    => true,  // Validate _token on POST/PUT/DELETE
+    'secure_cookies'  => false, // Set true in production (requires HTTPS)
+    'same_site'       => 'Lax', // Cookie SameSite policy
+
+    // Content Security Policy sources
+    'csp_default_src' => ["'self'"],
+    'csp_script_src'  => ["'self'", 'https://cdn.tailwindcss.com'],
+];</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Style Config -->
+          <div>
+            <h3 class="text-xl font-bold text-slate-200 mb-2"><code>config/style.php</code></h3>
+            <p class="text-sm text-slate-400 mb-3">Theme settings and asset paths.</p>
+            <div class="doc-code-block">
+              <div class="doc-code-content">
+<pre><code>return [
+    'theme'    => env('APP_THEME', 'dark'),
+    'css_path' => '/css/app.css', // Path to public asset
+];</code></pre>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- Database -->
-      <section id="database" class="doc-section mb-20">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-            <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-3xl font-bold text-slate-100">Database & ORM</h2>
-            <p class="text-sm text-slate-400 mt-1">Lightweight QueryBuilder (SQLite Default)</p>
+      <!-- DV Engine (Deep Dive) -->
+      <section id="dv-engine" class="mb-20">
+        <h2 class="section-title text-cyan-400">DV Engine Deep Dive</h2>
+        <p class="mb-6 text-slate-300 leading-relaxed">
+          The <strong>Data View (DV) Engine</strong> is a static state container (`App\Core\DV`) that allows pages to "bubble up" data to their parent layouts. 
+          Since `page.php` is executed <em>before</em> `layout.php`, the page can define titles, breadcrumbs, or control sidebar visibility before the layout renders the HTML shell.
+        </p>
+
+        <h3 class="subsection-title">5 Essential Use Cases</h3>
+
+        <!-- Case 1 -->
+        <div class="mb-8">
+          <h4 class="font-bold text-slate-200 mb-2">1. Dynamic Page Titles</h4>
+          <p class="text-sm text-slate-400 mb-2">The most common use case. The page sets the title, the layout renders the <code>&lt;title&gt;</code> tag.</p>
+          <div class="grid lg:grid-cols-2 gap-4">
+            <div class="doc-code-block mb-0">
+              <div class="doc-code-header">app/dashboard/page.php</div>
+              <div class="doc-code-content">
+<pre><code>use App\Core\DV;
+
+// Set specific title
+DV::set('title', 'Sales Dashboard');</code></pre>
+              </div>
+            </div>
+            <div class="doc-code-block mb-0">
+              <div class="doc-code-header">app/layout.php</div>
+              <div class="doc-code-content">
+<pre><code>// Get with fallback
+$t = DV::get('title', 'Bastion');
+echo "&lt;title&gt;" . e($t) . "&lt;/title&gt;";</code></pre>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="doc-code" data-code-block>
-          <div class="doc-code-header">
-            <span class="text-xs text-slate-400 font-medium">QueryBuilder Syntax</span>
-            <button type="button" class="copy-btn">Copy</button>
+        <!-- Case 2 -->
+        <div class="mb-8">
+          <h4 class="font-bold text-slate-200 mb-2">2. Breadcrumbs System</h4>
+          <p class="text-sm text-slate-400 mb-2">Pass an array of links to render a navigation trail in the layout header.</p>
+          <div class="doc-code-block">
+              <div class="doc-code-header">app/admin/users/page.php</div>
+              <div class="doc-code-content">
+<pre><code>DV::set('breadcrumbs', [
+    ['label' => 'Admin', 'url' => '/admin'],
+    ['label' => 'Users', 'url' => '/admin/users'],
+    ['label' => 'Edit',  'url' => null]
+]);</code></pre>
+              </div>
           </div>
-<pre><code>use App\Core\DB;
+        </div>
 
-// READ
+        <!-- Case 3 -->
+        <div class="mb-8">
+          <h4 class="font-bold text-slate-200 mb-2">3. Sidebar Visibility Control</h4>
+          <p class="text-sm text-slate-400 mb-2">A login page or full-screen map might want to hide the main navigation.</p>
+          <div class="grid lg:grid-cols-2 gap-4">
+            <div class="doc-code-block mb-0">
+              <div class="doc-code-header">app/login/page.php</div>
+              <div class="doc-code-content">
+<pre><code>// Disable sidebar for login
+DV::set('show_sidebar', false);</code></pre>
+              </div>
+            </div>
+            <div class="doc-code-block mb-0">
+              <div class="doc-code-header">app/layout.php</div>
+              <div class="doc-code-content">
+<pre><code>if (DV::get('show_sidebar', true)) {
+    include 'components/sidebar.php';
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 4 -->
+        <div class="mb-8">
+          <h4 class="font-bold text-slate-200 mb-2">4. Injecting Page-Specific Scripts</h4>
+          <p class="text-sm text-slate-400 mb-2">Inject Chart.js or Maps API only on pages that need it, keeping other pages light.</p>
+          <div class="doc-code-block">
+              <div class="doc-code-header">app/analytics/page.php</div>
+              <div class="doc-code-content">
+<pre><code>DV::set('scripts', [
+    'https://cdn.jsdelivr.net/npm/chart.js'
+]);</code></pre>
+              </div>
+          </div>
+        </div>
+
+        <!-- Case 5 -->
+        <div class="mb-8">
+          <h4 class="font-bold text-slate-200 mb-2">5. Active Menu Highlighting</h4>
+          <p class="text-sm text-slate-400 mb-2">Tell the layout which navbar item should be highlighted.</p>
+          <div class="doc-code-block">
+              <div class="doc-code-header">app/settings/profile/page.php</div>
+              <div class="doc-code-content">
+<pre><code>// Highlight the 'settings' tab
+DV::set('current_tab', 'settings');</code></pre>
+              </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Routing & Structure -->
+      <section id="structure" class="mb-20">
+        <h2 class="section-title">Project Structure & Routing</h2>
+        <p class="mb-6 text-slate-400">Bastion uses <strong>filesystem-based routing</strong>. The folder structure inside `app/` determines your URLs.</p>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-lg font-bold text-slate-200 mb-4">Core Directories</h3>
+            <ul class="space-y-4">
+              <li class="pl-4 border-l-2 border-slate-700">
+                <code class="text-cyan-400">app/</code>
+                <p class="text-sm text-slate-400 mt-1">Contains all pages, layouts, and API endpoints.</p>
+              </li>
+              <li class="pl-4 border-l-2 border-slate-700">
+                <code class="text-cyan-400">src/</code>
+                <p class="text-sm text-slate-400 mt-1">Application logic. Models, Services, Middleware, and Core files.</p>
+              </li>
+              <li class="pl-4 border-l-2 border-slate-700">
+                <code class="text-cyan-400">config/</code>
+                <p class="text-sm text-slate-400 mt-1">Configuration files loaded by helper.</p>
+              </li>
+              <li class="pl-4 border-l-2 border-slate-700">
+                <code class="text-cyan-400">public/</code>
+                <p class="text-sm text-slate-400 mt-1">Web root. Contains `index.php` and compiled assets.</p>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-slate-200 mb-4">Routing Examples</h3>
+            <table class="w-full text-sm text-left">
+              <thead class="text-xs text-slate-500 uppercase bg-slate-900">
+                <tr>
+                  <th class="px-3 py-2">File Path</th>
+                  <th class="px-3 py-2">URL</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800">
+                <tr>
+                  <td class="px-3 py-3 font-mono">app/page.php</td>
+                  <td class="px-3 py-3 text-cyan-400">/</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-3 font-mono">app/about/page.php</td>
+                  <td class="px-3 py-3 text-cyan-400">/about</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-3 font-mono">app/blog/[slug]/page.php</td>
+                  <td class="px-3 py-3 text-cyan-400">/blog/my-post</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-3 font-mono">app/api/users/+server.php</td>
+                  <td class="px-3 py-3 text-purple-400">POST /api/users</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tools & Helpers -->
+      <section id="db-querybuilder" class="mb-20">
+        <h2 class="section-title">Tools: Database & QueryBuilder</h2>
+        <p class="mb-4 text-slate-400">
+          Access the database via the <code>App\Core\DB</code> facade. It uses PDO and provides a fluent interface for SQLite and MySQL.
+        </p>
+
+        <div class="grid gap-6">
+          <div class="card">
+            <h4 class="text-cyan-400 font-mono mb-2">DB::table('name')</h4>
+            <div class="doc-code-block mb-0">
+              <div class="doc-code-content">
+<pre><code>// Select with conditions
 $users = DB::table('users')
     ->where('role', 'admin')
+    ->where('active', 1)
     ->orderBy('created_at', 'DESC')
-    ->limit(5)
-    ->get(); // returns array of arrays
+    ->limit(10)
+    ->get(); // Returns array of arrays
 
-$user = DB::table('users')->where('id', 1)->first();
+// Get single row
+$user = DB::table('users')->where('id', 5)->first();
 
-// CREATE
-$id = DB::table('users')->insert([
-    'name' => 'John',
-    'email' => 'john@example.com',
-    'created_at' => time()
+// Insert (Returns ID)
+$id = DB::table('logs')->insert([
+    'action' => 'login',
+    'user_id' => 1,
+    'timestamp' => time()
 ]);
 
-// UPDATE
+// Update
 DB::table('users')
-    ->where('id', $id)
-    ->update(['name' => 'John Doe']);
+    ->where('id', 1)
+    ->update(['status' => 'banned']);
 
-// DELETE
-DB::table('users')
-    ->where('id', $id)
-    ->delete();
-</code></pre>
+// Delete
+DB::table('users')->where('id', 1)->delete();</code></pre>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- Auth & Security -->
-      <section id="auth-csrf" class="doc-section mb-20">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
-            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-3xl font-bold text-slate-100">Auth & Security</h2>
-            <p class="text-sm text-slate-400 mt-1">Helpers for secure development</p>
-          </div>
-        </div>
+      <section id="auth-security" class="mb-20">
+        <h2 class="section-title">Tools: Auth & Security</h2>
+        
+        <h3 class="subsection-title">Authentication (`App\Core\Auth`)</h3>
+        <ul class="grid sm:grid-cols-2 gap-4 mb-8">
+          <li class="card p-4">
+            <code class="block text-cyan-400 mb-1">Auth::attempt($email, $pass)</code>
+            <span class="text-sm text-slate-400">Validates credentials against `users` table and starts session.</span>
+          </li>
+          <li class="card p-4">
+            <code class="block text-cyan-400 mb-1">Auth::user()</code>
+            <span class="text-sm text-slate-400">Returns current user array or null.</span>
+          </li>
+          <li class="card p-4">
+            <code class="block text-cyan-400 mb-1">Auth::check()</code>
+            <span class="text-sm text-slate-400">Returns boolean true if logged in.</span>
+          </li>
+          <li class="card p-4">
+            <code class="block text-cyan-400 mb-1">Auth::isAdmin()</code>
+            <span class="text-sm text-slate-400">Checks if current user role is 'admin'.</span>
+          </li>
+        </ul>
 
-        <div class="grid lg:grid-cols-2 gap-6">
-            <div>
-                <h3 class="text-lg font-semibold text-slate-200 mb-3">Auth Facade</h3>
-                <ul class="text-sm text-slate-300 space-y-3 font-mono">
-                    <li class="p-2 bg-slate-900 rounded border border-slate-800">
-                        <div class="text-cyan-400">Auth::attempt($email, $pass)</div>
-                        <div class="text-xs text-slate-500 mt-1">Validates credentials & starts session.</div>
-                    </li>
-                    <li class="p-2 bg-slate-900 rounded border border-slate-800">
-                        <div class="text-cyan-400">Auth::user()</div>
-                        <div class="text-xs text-slate-500 mt-1">Returns current user array or null.</div>
-                    </li>
-                    <li class="p-2 bg-slate-900 rounded border border-slate-800">
-                        <div class="text-cyan-400">Auth::isAdmin()</div>
-                        <div class="text-xs text-slate-500 mt-1">Checks if role === 'admin'.</div>
-                    </li>
-                </ul>
+        <h3 class="subsection-title">Security Helpers</h3>
+        <p class="text-slate-400 mb-4">These are globally available functions.</p>
+        
+        <div class="space-y-4">
+            <div class="doc-code-block">
+                <div class="doc-code-header">1. Output Escaping (XSS Prevention)</div>
+                <div class="doc-code-content">
+<pre><code>&lt;!-- ALWAYS use e() for user content -->
+&lt;p>Hello, &lt;?= e($user['name']) ?>&lt;/p></code></pre>
+                </div>
             </div>
-            <div>
-                 <h3 class="text-lg font-semibold text-slate-200 mb-3">Middleware</h3>
-                 <p class="text-sm text-slate-400 mb-4">Located in <code>src/Middleware</code>.</p>
-                 <div class="space-y-3">
-                    <div class="border border-slate-800 rounded p-3 bg-slate-900/50">
-                        <h4 class="font-bold text-cyan-400 text-xs uppercase mb-1">SecurityHeaders</h4>
-                        <p class="text-xs text-slate-400">Adds CSP, X-Frame-Options, XSS-Protection.</p>
-                    </div>
-                    <div class="border border-slate-800 rounded p-3 bg-slate-900/50">
-                        <h4 class="font-bold text-cyan-400 text-xs uppercase mb-1">CsrfMiddleware</h4>
-                        <p class="text-xs text-slate-400">Validates <code>_token</code> on POST/PUT/DELETE.</p>
-                    </div>
-                 </div>
+
+            <div class="doc-code-block">
+                <div class="doc-code-header">2. CSRF Protection</div>
+                <div class="doc-code-content">
+<pre><code>&lt;form method="POST" action="/api/save">
+    &lt;!-- Generates &lt;input type="hidden" name="_token" ...> -->
+    &lt;?= csrf_field() ?>
+    
+    &lt;button type="submit">Save&lt;/button>
+&lt;/form></code></pre>
+                </div>
             </div>
         </div>
       </section>
 
-      <!-- CLI Commands -->
-      <section id="cli" class="doc-section mb-20">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 rounded-lg bg-gray-700 flex items-center justify-center">
-            <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
+      <section id="request-response" class="mb-20">
+        <h2 class="section-title">Tools: Request & Response</h2>
+        <p class="mb-6 text-slate-400">Used primarily within <code>+server.php</code> API files.</p>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-lg font-bold text-slate-200 mb-3">Request Object</h3>
+            <div class="doc-code-block">
+              <div class="doc-code-content">
+<pre><code>// Get POST body or GET param
+$val = $req->input('key', 'default');
+
+// Get URL param (from [id] folder)
+$id = $req->path_param_id;
+
+// Get HTTP Method
+$method = $req->method; // 'GET', 'POST'
+
+// Get Raw Body (JSON)
+$data = $req->body;</code></pre>
+              </div>
+            </div>
           </div>
           <div>
-            <h2 class="text-3xl font-bold text-slate-100">CLI Commands</h2>
-            <p class="text-sm text-slate-400 mt-1">The <code>./bastion</code> utility</p>
+            <h3 class="text-lg font-bold text-slate-200 mb-3">Response Helper</h3>
+            <div class="doc-code-block">
+              <div class="doc-code-content">
+<pre><code>// Return JSON and exit
+Response::json(['status' => 'ok'], 200);
+
+// Redirect
+Response::redirect('/login');
+
+// Abort with error code
+Response::abort(404, 'User not found');
+
+// Render HTML
+Response::html('&lt;h1>Error&lt;/h1>', 500);</code></pre>
+              </div>
+            </div>
           </div>
         </div>
+      </section>
+      
+      <section id="logging" class="mb-20">
+        <h2 class="section-title">Tools: Logging</h2>
+        <p class="mb-4 text-slate-400">
+            Simple file-based logging to `storage/logs/app.log`.
+        </p>
+        <div class="doc-code-block">
+            <div class="doc-code-content">
+<pre><code>// Log an info message
+logger()->info('User logged in: ' . $email);
 
+// Log an error
+logger()->error('Database connection failed: ' . $e->getMessage());
+
+// Available methods: debug, info, warning, error</code></pre>
+            </div>
+        </div>
+      </section>
+
+      <section id="global-helpers" class="mb-20">
+        <h2 class="section-title">Global Helpers Reference</h2>
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-300">
-                <thead class="bg-slate-800 text-slate-200 uppercase font-medium">
-                    <tr>
-                        <th class="px-4 py-3 rounded-tl-lg">Command</th>
-                        <th class="px-4 py-3 rounded-tr-lg">Description</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-800 border-x border-b border-slate-800">
-                    <tr class="bg-slate-900/50">
-                        <td class="px-4 py-3 font-mono text-cyan-400">./bastion run-dev</td>
-                        <td class="px-4 py-3">Starts PHP server (8000), Tailwind Watch, and BrowserSync (9876).</td>
-                    </tr>
-                    <tr class="bg-slate-900/50">
-                        <td class="px-4 py-3 font-mono text-cyan-400">./bastion migrate</td>
-                        <td class="px-4 py-3">Runs SQL files located in <code>database/migrations/</code>.</td>
-                    </tr>
-                    <tr class="bg-slate-900/50">
-                        <td class="px-4 py-3 font-mono text-cyan-400">./bastion seed</td>
-                        <td class="px-4 py-3">Executes PHP seeders from <code>database/seeds/</code>.</td>
-                    </tr>
-                    <tr class="bg-slate-900/50">
-                        <td class="px-4 py-3 font-mono text-cyan-400">./bastion build</td>
-                        <td class="px-4 py-3">Compiles Tailwind v4 for production (minified).</td>
-                    </tr>
-                </tbody>
-            </table>
+          <table class="w-full text-sm text-left border-collapse">
+            <thead class="text-xs text-slate-500 uppercase bg-slate-900 border border-slate-800">
+              <tr>
+                <th class="px-4 py-3 border border-slate-800">Helper</th>
+                <th class="px-4 py-3 border border-slate-800">Return</th>
+                <th class="px-4 py-3 border border-slate-800">Description</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+              <tr>
+                <td class="px-4 py-3 font-mono text-cyan-400">e($str)</td>
+                <td class="px-4 py-3 text-slate-400">string</td>
+                <td class="px-4 py-3">Escapes string for safe HTML output.</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 font-mono text-cyan-400">env($key, $def)</td>
+                <td class="px-4 py-3 text-slate-400">mixed</td>
+                <td class="px-4 py-3">Reads from <code>.env</code> file.</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 font-mono text-cyan-400">config($key)</td>
+                <td class="px-4 py-3 text-slate-400">mixed</td>
+                <td class="px-4 py-3">Reads from <code>config/</code> files (dot notation).</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 font-mono text-cyan-400">csrf_token()</td>
+                <td class="px-4 py-3 text-slate-400">string</td>
+                <td class="px-4 py-3">Returns the current session CSRF token string.</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 font-mono text-cyan-400">csrf_field()</td>
+                <td class="px-4 py-3 text-slate-400">html</td>
+                <td class="px-4 py-3">Returns hidden input field with CSRF token.</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 font-mono text-cyan-400">dv_get($k, $d)</td>
+                <td class="px-4 py-3 text-slate-400">mixed</td>
+                <td class="px-4 py-3">Alias for <code>DV::get()</code>.</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 font-mono text-cyan-400">logger()</td>
+                <td class="px-4 py-3 text-slate-400">Logger</td>
+                <td class="px-4 py-3">Returns the global Logger instance.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-      <!-- Footer Note -->
-      <div class="mt-20 pt-8 border-t border-slate-800 text-center text-sm text-slate-400">
-        <p class="mb-2">Bastion PHP v0.1.0 - Security-First Framework</p>
-        <p>Built with care for internal tool developers</p>
-      </div>
+      <!-- CLI Reference -->
+      <section id="cli-reference" class="mb-20">
+        <h2 class="section-title">CLI Reference</h2>
+        <p class="mb-6 text-slate-400">The <code>./bastion</code> executable in the root directory is your main tool.</p>
+
+        <div class="space-y-4">
+          <div class="card bg-slate-900/40">
+            <div class="flex items-center gap-3 mb-2">
+              <code class="text-lg text-emerald-400">./bastion run-dev</code>
+            </div>
+            <p class="text-sm text-slate-400">
+              Starts the full development stack:
+              <br>1. PHP Built-in Server (:8000)
+              <br>2. Tailwind v4 Watch Mode
+              <br>3. BrowserSync Proxy (:9876) for live reload
+            </p>
+          </div>
+
+          <div class="card bg-slate-900/40">
+            <div class="flex items-center gap-3 mb-2">
+              <code class="text-lg text-emerald-400">./bastion migrate</code>
+            </div>
+            <p class="text-sm text-slate-400">
+              Executes all SQL files found in <code>database/migrations/</code> against the configured DB.
+            </p>
+          </div>
+
+          <div class="card bg-slate-900/40">
+            <div class="flex items-center gap-3 mb-2">
+              <code class="text-lg text-emerald-400">./bastion seed</code>
+            </div>
+            <p class="text-sm text-slate-400">
+              Runs PHP scripts found in <code>database/seeds/</code>. Useful for creating initial admin users or dummy data.
+            </p>
+          </div>
+          
+          <div class="card bg-slate-900/40">
+            <div class="flex items-center gap-3 mb-2">
+              <code class="text-lg text-emerald-400">./bastion build</code>
+            </div>
+            <p class="text-sm text-slate-400">
+              Compiles and minifies CSS using Tailwind CLI for production deployment.
+            </p>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Footer -->
+      <footer class="pt-8 mt-20 border-t border-slate-800 text-center text-slate-500 text-sm">
+        <p>&copy; 2024 Bastion PHP Framework. Created for internal tools.</p>
+      </footer>
 
     </main>
-
-    <!-- Right Sidebar - On This Page (Desktop Only) -->
+    
+    <!-- Table of Contents (Desktop Right) -->
     <aside class="hidden xl:block w-64 flex-shrink-0">
-      <div class="sticky top-20 p-6">
-        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">On This Page</h3>
-        <nav id="page-toc" class="text-sm space-y-2 text-slate-400">
-          <!-- Dynamically populated by JS -->
-        </nav>
-      </div>
+        <div class="sticky top-24 pr-8">
+            <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">On This Page</h5>
+            <nav id="toc" class="space-y-2 text-sm border-l border-slate-800 pl-4">
+                <!-- JS will populate this -->
+            </nav>
+        </div>
     </aside>
 
   </div>
-</div>
 
-<!-- Scroll to Top Button -->
-<button id="scroll-top" class="hidden fixed bottom-8 right-8 w-12 h-12 rounded-full bg-cyan-500 text-white shadow-lg hover:bg-cyan-400 transition z-40 items-center justify-center">
-  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
-  </svg>
-</button>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Generate TOC
-    const main = document.querySelector('main');
-    const headings = main.querySelectorAll('h2, h3');
-    const tocContainer = document.getElementById('page-toc');
+  <script>
+    // Sidebar Toggle
+    const menuBtn = document.getElementById('menu-btn');
+    const sidebar = document.getElementById('sidebar');
     
-    headings.forEach(heading => {
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('sidebar-closed');
+      sidebar.classList.toggle('sidebar-open');
+    });
+
+    // Dynamic TOC Generation
+    document.addEventListener('DOMContentLoaded', () => {
+      const headings = document.querySelectorAll('main h2, main h3');
+      const toc = document.getElementById('toc');
+      
+      headings.forEach(heading => {
         if (!heading.id) {
-            heading.id = heading.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          heading.id = heading.innerText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         }
         
         const link = document.createElement('a');
         link.href = `#${heading.id}`;
-        link.textContent = heading.textContent;
-        link.className = 'block hover:text-cyan-400 transition-colors duration-200';
-        if (heading.tagName === 'H3') link.classList.add('pl-3', 'text-xs');
+        link.innerText = heading.innerText;
+        link.className = `block text-slate-400 hover:text-cyan-400 transition-colors ${heading.tagName === 'H3' ? 'pl-4 text-xs' : ''}`;
         
-        tocContainer.appendChild(link);
+        toc.appendChild(link);
+      });
     });
-
-    // 2. Mobile Menu
-    const menuBtn = document.getElementById('mobile-menu-toggle');
-    const sidebar = document.getElementById('sidebar-nav');
-    
-    menuBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-    });
-
-    // Close sidebar on link click (mobile)
-    sidebar.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            if (window.innerWidth < 1024) sidebar.classList.remove('open');
-        });
-    });
-
-    // 3. Scroll to Top
-    const scrollBtn = document.getElementById('scroll-top');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) {
-            scrollBtn.classList.remove('hidden');
-            scrollBtn.classList.add('flex');
-        } else {
-            scrollBtn.classList.add('hidden');
-            scrollBtn.classList.remove('flex');
-        }
-    });
-    
-    scrollBtn.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // 4. Copy Code
-    document.querySelectorAll('.copy-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const codeBlock = e.target.closest('.doc-code, .method-card, .bg-slate-900').querySelector('code, .font-mono');
-            
-            // Handle different structure of code blocks
-            let textToCopy = codeBlock.textContent;
-            // Clean up if it grabbed extra UI elements
-            textToCopy = textToCopy.replace(/^\s+|\s+$/g, '');
-
-            navigator.clipboard.writeText(textToCopy);
-            
-            const originalText = e.target.textContent;
-            e.target.textContent = 'Copied!';
-            e.target.classList.add('text-green-400', 'border-green-400');
-            
-            setTimeout(() => {
-                e.target.textContent = originalText;
-                e.target.classList.remove('text-green-400', 'border-green-400');
-            }, 2000);
-        });
-    });
-});
-</script>
+  </script>
 </body>
 </html>
