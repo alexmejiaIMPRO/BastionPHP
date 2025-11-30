@@ -1,813 +1,694 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="dark scroll-smooth">
 <head>
   <meta charset="utf-8">
-  <title>Bastion PHP Documentation - The Complete Guide</title>
+  <title>Bastion PHP - The Complete Guide</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Comprehensive documentation for Bastion PHP. Security-first framework generator for internal tools.">
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <meta name="description" content="The definitive guide to Bastion PHP. Security-first, rapid development framework for internal tools.">
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { 
+            sans: ['Inter', 'sans-serif'], 
+            mono: ['JetBrains Mono', 'monospace'] 
+          },
+          colors: {
+            background: '#0B1120', // Deep Space Blue
+            surface: '#1e293b',    // Slate 800
+            primary: '#38bdf8',    // Sky 400
+            secondary: '#818cf8',  // Indigo 400
+            accent: '#2dd4bf',     // Teal 400
+            border: '#334155'      // Slate 700
+          },
+          maxWidth: { '8xl': '90rem' },
+          boxShadow: {
+            'glow': '0 0 20px rgba(56, 189, 248, 0.15)'
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
-    :root {
-      --scroll-padding: 6rem;
-    }
+    /* Base Settings */
+    :root { --scroll-padding: 80px; }
+    html { scroll-behavior: smooth; scroll-padding-top: var(--scroll-padding); }
+    body { background-color: #0B1120; color: #e2e8f0; antialiased; }
     
-    html { 
-      scroll-behavior: smooth; 
-      scroll-padding-top: var(--scroll-padding); 
-    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0B1120; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #020617; /* slate-950 */
-      color: #e2e8f0; /* slate-200 */
-    }
+    /* Syntax Highlighting Simulation */
+    pre { margin: 0; }
+    .token.k { color: #c084fc; } /* keyword (purple) */
+    .token.s { color: #86efac; } /* string (green) */
+    .token.f { color: #38bdf8; } /* function (blue) */
+    .token.v { color: #fca5a5; } /* variable (red) */
+    .token.c { color: #94a3b8; font-style: italic; } /* comment (gray) */
+    .token.t { color: #2dd4bf; } /* type (teal) */
+    .token.n { color: #fbbf24; } /* number (amber) */
 
-    /* Code Blocks */
-    pre, code, kbd {
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    code:not(pre code) {
-      background: rgba(30, 41, 59, 0.5); /* slate-800/50 */
-      color: #38bdf8; /* sky-400 */
-      padding: 0.125rem 0.375rem;
-      border-radius: 0.25rem;
-      font-size: 0.875em;
+    /* Glassmorphism Panels */
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(51, 65, 85, 0.5);
-    }
-
-    .doc-code-block {
-      background: #0f172a; /* slate-900 */
-      border: 1px solid #1e293b; /* slate-800 */
-      border-radius: 0.75rem;
-      overflow: hidden;
-      margin-bottom: 1.5rem;
-    }
-
-    .doc-code-header {
-      background: #1e293b; /* slate-800 */
-      padding: 0.5rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #334155;
-      font-size: 0.75rem;
-      color: #94a3b8;
-    }
-
-    .doc-code-content {
-      padding: 1rem;
-      overflow-x: auto;
-      color: #e2e8f0;
-      font-size: 0.875rem;
-      line-height: 1.7;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
 
     /* Gradients */
     .text-gradient {
-      background: linear-gradient(to right, #22d3ee, #3b82f6);
+      background: linear-gradient(to right, #38bdf8, #818cf8);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-
-    /* Sidebar Navigation */
+    
+    /* Navigation Links */
     .nav-link {
-      display: block;
-      padding: 0.5rem 0.75rem;
-      color: #94a3b8; /* slate-400 */
-      border-radius: 0.375rem;
-      transition: all 0.2s;
-      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      border-left: 2px solid transparent;
+      transition: all 0.2s ease-in-out;
     }
     .nav-link:hover {
-      color: #38bdf8;
-      background: rgba(30, 41, 59, 0.5);
+      color: #f8fafc;
+      border-left-color: #475569;
     }
     .nav-link.active {
       color: #38bdf8;
-      background: rgba(6, 182, 212, 0.1);
-      border-left: 2px solid #06b6d4;
+      border-left-color: #38bdf8;
+      background: linear-gradient(90deg, rgba(56,189,248,0.1) 0%, transparent 100%);
     }
 
-    /* Headings */
-    h1, h2, h3, h4 { scroll-margin-top: var(--scroll-padding); }
-    
-    .section-title {
-      font-size: 1.875rem;
-      font-weight: 700;
-      color: #f1f5f9;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid #1e293b;
-    }
-
-    .subsection-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #e2e8f0;
-      margin-top: 2.5rem;
-      margin-bottom: 1rem;
-    }
-    
-    .card {
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px solid #1e293b;
-        border-radius: 0.75rem;
-        padding: 1.5rem;
-    }
-
-    /* Mobile Menu Animation */
-    #sidebar {
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .sidebar-closed { transform: translateX(-100%); }
-    .sidebar-open { transform: translateX(0); }
-    
-    @media (min-width: 1024px) {
-      .sidebar-closed { transform: none; }
+    /* Code Block Header */
+    .code-header {
+      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+      background: rgba(15, 23, 42, 0.5);
     }
   </style>
 </head>
-<body class="antialiased selection:bg-cyan-500/30">
+<body class="relative">
 
-  <!-- Header -->
-  <header class="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 h-16">
-    <div class="max-w-[90rem] mx-auto px-4 h-full flex items-center justify-between">
+  <!-- Mobile Menu Button -->
+  <button id="mobile-menu-btn" class="lg:hidden fixed bottom-6 right-6 z-50 p-4 bg-primary text-slate-900 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+
+  <!-- Navbar -->
+  <header class="fixed top-0 w-full z-40 bg-[#0B1120]/80 backdrop-blur-md border-b border-border transition-all duration-200">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <button id="menu-btn" class="lg:hidden p-2 text-slate-400 hover:text-white">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white text-sm">BP</div>
-          <span class="font-bold text-lg tracking-tight">Bastion<span class="text-cyan-400">PHP</span></span>
-        </div>
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-cyan-500/20">BP</div>
+        <span class="font-bold text-lg tracking-tight text-slate-100">Bastion<span class="text-primary">PHP</span></span>
       </div>
-      <div class="flex items-center gap-4 text-sm">
-        <span class="text-slate-500 hidden sm:inline">v0.1.0</span>
-        <a href="https://github.com/alexmejiaIMPRO/BastionPHP" target="_blank" class="text-slate-400 hover:text-white transition">GitHub</a>
+      <div class="flex items-center gap-6">
+        <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+          v0.1.2
+        </span>
+        <a href="https://github.com/alexmejiaIMPRO/BastionPHP" target="_blank" class="text-slate-400 hover:text-white transition-colors">
+          <span class="sr-only">GitHub</span>
+          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+        </a>
       </div>
     </div>
   </header>
 
-  <div class="max-w-[90rem] mx-auto flex pt-16 min-h-screen">
+  <div class="max-w-8xl mx-auto flex pt-16">
     
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar-closed fixed lg:sticky top-16 left-0 z-40 w-72 h-[calc(100vh-4rem)] bg-slate-950 border-r border-slate-800 overflow-y-auto lg:translate-x-0">
-      <nav class="p-6 space-y-8">
-        <div>
-          <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Getting Started</h5>
-          <ul class="space-y-1">
-            <li><a href="#intro" class="nav-link">Introduction</a></li>
-            <li><a href="#installation" class="nav-link">Installation</a></li>
-            <li><a href="#structure" class="nav-link">Project Structure</a></li>
-          </ul>
-        </div>
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-72 bg-[#0B1120] border-r border-border transform -translate-x-full lg:translate-x-0 lg:static lg:h-[calc(100vh-4rem)] lg:top-16 overflow-y-auto transition-transform duration-300 pt-20 lg:pt-8 pb-10">
+      <nav class="px-6 space-y-9">
         
+        <!-- Section: Start -->
         <div>
-          <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Configuration</h5>
-          <ul class="space-y-1">
-            <li><a href="#config-files" class="nav-link">Config Files</a></li>
-            <li><a href="#env-vars" class="nav-link">Environment (.env)</a></li>
+          <h5 class="mb-4 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Getting Started
+          </h5>
+          <ul class="space-y-1.5 border-l border-slate-800 ml-2">
+            <li><a href="#introduction" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Introduction</a></li>
+            <li><a href="#quick-start" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Quick Start</a></li>
+            <li><a href="#structure" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Directory Structure</a></li>
           </ul>
         </div>
 
+        <!-- Section: Config -->
         <div>
-          <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Core Engine</h5>
-          <ul class="space-y-1">
-            <li><a href="#routing" class="nav-link">Routing & Layouts</a></li>
-            <li><a href="#dv-engine" class="nav-link text-cyan-400">DV Engine (5 Patterns)</a></li>
-            <li><a href="#api-server" class="nav-link">API & Endpoints</a></li>
-            <li><a href="#middleware" class="nav-link">Middleware Pipeline</a></li>
+          <h5 class="mb-4 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Configuration
+          </h5>
+          <ul class="space-y-1.5 border-l border-slate-800 ml-2">
+            <li><a href="#config-app" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">App & Environment</a></li>
+            <li><a href="#config-db" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Database</a></li>
+            <li><a href="#config-security" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Security Policies</a></li>
           </ul>
         </div>
 
+        <!-- Section: Core -->
         <div>
-          <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Tools & Helpers</h5>
-          <ul class="space-y-1">
-            <li><a href="#db-querybuilder" class="nav-link">Database & ORM</a></li>
-            <li><a href="#auth-security" class="nav-link">Auth & Security</a></li>
-            <li><a href="#request-response" class="nav-link">Request & Response</a></li>
-            <li><a href="#logging" class="nav-link">Logging</a></li>
-            <li><a href="#global-helpers" class="nav-link">Global Helpers</a></li>
+          <h5 class="mb-4 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            Core Engine
+          </h5>
+          <ul class="space-y-1.5 border-l border-slate-800 ml-2">
+            <li><a href="#routing" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Routing System</a></li>
+            <li><a href="#layouts" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Nested Layouts</a></li>
+            <li><a href="#dv-engine" class="nav-link block pl-4 py-1.5 text-sm text-primary font-medium">DV Engine (State)</a></li>
+            <li><a href="#api-endpoints" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">API & Server Files</a></li>
           </ul>
         </div>
 
+        <!-- Section: Tools -->
         <div>
-          <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">CLI & Deploy</h5>
-          <ul class="space-y-1">
-            <li><a href="#cli-reference" class="nav-link">Bastion CLI</a></li>
-            <li><a href="#deployment" class="nav-link">Deployment</a></li>
+          <h5 class="mb-4 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+            Tools
+          </h5>
+          <ul class="space-y-1.5 border-l border-slate-800 ml-2">
+            <li><a href="#query-builder" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">QueryBuilder</a></li>
+            <li><a href="#auth-facade" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Authentication</a></li>
+            <li><a href="#helpers" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Global Helpers</a></li>
           </ul>
         </div>
       </nav>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 min-w-0 px-4 sm:px-8 py-10">
+    <!-- Main Content Area -->
+    <main class="flex-1 min-w-0 px-4 sm:px-8 lg:px-16 py-12 scroll-mt-16">
       
-      <!-- Intro -->
-      <section id="intro" class="mb-16">
-        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-6">
-          Bastion <span class="text-gradient">PHP</span>
+      <!-- HERO -->
+      <section id="introduction" class="mb-24 scroll-mt-32">
+        <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight mb-8 text-slate-50 leading-tight">
+          The <span class="text-gradient">Bastion</span> Guide
         </h1>
-        <p class="text-xl text-slate-400 leading-relaxed max-w-3xl mb-8">
-          A security-first, opinionated framework generator for building internal tools. 
-          It combines <strong>Next.js-style file-based routing</strong>, <strong>FastAPI-like endpoints</strong>, 
-          and a robust <strong>SQLite QueryBuilder</strong> into a single, cohesive package.
+        <p class="text-xl sm:text-2xl text-slate-400 leading-relaxed max-w-4xl mb-12">
+          Bastion is an opinionated, <strong class="text-slate-200">security-first framework generator</strong> for internal tools. 
+          It bridges the gap between the Developer Experience of modern meta-frameworks and the raw stability of PHP.
         </p>
-        <div class="grid sm:grid-cols-3 gap-4">
-          <div class="card bg-cyan-950/20 border-cyan-900/50">
-            <div class="text-cyan-400 font-bold mb-1">Security First</div>
-            <div class="text-sm text-slate-400">CSP Nonces, CSRF, and XSS protection enabled by default.</div>
+        
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="glass-panel p-6 rounded-2xl">
+            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold text-slate-200 mb-2">Secure by Default</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">CSP Nonces, CSRF protection, and Secure Headers are not optional configs. They are baked into the core architecture.</p>
           </div>
-          <div class="card">
-            <div class="text-purple-400 font-bold mb-1">Developer Experience</div>
-            <div class="text-sm text-slate-400">Tailwind v4, Live Reload, and logical project structure.</div>
+          <div class="glass-panel p-6 rounded-2xl">
+            <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-slate-200 mb-2">FastAPI Style</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">Define API endpoints using <code>+server.php</code> files that return HTTP verb closures. Simple, typed, and fast.</p>
           </div>
-          <div class="card">
-            <div class="text-emerald-400 font-bold mb-1">Zero Magic</div>
-            <div class="text-sm text-slate-400">Explicit routing and configuration. No hidden behaviors.</div>
+          <div class="glass-panel p-6 rounded-2xl">
+            <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-slate-200 mb-2">Next.js Routing</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">Filesystem-based routing with nested layouts. Organize your app by features, not by file types.</p>
           </div>
         </div>
       </section>
 
-      <!-- Installation -->
-      <section id="installation" class="mb-20">
-        <h2 class="section-title">Installation</h2>
-        <p class="mb-4 text-slate-400">Requires PHP 8.1+, Composer, and optionally Node.js for development.</p>
+      <!-- QUICK START -->
+      <section id="quick-start" class="mb-32 scroll-mt-28">
+        <div class="flex items-center gap-4 mb-8">
+          <h2 class="text-3xl font-bold text-slate-200">Quick Start</h2>
+          <span class="h-px flex-1 bg-border"></span>
+        </div>
         
-        <div class="doc-code-block">
-          <div class="doc-code-header">Terminal</div>
-          <div class="doc-code-content">
-<pre><code># 1. Clone the generator
-git clone https://github.com/alexmejiaIMPRO/BastionPHP.git
-cd BastionPHP
+        <div class="glass-panel rounded-xl overflow-hidden mb-8">
+          <div class="flex items-center justify-between px-4 py-3 bg-slate-900/50 border-b border-border">
+            <div class="flex gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-500/50"></span>
+              <span class="w-3 h-3 rounded-full bg-yellow-500/50"></span>
+              <span class="w-3 h-3 rounded-full bg-green-500/50"></span>
+            </div>
+            <span class="text-xs font-mono text-slate-500">Terminal</span>
+          </div>
+          <div class="p-6 overflow-x-auto font-mono text-sm text-slate-300">
+<pre>
+<span class="token c"># 1. Generate Project</span>
+bash create-bastion-app MyInternalTool
+cd MyInternalTool
 
-# 2. Create your project
-bash create-bastion-app MySecureApp
-
-# 3. Enter and install
-cd MySecureApp
+<span class="token c"># 2. Install Dependencies</span>
 composer install
 npm install
 
-# 4. Setup Database
+<span class="token c"># 3. Setup Database & Admin</span>
 ./bastion migrate
 ./bastion seed
 
-# 5. Start Dev Server
-./bastion run-dev</code></pre>
+<span class="token c"># 4. Launch Development Environment</span>
+./bastion run-dev
+</pre>
+          </div>
+        </div>
+        
+        <div class="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-200 text-sm flex gap-3 items-start">
+          <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div>
+            <strong class="block mb-1">Default Credentials</strong>
+            The seeder creates an admin user: <code>admin@example.com</code> / <code>password</code>.
           </div>
         </div>
       </section>
 
-      <!-- Config Files -->
-      <section id="config-files" class="mb-20">
-        <h2 class="section-title">Configuration Files</h2>
-        <p class="mb-6 text-slate-400">
-          All configuration lives in the <code>config/</code> directory. Bastion loads these files lazily using the <code>config('filename.key')</code> helper.
-        </p>
-
-        <div class="space-y-8">
-          <!-- App Config -->
-          <div>
-            <h3 class="text-xl font-bold text-slate-200 mb-2"><code>config/app.php</code></h3>
-            <p class="text-sm text-slate-400 mb-3">General application identity and environment settings.</p>
-            <div class="doc-code-block">
-              <div class="doc-code-content">
-<pre><code>return [
-    'name'     => env('APP_NAME', 'Bastion App'),
-    'env'      => env('APP_ENV', 'local'),      // 'local' or 'production'
-    'debug'    => (bool) env('APP_DEBUG', false),
-    'timezone' => env('APP_TIMEZONE', 'UTC'),   // Sets PHP default timezone
-];</code></pre>
-              </div>
-            </div>
-          </div>
-
-          <!-- DB Config -->
-          <div>
-            <h3 class="text-xl font-bold text-slate-200 mb-2"><code>config/database.php</code></h3>
-            <p class="text-sm text-slate-400 mb-3">Database connections. SQLite is the default.</p>
-            <div class="doc-code-block">
-              <div class="doc-code-content">
-<pre><code>return [
-    'default' => env('DB_CONNECTION', 'sqlite'),
-
-    'connections' => [
-        'sqlite' => [
-            'driver' => 'sqlite',
-            'path'   => env('DB_PATH', 'storage/db/app.db'),
-        ],
-        // MySQL configuration is also available here
-    ],
-];</code></pre>
-              </div>
-            </div>
-          </div>
-
-          <!-- Security Config -->
-          <div>
-            <h3 class="text-xl font-bold text-slate-200 mb-2"><code>config/security.php</code></h3>
-            <p class="text-sm text-slate-400 mb-3">Toggles for the <code>SecurityHeaders</code> and <code>CsrfMiddleware</code>.</p>
-            <div class="doc-code-block">
-              <div class="doc-code-content">
-<pre><code>return [
-    'csrf_enabled'    => true,  // Validate _token on POST/PUT/DELETE
-    'secure_cookies'  => false, // Set true in production (requires HTTPS)
-    'same_site'       => 'Lax', // Cookie SameSite policy
-
-    // Content Security Policy sources
-    'csp_default_src' => ["'self'"],
-    'csp_script_src'  => ["'self'", 'https://cdn.tailwindcss.com'],
-];</code></pre>
-              </div>
-            </div>
-          </div>
-
-          <!-- Style Config -->
-          <div>
-            <h3 class="text-xl font-bold text-slate-200 mb-2"><code>config/style.php</code></h3>
-            <p class="text-sm text-slate-400 mb-3">Theme settings and asset paths.</p>
-            <div class="doc-code-block">
-              <div class="doc-code-content">
-<pre><code>return [
-    'theme'    => env('APP_THEME', 'dark'),
-    'css_path' => '/css/app.css', // Path to public asset
-];</code></pre>
-              </div>
-            </div>
-          </div>
+      <!-- STRUCTURE -->
+      <section id="structure" class="mb-32 scroll-mt-28">
+        <div class="flex items-center gap-4 mb-8">
+          <h2 class="text-3xl font-bold text-slate-200">Directory Structure</h2>
+          <span class="h-px flex-1 bg-border"></span>
         </div>
-      </section>
-
-      <!-- DV Engine (Deep Dive) -->
-      <section id="dv-engine" class="mb-20">
-        <h2 class="section-title text-cyan-400">DV Engine Deep Dive</h2>
-        <p class="mb-6 text-slate-300 leading-relaxed">
-          The <strong>Data View (DV) Engine</strong> is a static state container (`App\Core\DV`) that allows pages to "bubble up" data to their parent layouts. 
-          Since `page.php` is executed <em>before</em> `layout.php`, the page can define titles, breadcrumbs, or control sidebar visibility before the layout renders the HTML shell.
-        </p>
-
-        <h3 class="subsection-title">5 Essential Use Cases</h3>
-
-        <!-- Case 1 -->
-        <div class="mb-8">
-          <h4 class="font-bold text-slate-200 mb-2">1. Dynamic Page Titles</h4>
-          <p class="text-sm text-slate-400 mb-2">The most common use case. The page sets the title, the layout renders the <code>&lt;title&gt;</code> tag.</p>
-          <div class="grid lg:grid-cols-2 gap-4">
-            <div class="doc-code-block mb-0">
-              <div class="doc-code-header">app/dashboard/page.php</div>
-              <div class="doc-code-content">
-<pre><code>use App\Core\DV;
-
-// Set specific title
-DV::set('title', 'Sales Dashboard');</code></pre>
-              </div>
-            </div>
-            <div class="doc-code-block mb-0">
-              <div class="doc-code-header">app/layout.php</div>
-              <div class="doc-code-content">
-<pre><code>// Get with fallback
-$t = DV::get('title', 'Bastion');
-echo "&lt;title&gt;" . e($t) . "&lt;/title&gt;";</code></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Case 2 -->
-        <div class="mb-8">
-          <h4 class="font-bold text-slate-200 mb-2">2. Breadcrumbs System</h4>
-          <p class="text-sm text-slate-400 mb-2">Pass an array of links to render a navigation trail in the layout header.</p>
-          <div class="doc-code-block">
-              <div class="doc-code-header">app/admin/users/page.php</div>
-              <div class="doc-code-content">
-<pre><code>DV::set('breadcrumbs', [
-    ['label' => 'Admin', 'url' => '/admin'],
-    ['label' => 'Users', 'url' => '/admin/users'],
-    ['label' => 'Edit',  'url' => null]
-]);</code></pre>
-              </div>
-          </div>
-        </div>
-
-        <!-- Case 3 -->
-        <div class="mb-8">
-          <h4 class="font-bold text-slate-200 mb-2">3. Sidebar Visibility Control</h4>
-          <p class="text-sm text-slate-400 mb-2">A login page or full-screen map might want to hide the main navigation.</p>
-          <div class="grid lg:grid-cols-2 gap-4">
-            <div class="doc-code-block mb-0">
-              <div class="doc-code-header">app/login/page.php</div>
-              <div class="doc-code-content">
-<pre><code>// Disable sidebar for login
-DV::set('show_sidebar', false);</code></pre>
-              </div>
-            </div>
-            <div class="doc-code-block mb-0">
-              <div class="doc-code-header">app/layout.php</div>
-              <div class="doc-code-content">
-<pre><code>if (DV::get('show_sidebar', true)) {
-    include 'components/sidebar.php';
-}</code></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Case 4 -->
-        <div class="mb-8">
-          <h4 class="font-bold text-slate-200 mb-2">4. Injecting Page-Specific Scripts</h4>
-          <p class="text-sm text-slate-400 mb-2">Inject Chart.js or Maps API only on pages that need it, keeping other pages light.</p>
-          <div class="doc-code-block">
-              <div class="doc-code-header">app/analytics/page.php</div>
-              <div class="doc-code-content">
-<pre><code>DV::set('scripts', [
-    'https://cdn.jsdelivr.net/npm/chart.js'
-]);</code></pre>
-              </div>
-          </div>
-        </div>
-
-        <!-- Case 5 -->
-        <div class="mb-8">
-          <h4 class="font-bold text-slate-200 mb-2">5. Active Menu Highlighting</h4>
-          <p class="text-sm text-slate-400 mb-2">Tell the layout which navbar item should be highlighted.</p>
-          <div class="doc-code-block">
-              <div class="doc-code-header">app/settings/profile/page.php</div>
-              <div class="doc-code-content">
-<pre><code>// Highlight the 'settings' tab
-DV::set('current_tab', 'settings');</code></pre>
-              </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Routing & Structure -->
-      <section id="structure" class="mb-20">
-        <h2 class="section-title">Project Structure & Routing</h2>
-        <p class="mb-6 text-slate-400">Bastion uses <strong>filesystem-based routing</strong>. The folder structure inside `app/` determines your URLs.</p>
-
-        <div class="grid lg:grid-cols-2 gap-8">
-          <div>
-            <h3 class="text-lg font-bold text-slate-200 mb-4">Core Directories</h3>
-            <ul class="space-y-4">
-              <li class="pl-4 border-l-2 border-slate-700">
-                <code class="text-cyan-400">app/</code>
-                <p class="text-sm text-slate-400 mt-1">Contains all pages, layouts, and API endpoints.</p>
-              </li>
-              <li class="pl-4 border-l-2 border-slate-700">
-                <code class="text-cyan-400">src/</code>
-                <p class="text-sm text-slate-400 mt-1">Application logic. Models, Services, Middleware, and Core files.</p>
-              </li>
-              <li class="pl-4 border-l-2 border-slate-700">
-                <code class="text-cyan-400">config/</code>
-                <p class="text-sm text-slate-400 mt-1">Configuration files loaded by helper.</p>
-              </li>
-              <li class="pl-4 border-l-2 border-slate-700">
-                <code class="text-cyan-400">public/</code>
-                <p class="text-sm text-slate-400 mt-1">Web root. Contains `index.php` and compiled assets.</p>
-              </li>
+        
+        <div class="grid lg:grid-cols-2 gap-12">
+          <div class="glass-panel rounded-xl p-8 font-mono text-sm leading-relaxed text-slate-400">
+            <ul class="space-y-2">
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> <span class="text-primary font-bold">app/</span></li>
+              <li class="pl-6 border-l border-slate-800 ml-2">├── <span class="text-slate-200">admin/</span> <span class="text-slate-600 float-right text-xs pt-1">Nested Route (/admin)</span></li>
+              <li class="pl-6 border-l border-slate-800 ml-2">├── <span class="text-slate-200">api/</span> <span class="text-slate-600 float-right text-xs pt-1">API Endpoints</span></li>
+              <li class="pl-6 border-l border-slate-800 ml-2">├── <span class="text-slate-200">components/</span> <span class="text-slate-600 float-right text-xs pt-1">UI Fragments</span></li>
+              <li class="pl-6 border-l border-slate-800 ml-2">├── <span class="text-accent font-bold">layout.php</span> <span class="text-slate-600 float-right text-xs pt-1">ROOT LAYOUT</span></li>
+              <li class="pl-6 border-l border-slate-800 ml-2">└── <span class="text-secondary font-bold">page.php</span> <span class="text-slate-600 float-right text-xs pt-1">Home Page</span></li>
+              
+              <li class="flex items-center gap-2 mt-4"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> <span>config/</span> <span class="text-slate-600 float-right text-xs pt-1">Settings</span></li>
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> <span>public/</span> <span class="text-slate-600 float-right text-xs pt-1">Web Root</span></li>
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> <span>src/</span> <span class="text-slate-600 float-right text-xs pt-1">Models & Logic</span></li>
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg> <span>storage/</span> <span class="text-slate-600 float-right text-xs pt-1">DB & Logs</span></li>
             </ul>
           </div>
-          <div>
-            <h3 class="text-lg font-bold text-slate-200 mb-4">Routing Examples</h3>
-            <table class="w-full text-sm text-left">
-              <thead class="text-xs text-slate-500 uppercase bg-slate-900">
-                <tr>
-                  <th class="px-3 py-2">File Path</th>
-                  <th class="px-3 py-2">URL</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-800">
-                <tr>
-                  <td class="px-3 py-3 font-mono">app/page.php</td>
-                  <td class="px-3 py-3 text-cyan-400">/</td>
-                </tr>
-                <tr>
-                  <td class="px-3 py-3 font-mono">app/about/page.php</td>
-                  <td class="px-3 py-3 text-cyan-400">/about</td>
-                </tr>
-                <tr>
-                  <td class="px-3 py-3 font-mono">app/blog/[slug]/page.php</td>
-                  <td class="px-3 py-3 text-cyan-400">/blog/my-post</td>
-                </tr>
-                <tr>
-                  <td class="px-3 py-3 font-mono">app/api/users/+server.php</td>
-                  <td class="px-3 py-3 text-purple-400">POST /api/users</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="space-y-6">
+            <div>
+              <h4 class="text-lg font-semibold text-primary mb-2">The <code>app/</code> Directory</h4>
+              <p class="text-sm text-slate-400 leading-relaxed">
+                This contains your routing logic and views. The structure here is mirrored in the browser URL. 
+                Unlike MVC frameworks where Views and Controllers are far apart, Bastion colocates them.
+              </p>
+            </div>
+            <div>
+              <h4 class="text-lg font-semibold text-secondary mb-2">The <code>src/</code> Directory</h4>
+              <p class="text-sm text-slate-400 leading-relaxed">
+                This is for your pure PHP classes. Models, Services, DTOs, and Business Logic live here. 
+                Classes here are PSR-4 autoloaded under the <code>App\</code> namespace.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Tools & Helpers -->
-      <section id="db-querybuilder" class="mb-20">
-        <h2 class="section-title">Tools: Database & QueryBuilder</h2>
-        <p class="mb-4 text-slate-400">
-          Access the database via the <code>App\Core\DB</code> facade. It uses PDO and provides a fluent interface for SQLite and MySQL.
+      <!-- CONFIGURATION -->
+      <section id="config-app" class="mb-32 scroll-mt-28">
+        <div class="flex items-center gap-4 mb-8">
+          <h2 class="text-3xl font-bold text-slate-200">Configuration</h2>
+          <span class="h-px flex-1 bg-border"></span>
+        </div>
+        
+        <p class="text-slate-400 mb-8 max-w-2xl">
+          Bastion uses a lazy-loading config system. Files in <code>config/*.php</code> return arrays, which are accessed via the <code>config()</code> helper using dot notation.
         </p>
 
-        <div class="grid gap-6">
-          <div class="card">
-            <h4 class="text-cyan-400 font-mono mb-2">DB::table('name')</h4>
-            <div class="doc-code-block mb-0">
-              <div class="doc-code-content">
-<pre><code>// Select with conditions
-$users = DB::table('users')
-    ->where('role', 'admin')
-    ->where('active', 1)
-    ->orderBy('created_at', 'DESC')
-    ->limit(10)
-    ->get(); // Returns array of arrays
+        <div class="space-y-10">
+          <!-- Config 1 -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-semibold text-slate-200">1. App & Environment</h3>
+              <code class="text-xs text-slate-500 font-mono">config/app.php</code>
+            </div>
+            <div class="glass-panel rounded-xl overflow-hidden">
+              <div class="p-6 font-mono text-sm text-slate-300">
+<pre><span class="token k">return</span> [
+    <span class="token s">'name'</span>     => <span class="token f">env</span>(<span class="token s">'APP_NAME'</span>, <span class="token s">'Bastion App'</span>),
+    <span class="token s">'env'</span>      => <span class="token f">env</span>(<span class="token s">'APP_ENV'</span>, <span class="token s">'local'</span>),      <span class="token c">// 'local' or 'production'</span>
+    <span class="token s">'debug'</span>    => (bool) <span class="token f">env</span>(<span class="token s">'APP_DEBUG'</span>, <span class="token k">false</span>),
+    <span class="token s">'timezone'</span> => <span class="token f">env</span>(<span class="token s">'APP_TIMEZONE'</span>, <span class="token s">'UTC'</span>),
+];</pre>
+              </div>
+            </div>
+          </div>
 
-// Get single row
-$user = DB::table('users')->where('id', 5)->first();
+          <!-- Config 2 -->
+          <div id="config-db" class="scroll-mt-28">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-semibold text-slate-200">2. Database</h3>
+              <code class="text-xs text-slate-500 font-mono">config/database.php</code>
+            </div>
+            <div class="glass-panel rounded-xl overflow-hidden">
+              <div class="p-6 font-mono text-sm text-slate-300">
+<pre><span class="token k">return</span> [
+    <span class="token s">'default'</span> => <span class="token f">env</span>(<span class="token s">'DB_CONNECTION'</span>, <span class="token s">'sqlite'</span>),
 
-// Insert (Returns ID)
-$id = DB::table('logs')->insert([
-    'action' => 'login',
-    'user_id' => 1,
-    'timestamp' => time()
-]);
+    <span class="token s">'connections'</span> => [
+        <span class="token s">'sqlite'</span> => [
+            <span class="token s">'driver'</span> => <span class="token s">'sqlite'</span>,
+            <span class="token s">'path'</span>   => <span class="token f">env</span>(<span class="token s">'DB_PATH'</span>, <span class="token s">'storage/db/app.db'</span>),
+        ],
+        <span class="token s">'mysql'</span> => [
+            <span class="token s">'driver'</span>   => <span class="token s">'mysql'</span>,
+            <span class="token s">'host'</span>     => <span class="token f">env</span>(<span class="token s">'DB_HOST'</span>, <span class="token s">'127.0.0.1'</span>),
+            <span class="token s">'database'</span> => <span class="token f">env</span>(<span class="token s">'DB_DATABASE'</span>, <span class="token s">'bastion'</span>),
+            <span class="token s">'username'</span> => <span class="token f">env</span>(<span class="token s">'DB_USERNAME'</span>, <span class="token s">'root'</span>),
+            <span class="token s">'password'</span> => <span class="token f">env</span>(<span class="token s">'DB_PASSWORD'</span>, <span class="token s">''</span>),
+        ],
+    ],
+];</pre>
+              </div>
+            </div>
+          </div>
 
-// Update
-DB::table('users')
-    ->where('id', 1)
-    ->update(['status' => 'banned']);
+          <!-- Config 3 -->
+          <div id="config-security" class="scroll-mt-28">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-semibold text-slate-200">3. Security</h3>
+              <code class="text-xs text-slate-500 font-mono">config/security.php</code>
+            </div>
+            <div class="glass-panel rounded-xl overflow-hidden">
+              <div class="p-6 font-mono text-sm text-slate-300">
+<pre><span class="token k">return</span> [
+    <span class="token s">'csrf_enabled'</span>    => <span class="token k">true</span>,  <span class="token c">// Validate _token on unsafe verbs</span>
+    <span class="token s">'secure_cookies'</span>  => <span class="token k">false</span>, <span class="token c">// Set true in production (requires HTTPS)</span>
+    <span class="token s">'same_site'</span>       => <span class="token s">'Lax'</span>,
 
-// Delete
-DB::table('users')->where('id', 1)->delete();</code></pre>
+    <span class="token c">// Content Security Policy (CSP) Sources</span>
+    <span class="token s">'csp_script_src'</span>  => [
+        <span class="token s">"'self'"</span>, 
+        <span class="token s">'https://cdn.tailwindcss.com'</span>,
+        <span class="token s">'https://js.stripe.com'</span> <span class="token c">// Add external scripts here</span>
+    ],
+];</pre>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="auth-security" class="mb-20">
-        <h2 class="section-title">Tools: Auth & Security</h2>
-        
-        <h3 class="subsection-title">Authentication (`App\Core\Auth`)</h3>
-        <ul class="grid sm:grid-cols-2 gap-4 mb-8">
-          <li class="card p-4">
-            <code class="block text-cyan-400 mb-1">Auth::attempt($email, $pass)</code>
-            <span class="text-sm text-slate-400">Validates credentials against `users` table and starts session.</span>
-          </li>
-          <li class="card p-4">
-            <code class="block text-cyan-400 mb-1">Auth::user()</code>
-            <span class="text-sm text-slate-400">Returns current user array or null.</span>
-          </li>
-          <li class="card p-4">
-            <code class="block text-cyan-400 mb-1">Auth::check()</code>
-            <span class="text-sm text-slate-400">Returns boolean true if logged in.</span>
-          </li>
-          <li class="card p-4">
-            <code class="block text-cyan-400 mb-1">Auth::isAdmin()</code>
-            <span class="text-sm text-slate-400">Checks if current user role is 'admin'.</span>
-          </li>
-        </ul>
+      <!-- DV ENGINE -->
+      <section id="dv-engine" class="mb-32 scroll-mt-28">
+        <div class="flex items-center gap-4 mb-8">
+          <span class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-purple-500/30">DV</span>
+          <div>
+            <h2 class="text-3xl font-bold text-slate-200">DV Engine Deep Dive</h2>
+            <p class="text-sm text-slate-400">The <strong>Data View</strong> engine allows pages to pass state "up" to layouts.</p>
+          </div>
+        </div>
 
-        <h3 class="subsection-title">Security Helpers</h3>
-        <p class="text-slate-400 mb-4">These are globally available functions.</p>
-        
-        <div class="space-y-4">
-            <div class="doc-code-block">
-                <div class="doc-code-header">1. Output Escaping (XSS Prevention)</div>
-                <div class="doc-code-content">
-<pre><code>&lt;!-- ALWAYS use e() for user content -->
-&lt;p>Hello, &lt;?= e($user['name']) ?>&lt;/p></code></pre>
-                </div>
-            </div>
+        <p class="text-slate-400 mb-10 leading-relaxed max-w-3xl">
+          In traditional MVC, the Controller passes data to the View. In Bastion, <code>page.php</code> executes <em>before</em> <code>layout.php</code>. 
+          This allows the child page to configure the parent layout (e.g., setting the window title, active menu item, or injecting scripts).
+        </p>
 
-            <div class="doc-code-block">
-                <div class="doc-code-header">2. CSRF Protection</div>
-                <div class="doc-code-content">
-<pre><code>&lt;form method="POST" action="/api/save">
-    &lt;!-- Generates &lt;input type="hidden" name="_token" ...> -->
-    &lt;?= csrf_field() ?>
-    
-    &lt;button type="submit">Save&lt;/button>
-&lt;/form></code></pre>
+        <div class="space-y-12">
+          
+          <!-- Pattern 1 -->
+          <div class="group">
+            <h3 class="text-xl font-bold text-white mb-4 group-hover:text-primary transition-colors">1. Dynamic Page Titles</h3>
+            <div class="grid lg:grid-cols-2 gap-6">
+              <div>
+                <div class="text-xs font-mono text-slate-500 mb-2">app/dashboard/page.php</div>
+                <div class="glass-panel p-4 rounded-lg font-mono text-sm text-slate-300">
+<span class="token k">use</span> App\Core\DV;
+<span class="token f">DV::set</span>(<span class="token s">'title'</span>, <span class="token s">'Sales Dashboard'</span>);
                 </div>
+              </div>
+              <div>
+                <div class="text-xs font-mono text-slate-500 mb-2">app/layout.php</div>
+                <div class="glass-panel p-4 rounded-lg font-mono text-sm text-slate-300">
+&lt;title&gt;<span class="token f">&lt;?=</span> DV::get(<span class="token s">'title'</span>, <span class="token s">'Bastion'</span>) <span class="token f">?&gt;</span>&lt;/title&gt;
+                </div>
+              </div>
             </div>
+          </div>
+
+          <!-- Pattern 2 -->
+          <div class="group">
+            <h3 class="text-xl font-bold text-white mb-4 group-hover:text-primary transition-colors">2. Breadcrumbs System</h3>
+            <div class="glass-panel p-6 rounded-xl font-mono text-sm text-slate-300">
+<span class="token c">// app/admin/users/edit/page.php</span>
+<span class="token f">DV::set</span>(<span class="token s">'breadcrumbs'</span>, [
+    [<span class="token s">'label'</span> => <span class="token s">'Admin'</span>, <span class="token s">'url'</span> => <span class="token s">'/admin'</span>],
+    [<span class="token s">'label'</span> => <span class="token s">'Users'</span>, <span class="token s">'url'</span> => <span class="token s">'/admin/users'</span>],
+    [<span class="token s">'label'</span> => <span class="token s">'Edit'</span>,  <span class="token s">'active'</span> => <span class="token k">true</span>]
+]);
+            </div>
+          </div>
+
+          <!-- Pattern 3 -->
+          <div class="group">
+            <h3 class="text-xl font-bold text-white mb-4 group-hover:text-primary transition-colors">3. Conditional UI (Login Page)</h3>
+            <div class="grid lg:grid-cols-2 gap-6">
+              <div>
+                <div class="text-xs font-mono text-slate-500 mb-2">app/login/page.php</div>
+                <div class="glass-panel p-4 rounded-lg font-mono text-sm text-slate-300">
+<span class="token f">DV::set</span>(<span class="token s">'show_sidebar'</span>, <span class="token k">false</span>);
+<span class="token f">DV::set</span>(<span class="token s">'full_width'</span>, <span class="token k">true</span>);
+                </div>
+              </div>
+              <div>
+                <div class="text-xs font-mono text-slate-500 mb-2">app/layout.php</div>
+                <div class="glass-panel p-4 rounded-lg font-mono text-sm text-slate-300">
+<span class="token k">if</span> (DV::get(<span class="token s">'show_sidebar'</span>, <span class="token k">true</span>)) {
+    <span class="token k">include</span> <span class="token s">'components/sidebar.php'</span>;
+}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pattern 4 -->
+          <div class="group">
+            <h3 class="text-xl font-bold text-white mb-4 group-hover:text-primary transition-colors">4. Script Injection</h3>
+            <p class="text-sm text-slate-400 mb-2">Inject scripts only where needed (e.g. Chart.js on analytics page).</p>
+            <div class="glass-panel p-6 rounded-xl font-mono text-sm text-slate-300">
+<span class="token c">// app/analytics/page.php</span>
+<span class="token f">DV::set</span>(<span class="token s">'scripts'</span>, [
+    <span class="token s">'https://cdn.jsdelivr.net/npm/chart.js'</span>,
+    <span class="token s">'/js/analytics.js'</span>
+]);
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="request-response" class="mb-20">
-        <h2 class="section-title">Tools: Request & Response</h2>
-        <p class="mb-6 text-slate-400">Used primarily within <code>+server.php</code> API files.</p>
+      <!-- API & ENDPOINTS -->
+      <section id="api-endpoints" class="mb-32 scroll-mt-28">
+        <div class="flex items-center gap-4 mb-8">
+          <h2 class="text-3xl font-bold text-slate-200">API & Server Files</h2>
+          <span class="h-px flex-1 bg-border"></span>
+        </div>
+
+        <p class="text-slate-400 mb-8">
+          API endpoints are defined in <code>+server.php</code> files. These files must return an array where keys are HTTP verbs (get, post, put, delete) and values are closures.
+        </p>
+
+        <div class="glass-panel rounded-xl overflow-hidden">
+          <div class="code-header px-6 py-3 flex justify-between">
+            <span class="text-xs font-mono text-slate-400">app/api/users/[id]/+server.php</span>
+            <span class="text-xs font-bold text-secondary">DYNAMIC ROUTE</span>
+          </div>
+          <div class="p-6 font-mono text-sm text-slate-300">
+<pre>
+<span class="token k">use</span> App\Core\Request;
+<span class="token k">use</span> App\Core\Response;
+<span class="token k">use</span> App\Core\DB;
+
+<span class="token k">return</span> [
+    <span class="token c">// GET /api/users/123</span>
+    <span class="token s">'get'</span> => <span class="token k">function</span> (Request <span class="token v">$req</span>) {
+        <span class="token v">$id</span> = <span class="token v">$req</span>->path_param_id;
+        
+        <span class="token v">$user</span> = <span class="token f">DB::table</span>(<span class="token s">'users'</span>)-><span class="token f">where</span>(<span class="token s">'id'</span>, <span class="token v">$id</span>)-><span class="token f">first</span>();
+        
+        <span class="token k">if</span> (!<span class="token v">$user</span>) {
+            <span class="token f">Response::json</span>([<span class="token s">'error'</span> => <span class="token s">'Not found'</span>], <span class="token n">404</span>);
+        }
+        
+        <span class="token f">Response::json</span>([<span class="token s">'data'</span> => <span class="token v">$user</span>]);
+    },
+
+    <span class="token c">// DELETE /api/users/123</span>
+    <span class="token s">'delete'</span> => <span class="token k">function</span> (Request <span class="token v">$req</span>) {
+        <span class="token v">$id</span> = <span class="token v">$req</span>->path_param_id;
+        <span class="token f">DB::table</span>(<span class="token s">'users'</span>)-><span class="token f">where</span>(<span class="token s">'id'</span>, <span class="token v">$id</span>)-><span class="token f">delete</span>();
+        
+        <span class="token f">Response::json</span>([<span class="token s">'success'</span> => <span class="token k">true</span>]);
+    }
+];
+</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- DB & QueryBuilder -->
+      <section id="query-builder" class="mb-32 scroll-mt-28">
+        <div class="flex items-center gap-4 mb-8">
+          <h2 class="text-3xl font-bold text-slate-200">Database Tools</h2>
+          <span class="h-px flex-1 bg-border"></span>
+        </div>
 
         <div class="grid lg:grid-cols-2 gap-8">
-          <div>
-            <h3 class="text-lg font-bold text-slate-200 mb-3">Request Object</h3>
-            <div class="doc-code-block">
-              <div class="doc-code-content">
-<pre><code>// Get POST body or GET param
-$val = $req->input('key', 'default');
+          <!-- Read -->
+          <div class="glass-panel rounded-xl p-6">
+            <h4 class="text-accent font-bold mb-4 uppercase text-xs tracking-wider">SELECT (Read)</h4>
+            <pre class="font-mono text-sm text-slate-300 overflow-x-auto">
+<span class="token v">$users</span> = <span class="token f">DB::table</span>(<span class="token s">'users'</span>)
+    -><span class="token f">where</span>(<span class="token s">'role'</span>, <span class="token s">'admin'</span>)
+    -><span class="token f">orderBy</span>(<span class="token s">'created_at'</span>, <span class="token s">'DESC'</span>)
+    -><span class="token f">limit</span>(<span class="token n">10</span>)
+    -><span class="token f">get</span>();
 
-// Get URL param (from [id] folder)
-$id = $req->path_param_id;
-
-// Get HTTP Method
-$method = $req->method; // 'GET', 'POST'
-
-// Get Raw Body (JSON)
-$data = $req->body;</code></pre>
-              </div>
-            </div>
+<span class="token v">$user</span> = <span class="token f">DB::table</span>(<span class="token s">'users'</span>)
+    -><span class="token f">where</span>(<span class="token s">'email'</span>, <span class="token v">$email</span>)
+    -><span class="token f">first</span>();
+            </pre>
           </div>
-          <div>
-            <h3 class="text-lg font-bold text-slate-200 mb-3">Response Helper</h3>
-            <div class="doc-code-block">
-              <div class="doc-code-content">
-<pre><code>// Return JSON and exit
-Response::json(['status' => 'ok'], 200);
 
-// Redirect
-Response::redirect('/login');
+          <!-- Write -->
+          <div class="glass-panel rounded-xl p-6">
+            <h4 class="text-accent font-bold mb-4 uppercase text-xs tracking-wider">INSERT / UPDATE (Write)</h4>
+            <pre class="font-mono text-sm text-slate-300 overflow-x-auto">
+<span class="token c">// Insert</span>
+<span class="token v">$id</span> = <span class="token f">DB::table</span>(<span class="token s">'logs'</span>)-><span class="token f">insert</span>([
+    <span class="token s">'action'</span> => <span class="token s">'login'</span>,
+    <span class="token s">'timestamp'</span> => <span class="token f">time</span>()
+]);
 
-// Abort with error code
-Response::abort(404, 'User not found');
-
-// Render HTML
-Response::html('&lt;h1>Error&lt;/h1>', 500);</code></pre>
-              </div>
-            </div>
+<span class="token c">// Update</span>
+<span class="token f">DB::table</span>(<span class="token s">'users'</span>)
+    -><span class="token f">where</span>(<span class="token s">'id'</span>, <span class="token n">1</span>)
+    -><span class="token f">update</span>([<span class="token s">'active'</span> => <span class="token n">1</span>]);
+            </pre>
           </div>
         </div>
       </section>
-      
-      <section id="logging" class="mb-20">
-        <h2 class="section-title">Tools: Logging</h2>
-        <p class="mb-4 text-slate-400">
-            Simple file-based logging to `storage/logs/app.log`.
-        </p>
-        <div class="doc-code-block">
-            <div class="doc-code-content">
-<pre><code>// Log an info message
-logger()->info('User logged in: ' . $email);
 
-// Log an error
-logger()->error('Database connection failed: ' . $e->getMessage());
-
-// Available methods: debug, info, warning, error</code></pre>
-            </div>
-        </div>
-      </section>
-
-      <section id="global-helpers" class="mb-20">
-        <h2 class="section-title">Global Helpers Reference</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm text-left border-collapse">
-            <thead class="text-xs text-slate-500 uppercase bg-slate-900 border border-slate-800">
+      <!-- GLOBAL HELPERS -->
+      <section id="helpers" class="mb-32 scroll-mt-28">
+        <h2 class="text-3xl font-bold mb-8 text-slate-200">Global Helpers Reference</h2>
+        
+        <div class="overflow-hidden rounded-xl border border-border shadow-2xl">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-slate-900 text-slate-400 uppercase font-bold tracking-wider">
               <tr>
-                <th class="px-4 py-3 border border-slate-800">Helper</th>
-                <th class="px-4 py-3 border border-slate-800">Return</th>
-                <th class="px-4 py-3 border border-slate-800">Description</th>
+                <th class="px-6 py-4">Helper</th>
+                <th class="px-6 py-4">Return</th>
+                <th class="px-6 py-4">Description</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-800">
-              <tr>
-                <td class="px-4 py-3 font-mono text-cyan-400">e($str)</td>
-                <td class="px-4 py-3 text-slate-400">string</td>
-                <td class="px-4 py-3">Escapes string for safe HTML output.</td>
+            <tbody class="divide-y divide-border bg-slate-900/50">
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-mono text-primary font-medium">e($string)</td>
+                <td class="px-6 py-4 text-slate-400 font-mono text-xs">string</td>
+                <td class="px-6 py-4 text-slate-300">Escapes HTML entities. <strong>Mandatory</strong> for XSS protection when echoing user data.</td>
               </tr>
-              <tr>
-                <td class="px-4 py-3 font-mono text-cyan-400">env($key, $def)</td>
-                <td class="px-4 py-3 text-slate-400">mixed</td>
-                <td class="px-4 py-3">Reads from <code>.env</code> file.</td>
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-mono text-primary font-medium">csrf_field()</td>
+                <td class="px-6 py-4 text-slate-400 font-mono text-xs">html</td>
+                <td class="px-6 py-4 text-slate-300">Generates <code>&lt;input type="hidden" name="_token"...&gt;</code> for forms.</td>
               </tr>
-              <tr>
-                <td class="px-4 py-3 font-mono text-cyan-400">config($key)</td>
-                <td class="px-4 py-3 text-slate-400">mixed</td>
-                <td class="px-4 py-3">Reads from <code>config/</code> files (dot notation).</td>
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-mono text-primary font-medium">csrf_token()</td>
+                <td class="px-6 py-4 text-slate-400 font-mono text-xs">string</td>
+                <td class="px-6 py-4 text-slate-300">Returns the raw token string (useful for JS fetch headers).</td>
               </tr>
-              <tr>
-                <td class="px-4 py-3 font-mono text-cyan-400">csrf_token()</td>
-                <td class="px-4 py-3 text-slate-400">string</td>
-                <td class="px-4 py-3">Returns the current session CSRF token string.</td>
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-mono text-primary font-medium">env($key, $def)</td>
+                <td class="px-6 py-4 text-slate-400 font-mono text-xs">mixed</td>
+                <td class="px-6 py-4 text-slate-300">Reads from <code>.env</code> or system environment variables.</td>
               </tr>
-              <tr>
-                <td class="px-4 py-3 font-mono text-cyan-400">csrf_field()</td>
-                <td class="px-4 py-3 text-slate-400">html</td>
-                <td class="px-4 py-3">Returns hidden input field with CSRF token.</td>
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-mono text-primary font-medium">config($key)</td>
+                <td class="px-6 py-4 text-slate-400 font-mono text-xs">mixed</td>
+                <td class="px-6 py-4 text-slate-300">Reads from <code>config/</code> files using dot notation (e.g. <code>'app.debug'</code>).</td>
               </tr>
-              <tr>
-                <td class="px-4 py-3 font-mono text-cyan-400">dv_get($k, $d)</td>
-                <td class="px-4 py-3 text-slate-400">mixed</td>
-                <td class="px-4 py-3">Alias for <code>DV::get()</code>.</td>
-              </tr>
-              <tr>
-                <td class="px-4 py-3 font-mono text-cyan-400">logger()</td>
-                <td class="px-4 py-3 text-slate-400">Logger</td>
-                <td class="px-4 py-3">Returns the global Logger instance.</td>
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-mono text-primary font-medium">logger()</td>
+                <td class="px-6 py-4 text-slate-400 font-mono text-xs">Logger</td>
+                <td class="px-6 py-4 text-slate-300">Returns the global Logger instance for writing to <code>storage/logs/</code>.</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <!-- CLI Reference -->
-      <section id="cli-reference" class="mb-20">
-        <h2 class="section-title">CLI Reference</h2>
-        <p class="mb-6 text-slate-400">The <code>./bastion</code> executable in the root directory is your main tool.</p>
-
-        <div class="space-y-4">
-          <div class="card bg-slate-900/40">
-            <div class="flex items-center gap-3 mb-2">
-              <code class="text-lg text-emerald-400">./bastion run-dev</code>
-            </div>
-            <p class="text-sm text-slate-400">
-              Starts the full development stack:
-              <br>1. PHP Built-in Server (:8000)
-              <br>2. Tailwind v4 Watch Mode
-              <br>3. BrowserSync Proxy (:9876) for live reload
-            </p>
+      <!-- CLI -->
+      <section id="cli" class="mb-32 scroll-mt-28">
+        <h2 class="text-3xl font-bold mb-8 text-slate-200">CLI Reference</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="glass-panel p-6 rounded-xl hover:border-primary/50 transition-colors cursor-default">
+            <code class="text-primary font-bold text-lg block mb-2">./bastion run-dev</code>
+            <p class="text-sm text-slate-400">Starts PHP Server + BrowserSync + Tailwind Watcher. The complete dev stack.</p>
           </div>
-
-          <div class="card bg-slate-900/40">
-            <div class="flex items-center gap-3 mb-2">
-              <code class="text-lg text-emerald-400">./bastion migrate</code>
-            </div>
-            <p class="text-sm text-slate-400">
-              Executes all SQL files found in <code>database/migrations/</code> against the configured DB.
-            </p>
+          <div class="glass-panel p-6 rounded-xl hover:border-primary/50 transition-colors cursor-default">
+            <code class="text-primary font-bold text-lg block mb-2">./bastion migrate</code>
+            <p class="text-sm text-slate-400">Runs all SQL files in <code>database/migrations/</code> against the active DB.</p>
           </div>
-
-          <div class="card bg-slate-900/40">
-            <div class="flex items-center gap-3 mb-2">
-              <code class="text-lg text-emerald-400">./bastion seed</code>
-            </div>
-            <p class="text-sm text-slate-400">
-              Runs PHP scripts found in <code>database/seeds/</code>. Useful for creating initial admin users or dummy data.
-            </p>
+          <div class="glass-panel p-6 rounded-xl hover:border-primary/50 transition-colors cursor-default">
+            <code class="text-primary font-bold text-lg block mb-2">./bastion seed</code>
+            <p class="text-sm text-slate-400">Executes PHP scripts in <code>database/seeds/</code>.</p>
           </div>
-          
-          <div class="card bg-slate-900/40">
-            <div class="flex items-center gap-3 mb-2">
-              <code class="text-lg text-emerald-400">./bastion build</code>
-            </div>
-            <p class="text-sm text-slate-400">
-              Compiles and minifies CSS using Tailwind CLI for production deployment.
-            </p>
+          <div class="glass-panel p-6 rounded-xl hover:border-primary/50 transition-colors cursor-default">
+            <code class="text-primary font-bold text-lg block mb-2">./bastion build</code>
+            <p class="text-sm text-slate-400">Compiles and minifies CSS for production deployment.</p>
           </div>
         </div>
       </section>
-      
+
       <!-- Footer -->
-      <footer class="pt-8 mt-20 border-t border-slate-800 text-center text-slate-500 text-sm">
-        <p>&copy; 2024 Bastion PHP Framework. Created for internal tools.</p>
+      <footer class="mt-32 pt-8 border-t border-border text-center">
+        <div class="flex items-center justify-center gap-2 mb-4 text-slate-100 font-bold">
+          <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Bastion PHP</span>
+        </div>
+        <p class="text-slate-500 text-sm">
+          &copy; 2024 Bastion PHP. Released under the MIT License.
+        </p>
       </footer>
 
     </main>
-    
-    <!-- Table of Contents (Desktop Right) -->
-    <aside class="hidden xl:block w-64 flex-shrink-0">
-        <div class="sticky top-24 pr-8">
-            <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">On This Page</h5>
-            <nav id="toc" class="space-y-2 text-sm border-l border-slate-800 pl-4">
-                <!-- JS will populate this -->
-            </nav>
-        </div>
-    </aside>
-
   </div>
 
   <script>
-    // Sidebar Toggle
-    const menuBtn = document.getElementById('menu-btn');
+    // Mobile Menu Logic
+    const btn = document.getElementById('mobile-menu-btn');
     const sidebar = document.getElementById('sidebar');
     
-    menuBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('sidebar-closed');
-      sidebar.classList.toggle('sidebar-open');
+    btn.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
     });
 
-    // Dynamic TOC Generation
-    document.addEventListener('DOMContentLoaded', () => {
-      const headings = document.querySelectorAll('main h2, main h3');
-      const toc = document.getElementById('toc');
-      
-      headings.forEach(heading => {
-        if (!heading.id) {
-          heading.id = heading.innerText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    // Active Link Highlighting
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 150) {
+          current = section.getAttribute('id');
         }
-        
-        const link = document.createElement('a');
-        link.href = `#${heading.id}`;
-        link.innerText = heading.innerText;
-        link.className = `block text-slate-400 hover:text-cyan-400 transition-colors ${heading.tagName === 'H3' ? 'pl-4 text-xs' : ''}`;
-        
-        toc.appendChild(link);
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').includes(current)) {
+          link.classList.add('active');
+        }
       });
     });
   </script>
