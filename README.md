@@ -90,6 +90,7 @@ Execution order: Request parsed → Middlewares → Router → stacked layouts �
 <div class="bg-gray-900 text-white p-6">
   <?php $content(); ?>
 </div>
+```
 
 You never write full HTML inside pages. The layout wraps it automatically.
 
