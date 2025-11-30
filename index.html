@@ -2,257 +2,860 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <title>Bastion PHP Framework — Developer Documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bastion PHP — Developer Documentation</title>
 
-  <!-- Exhaustive styling (vanilla CSS + utility helpers) -->
+  <!-- Pure CSS, no frameworks -->
   <style>
     :root {
-      --bg-main: #0f172a;
-      --bg-card: #1e293b;
-      --border:  #334155;
-      --text:    #f1f5f9;
-      --accent:  #38bdf8;
-      --danger:  #f87171;
-      --success: #4ade80;
+      --bg: #020617;
+      --card: #020617;
+      --card-soft: #020617;
+      --border: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --title: #f9fafb;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.08);
+      --accent-strong: #0ea5e9;
+      --danger: #f97373;
+      --success: #22c55e;
+      --warn: #eab308;
+      --code-bg: #020617;
     }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg-main);
-      color: var(--text);
       margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #020617 0%, #020617 45%, #020617 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.6;
     }
-    nav {
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-card);
-      padding: 1rem;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+
+    .shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 2rem;
     }
-    nav h1 { margin: 0; font-size: 1.5rem; }
-    main { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
-    section { margin-bottom: 3rem; }
+
+    @media (max-width: 900px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 1.5rem;
+      align-self: flex-start;
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      box-shadow: 0 18px 45px rgba(15,23,42,0.85);
+    }
+
+    .sidebar h1 {
+      font-size: 1.4rem;
+      margin: 0 0 0.5rem;
+      color: var(--title);
+    }
+
+    .sidebar .version {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.85rem;
+    }
+
+    .sidebar li {
+      margin: 0.25rem 0;
+    }
+
+    .sidebar a {
+      color: var(--muted);
+      text-decoration: none;
+      display: block;
+      padding: 0.25rem 0.25rem;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar a:hover {
+      color: var(--accent);
+      background: rgba(15,23,42,0.8);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      background: rgba(15,23,42,0.95);
+      border-left: 2px solid var(--accent);
+      padding-left: 0.5rem;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
 
     .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.25rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.06) 0%, var(--card-soft) 40%, var(--card) 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(15,23,42,0.9);
+      padding: 1.75rem 1.75rem 1.5rem;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+      position: relative;
+      overflow: hidden;
     }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      border: 1px solid rgba(148,163,184,0.1);
+      pointer-events: none;
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      color: var(--title);
+    }
+
+    h3 {
+      margin-top: 1.2rem;
+      margin-bottom: 0.4rem;
+      font-size: 1.05rem;
+      color: #e5e7eb;
+    }
+
+    h4 {
+      margin-top: 0.9rem;
+      margin-bottom: 0.2rem;
+      font-size: 0.98rem;
+      color: #e5e7eb;
+    }
+
+    p {
+      margin: 0.2rem 0 0.4rem;
+      color: var(--text);
+      font-size: 0.94rem;
+    }
+
+    ul {
+      margin: 0.25rem 0 0.5rem 1.2rem;
+      padding: 0;
+      font-size: 0.93rem;
+    }
+
+    li {
+      margin: 0.15rem 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    pre {
+      margin: 0.5rem 0 0.8rem;
+      padding: 0.85rem 0.95rem;
+      background: var(--code-bg);
+      border-radius: 10px;
+      border: 1px solid #1e293b;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: Menlo, Monaco, Consolas, "Fira Code", monospace;
+      color: #93c5fd;
+    }
+
+    .highlight {
+      padding: 0.7rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: radial-gradient(circle at top, rgba(56,189,248,0.08) 0%, rgba(15,23,42,0.95) 55%, rgba(15,23,42,1) 100%);
+      font-size: 0.9rem;
+    }
+
+    .tagline {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+      font-size: 0.7rem;
+    }
+
     .badge {
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: rgba(15,23,42,0.85);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .badge.accent {
+      border-color: rgba(56,189,248,0.8);
+      color: var(--accent);
+      background: rgba(8,47,73,0.9);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.6rem;
+      font-size: 0.8rem;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 0.45rem 0.65rem;
+      border-bottom: 1px solid rgba(30,64,175,0.4);
+    }
+    th {
+      background: rgba(15,23,42,0.95);
+      color: #bae6fd;
+      text-align: left;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    tr:nth-child(even) td {
+      background: rgba(15,23,42,0.75);
+    }
+
+    .pill {
       display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.5);
       font-size: 0.75rem;
-      padding: 0.3em 0.7em;
-      border-radius: 30px;
-      border: 1px solid transparent;
-    }
-    .badge.success {
-      background: var(--success);
-      border-color: #22c55e;
-      color: #064e3b;
-    }
-    .badge.danger {
-      background: var(--danger);
-      border-color: #ef4444;
-      color: #450a0a;
+      color: var(--muted);
+      margin-right: 0.3rem;
     }
 
-    a { color: var(--accent); text-decoration: none; transition: opacity .2s; }
-    a:hover { opacity: .7; }
-    h2 { font-size: 2rem; margin-bottom: .5em; font-weight: 700; }
-    h3 { font-size: 1.4rem; margin-top: 1.5em; font-weight: 600; }
-    ul.tree { font-family: monospace; }
-    ul.tree li { list-style: none; margin-left: 1rem; position: relative; }
-    ul.tree li::before { content: "├── "; color: var(--accent); }
-    ul.tree li:last-child::before { content: "└── "; color: var(--accent); }
-
-    .endpoint {
-      padding: .25rem .5rem;
-      background: #0ea5e9;
-      color: #000;
-      font-family: monospace;
-      font-size: .85rem;
-      border-radius: 6px;
+    .pill.good {
+      border-color: rgba(34,197,94,0.7);
+      color: var(--success);
     }
 
-    pre.code-block {
-      background:#020617;
-      border:1px solid var(--border);
-      padding:1rem;
-      border-radius:12px;
-      font-size:.85rem;
-      overflow-x:auto;
-      box-shadow:0 4px 10px rgba(0,0,0,0.4);
+    .pill.danger {
+      border-color: rgba(248,113,113,0.7);
+      color: var(--danger);
     }
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-top: 1rem;
+    .pill.warn {
+      border-color: rgba(234,179,8,0.7);
+      color: var(--warn);
     }
 
-    /* Optional JS transition helpers */
-    .fade {
-      opacity: 0;
-      animation: fadeIn .4s forwards;
+    .section-title-small {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 0.1rem;
     }
-    @keyframes fadeIn { to { opacity:1; } }
-
   </style>
+
+  <!-- Vanilla JS: only UX helpers (no frameworks) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Smooth scroll for sidebar links
+      const links = document.querySelectorAll('.sidebar a[href^="#"]');
+      links.forEach(link => {
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      });
+
+      // Simple highlight of current section on scroll
+      const sections = document.querySelectorAll('section[id]');
+      function updateActiveLink() {
+        let best = null;
+        let bestOffset = Infinity;
+        sections.forEach(sec => {
+          const rect = sec.getBoundingClientRect();
+          if (rect.top >= -80 && rect.top < bestOffset) {
+            bestOffset = rect.top;
+            best = sec;
+          }
+        });
+        if (best) {
+          const id = best.getAttribute("id");
+          document.querySelectorAll(".sidebar a").forEach(a => {
+            a.classList.toggle("active", a.getAttribute("href") === "#" + id);
+          });
+        }
+      }
+      document.addEventListener("scroll", updateActiveLink);
+      updateActiveLink();
+    });
+  </script>
 </head>
 <body>
+  <div class="shell">
+    <aside class="sidebar">
+      <h1>Bastion PHP</h1>
+      <div class="version">Framework version: <strong>0.1.0</strong></div>
+      <div class="tagline">Internal tools framework with file-based routing, nested layouts, DV engine, HTMX components and FastAPI-style endpoints.</div>
 
-<nav>
-  <h1>Bastion PHP Framework — Developer Documentation (v0.1.0)</h1>
-</nav>
+      <ul>
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#routing">Routing & Layouts</a></li>
+        <li><a href="#dv-engine">DV Engine (Data View)</a></li>
+        <li><a href="#endpoints">Endpoints & QueryBuilder (FastAPI-style)</a></li>
+        <li><a href="#components">Components (Server & HTMX)</a></li>
+        <li><a href="#request-response">Request & Response</a></li>
+        <li><a href="#db-layer">Database Layer</a></li>
+        <li><a href="#auth">Authentication</a></li>
+        <li><a href="#middlewares">Middlewares</a></li>
+        <li><a href="#cli">CLI & Workflow</a></li>
+      </ul>
+    </aside>
 
-<main>
+    <main class="content">
 
-<section>
-  <h2>🚀 Getting Started</h2>
-  <div class="card">
-    <p>Generate a new project:</p>
-    <pre class="code-block">./create-bastion-app my-tool</pre>
-    <p>Run locally:</p>
-    <pre class="code-block">
-composer install
-./bastion migrate
-./bastion seed
-./bastion run-dev
-    </pre>
-    <p>The app will be available at <span class="endpoint">:8000</span> and BrowserSync proxy at <span class="endpoint">:9876</span>.</p>
+      <!-- 1. INTRO -->
+      <section id="intro" class="card">
+        <div class="section-title-small">Section 1</div>
+        <h2>Introduction & Philosophy</h2>
+
+        <p><strong>Bastion PHP</strong> is a file-based PHP framework for building internal tools with:</p>
+        <ul>
+          <li>Next.js-style routing and nested layouts (<code>page.php</code> + <code>layout.php</code>)</li>
+          <li>FastAPI-style endpoints via <code>+server.php</code> with method maps and validation</li>
+          <li>DV Engine (Data View) to pass data to pages and layouts, like a minimal view-layer</li>
+          <li>A simple QueryBuilder (<code>DB::table()</code>) instead of a heavy ORM</li>
+          <li>Components in <code>app/components</code>:
+            <ul>
+              <li>Server-side components (no HTMX)</li>
+              <li>HTMX-enabled interactive components for partial updates</li>
+            </ul>
+          </li>
+        </ul>
+
+        <div class="highlight">
+          <strong>Core mental model:</strong>  
+          <span class="pill good">Filesystem = Router</span>
+          <span class="pill good">Layouts = Shells around content</span>
+          <span class="pill good">DV Engine = Data bridge to views</span>
+          <span class="pill good">+server.php = Endpoint per folder</span>
+        </div>
+      </section>
+
+      <!-- 2. ROUTING & LAYOUTS -->
+      <section id="routing" class="card">
+        <div class="section-title-small">Section 2</div>
+        <h2>Routing & Layouts</h2>
+
+        <h3>2.1 File-based Routing</h3>
+        <p>No route arrays. URL ➜ folder structure:</p>
+
+        <table>
+          <tr><th>URL</th><th>Resolves file</th></tr>
+          <tr><td><code>/</code></td><td><code>app/page.php</code></td></tr>
+          <tr><td><code>/login</code></td><td><code>app/login/page.php</code></td></tr>
+          <tr><td><code>/admin</code></td><td><code>app/admin/page.php</code></td></tr>
+          <tr><td><code>/admin/users</code></td><td><code>app/admin/users/page.php</code></td></tr>
+          <tr><td><code>/api/users</code></td><td><code>app/api/users/+server.php</code></td></tr>
+          <tr><td><code>/api/users/12</code></td><td><code>app/api/users/[id]/+server.php</code> (param <code>id=12</code>)</td></tr>
+        </table>
+
+        <h3>2.2 Layout stacking (Next.js-style)</h3>
+        <p>Every folder can have a <code>layout.php</code> file. When you request <code>/admin/users</code>:</p>
+
+        <pre><code>Stack:
+1. app/admin/users/layout.php (if present)
+2. app/admin/layout.php (if present)
+3. app/layout.php (root layout, always)</code></pre>
+
+        <p>They are executed from root to leaf, each calling a <code>$content()</code> closure to render inner content.</p>
+
+        <h4>Root layout: <code>app/layout.php</code></h4>
+        <pre><code>&lt;?php
+use App\Core\DV;
+
+$title = DV::get('title', 'Bastion PHP');
+?&gt;
+&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;&lt;?= htmlspecialchars($title) ?&gt;&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header&gt;Global navbar goes here&lt;/header&gt;
+
+  &lt;main&gt;
+    &lt;?php $content(); ?&gt;
+  &lt;/main&gt;
+
+  &lt;footer&gt;Bastion PHP 0.1.0&lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+        <h4>Admin layout: <code>app/admin/layout.php</code></h4>
+        <pre><code>&lt;section class="admin-wrapper"&gt;
+  &lt;aside&gt;Admin sidebar&lt;/aside&gt;
+  &lt;div class="admin-main"&gt;
+    &lt;?php $content(); ?&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+
+        <h4>Admin users page: <code>app/admin/users/page.php</code></h4>
+        <pre><code>&lt;?php
+use App\Core\DB;
+use App\Core\DV;
+
+DV::set('title', 'Admin · Users');
+
+$users = DB::table('users')
+  -&gt;orderBy('id', 'DESC')
+  -&gt;limit(20)
+  -&gt;get();
+?&gt;
+
+&lt;h1&gt;User list&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;?php foreach ($users as $user): ?&gt;
+    &lt;li&gt;&lt;?= htmlspecialchars($user['email']) ?&gt;&lt;/li&gt;
+  &lt;?php endforeach; ?&gt;
+&lt;/ul&gt;</code></pre>
+      </section>
+
+      <!-- 3. DV ENGINE -->
+      <section id="dv-engine" class="card">
+        <div class="section-title-small">Section 3</div>
+        <h2>DV Engine (Data View)</h2>
+
+        <p>The DV Engine is a small internal class that acts as a **data bridge** between:</p>
+        <ul>
+          <li>Controllers / pages / endpoints</li>
+          <li>Layouts and reusable views</li>
+        </ul>
+
+        <h3>3.1 What DV Engine does</h3>
+        <ul>
+          <li>Stores global values like page title, user info, theme</li>
+          <li>Provides <code>DV::set()</code> and <code>DV::get()</code> helpers</li>
+          <li>Lets layouts read common data without passing variables through every file</li>
+        </ul>
+
+        <h3>3.2 Basic usage</h3>
+        <pre><code>&lt;?php
+use App\Core\DV;
+
+// In a page:
+DV::set('title', 'Dashboard');
+DV::set('breadcrumbs', ['Admin', 'Dashboard']);
+
+// Later in layout:
+$title = DV::get('title', 'Bastion PHP');
+$breadcrumbs = DV::get('breadcrumbs', []);
+?&gt;</code></pre>
+
+        <h3>3.3 Use cases</h3>
+        <ul>
+          <li>Page titles / meta titles</li>
+          <li>Breadcrumbs shared by nested pages</li>
+          <li>Layout-level toggles (e.g. hide sidebar, compact layout)</li>
+          <li>Global flash messages or notifications</li>
+        </ul>
+
+        <h3>3.4 DV with components</h3>
+        <p>You can also use DV to pass data to components that are included from layouts:</p>
+        <pre><code>&lt;?php
+// In page
+DV::set('page_actions', [
+  ['label' =&gt; 'Add user', 'href' =&gt; '/admin/users/new'],
+]);
+
+// In layout
+$actions = DV::get('page_actions', []);
+?&gt;
+
+&lt;?php include __DIR__ . '/../components/PageActions.php'; ?&gt;</code></pre>
+      </section>
+
+      <!-- 4. ENDPOINTS & QUERYBUILDER -->
+      <section id="endpoints" class="card">
+        <div class="section-title-small">Section 4</div>
+        <h2>Endpoints & QueryBuilder (FastAPI-style)</h2>
+
+        <p>Endpoints live in <code>app/api</code> as <code>+server.php</code> files. Each file returns an array of handlers keyed by HTTP method.</p>
+
+        <h3>4.1 Basic GET endpoint with QueryBuilder</h3>
+        <p>File: <code>app/api/users/+server.php</code></p>
+
+        <pre><code>&lt;?php
+use App\Core\DB;
+use App\Core\Response;
+
+return [
+
+  'get' =&gt; function($req) {
+      // Optional query param "role"
+      $role = $req-&gt;input('role');
+
+      $query = DB::table('users')
+          -&gt;orderBy('id', 'DESC')
+          -&gt;limit(50);
+
+      if ($role) {
+          $query = $query-&gt;where('role', $role);
+      }
+
+      $users = $query-&gt;get();
+
+      Response::json($users);
+  },
+
+];</code></pre>
+
+        <h3>4.2 POST endpoint (create user) with validation</h3>
+        <pre><code>&lt;?php
+use App\Core\DB;
+use App\Core\Response;
+use App\Core\ValidationException;
+
+return [
+
+  'post' =&gt; function($req) {
+      try {
+          $data = $req-&gt;validate([
+              'email'    =&gt; 'required|email',
+              'name'     =&gt; 'required',
+              'password' =&gt; 'required|min:8',
+          ]);
+
+          $id = DB::table('users')-&gt;insert([
+              'name'       =&gt; $data['name'],
+              'email'      =&gt; $data['email'],
+              'password'   =&gt; password_hash($data['password'], PASSWORD_DEFAULT),
+              'role'       =&gt; 'user',
+              'created_at' =&gt; time(),
+          ]);
+
+          Response::json(['id' =&gt; $id], 201);
+      } catch (ValidationException $e) {
+          Response::json(['errors' =&gt; $e-&gt;errors], 422);
+      }
+  },
+
+];</code></pre>
+
+        <h3>4.3 Dynamic endpoint with [id] folder</h3>
+        <p>File: <code>app/api/users/[id]/+server.php</code></p>
+
+        <pre><code>&lt;?php
+use App\Core\DB;
+use App\Core\Response;
+
+return [
+
+  'get' =&gt; function($req) {
+      $id = $req-&gt;meta['params']['id'] ?? null;
+      if (!$id) {
+          Response::json(['error' =&gt; 'Missing id'], 400);
+      }
+
+      $user = DB::table('users')
+          -&gt;where('id', $id)
+          -&gt;first();
+
+      if (!$user) {
+          Response::json(['error' =&gt; 'Not found'], 404);
+      }
+
+      Response::json($user);
+  },
+
+  'delete' =&gt; function($req) {
+      $id = $req-&gt;meta['params']['id'] ?? null;
+      if (!$id) {
+          Response::json(['error' =&gt; 'Missing id'], 400);
+      }
+
+      DB::table('users')-&gt;where('id', $id)-&gt;delete();
+
+      Response::json(['deleted' =&gt; true]);
+  },
+
+];</code></pre>
+
+        <p>This pattern is intentionally similar to FastAPI: one file per resource, handlers grouped by method.</p>
+      </section>
+
+      <!-- 5. COMPONENTS (SERVER + HTMX) -->
+      <section id="components" class="card">
+        <div class="section-title-small">Section 5</div>
+        <h2>Components: Server-side & HTMX</h2>
+
+        <p>Components live in <code>app/components</code> as plain PHP functions. Bastion encourages <strong>functional components</strong> instead of complex template engines.</p>
+
+        <h3>5.1 Server-side components (no HTMX)</h3>
+        <p>File: <code>app/components/UserCard.php</code></p>
+
+        <pre><code>&lt;?php
+// app/components/UserCard.php
+
+function UserCard(array $user): string {
+    $name  = htmlspecialchars($user['name']);
+    $email = htmlspecialchars($user['email']);
+
+    return &lt;&lt;&lt;HTML
+    &lt;article class="user-card"&gt;
+      &lt;h3&gt;$name&lt;/h3&gt;
+      &lt;p&gt;$email&lt;/p&gt;
+    &lt;/article&gt;
+    HTML;
+}</code></pre>
+
+        <p>Usage in a page: <code>app/admin/users/page.php</code></p>
+        <pre><code>&lt;?php
+require_once __DIR__ . '/../../components/UserCard.php';
+
+$users = DB::table('users')-&gt;limit(10)-&gt;get();
+?&gt;
+
+&lt;section&gt;
+  &lt;h1&gt;Users&lt;/h1&gt;
+  &lt;?php foreach ($users as $user): ?&gt;
+    &lt;?= UserCard($user) ?&gt;
+  &lt;?php endforeach; ?&gt;
+&lt;/section&gt;</code></pre>
+
+        <h3>5.2 HTMX components (client-side interactive)</h3>
+        <p>This style uses HTMX attributes in the returned HTML to make components interactive.</p>
+
+        <p>Interactive component file: <code>app/components/UserRow.php</code></p>
+        <pre><code>&lt;?php
+// app/components/UserRow.php
+
+function UserRow(array $user): string {
+    $id    = (int)$user['id'];
+    $name  = htmlspecialchars($user['name']);
+    $email = htmlspecialchars($user['email']);
+
+    return &lt;&lt;&lt;HTML
+    &lt;tr id="user-$id"&gt;
+      &lt;td&gt;$name&lt;/td&gt;
+      &lt;td&gt;$email&lt;/td&gt;
+      &lt;td&gt;
+        &lt;button
+          hx-delete="/api/users/$id"
+          hx-target="#user-$id"
+          hx-swap="outerHTML"
+        &gt;Delete&lt;/button&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    HTML;
+}</code></pre>
+
+        <h4>Using HTMX component in an endpoint</h4>
+        <p>In <code>app/api/users/+server.php</code>, return a partial HTML table if the request comes from HTMX:</p>
+
+        <pre><code>&lt;?php
+use App\Core\DB;
+use App\Core\Response;
+
+require_once __DIR__ . '/../../components/UserRow.php';
+
+return [
+  'get' =&gt; function($req) {
+      $users = DB::table('users')-&gt;orderBy('id','DESC')-&gt;get();
+
+      // If request is from HTMX, return HTML partial
+      if (isset($_SERVER['HTTP_HX_REQUEST'])) {
+          ob_start();
+          ?&gt;
+          &lt;table&gt;
+            &lt;tbody&gt;
+              &lt;?php foreach ($users as $user): ?&gt;
+                &lt;?= UserRow($user) ?&gt;
+              &lt;?php endforeach; ?&gt;
+            &lt;/tbody&gt;
+          &lt;/table&gt;
+          &lt;?php
+          $html = ob_get_clean();
+          Response::html($html);
+      }
+
+      // Default: JSON
+      Response::json($users);
+  },
+];</code></pre>
+
+        <h4>Calling HTMX component from a page</h4>
+        <p>Example page <code>app/admin/users/page.php</code>:</p>
+
+        <pre><code>&lt;h1&gt;Users&lt;/h1&gt;
+
+&lt;button
+  hx-get="/api/users"
+  hx-target="#users-table"
+  hx-swap="innerHTML"
+&gt;
+  Reload users
+&lt;/button&gt;
+
+&lt;div id="users-table"&gt;
+  &lt;!-- HTMX will inject the table component here --&gt;
+&lt;/div&gt;</code></pre>
+
+        <p>Result: first click loads the HTML table from the API; delete buttons call <code>hx-delete</code> to remove rows without full page reload.</p>
+      </section>
+
+      <!-- 6. REQUEST & RESPONSE -->
+      <section id="request-response" class="card">
+        <div class="section-title-small">Section 6</div>
+        <h2>Request & Response</h2>
+
+        <h3>6.1 Request basics</h3>
+        <p>Every endpoint receives a Request object with:</p>
+        <ul>
+          <li><code>$req-&gt;method</code> — HTTP method (GET, POST, ...)</li>
+          <li><code>$req-&gt;path</code> — normalized path (e.g. <code>admin/users</code>)</li>
+          <li><code>$req-&gt;query</code> — query parameters</li>
+          <li><code>$req-&gt;body</code> — parsed body (form or JSON)</li>
+          <li><code>$req-&gt;meta['params']</code> — dynamic route params like <code>[id]</code></li>
+        </ul>
+
+        <h3>6.2 Getting data</h3>
+        <pre><code>$email = $req-&gt;input('email');          // body or query
+$isJson = $req-&gt;isJson();              // bool
+$data   = $req-&gt;json();                // array
+$params = $req-&gt;meta['params'] ?? [];  // route params</code></pre>
+
+        <h3>6.3 Validation</h3>
+        <pre><code>&lt;?php
+use App\Core\ValidationException;
+
+try {
+    $data = $req-&gt;validate([
+        'email' =&gt; 'required|email',
+        'name'  =&gt; 'required',
+    ]);
+} catch (ValidationException $e) {
+    Response::json(['errors' =&gt; $e-&gt;errors], 422);
+}</code></pre>
+
+        <h3>6.4 Response helpers</h3>
+        <pre><code>Response::json(['ok' =&gt; true]);
+Response::html($html);
+Response::redirect('/admin');
+Response::abort(403, 'Forbidden');</code></pre>
+      </section>
+
+      <!-- 7. DB LAYER -->
+      <section id="db-layer" class="card">
+        <div class="section-title-small">Section 7</div>
+        <h2>Database Layer (QueryBuilder)</h2>
+
+        <p>Configured via <code>config/database.php</code>. Default is SQLite, but anything PDO-based can be adapted.</p>
+
+        <h3>7.1 Typical queries</h3>
+        <pre><code>$users = DB::table('users')
+    -&gt;where('role', 'admin')
+    -&gt;orderBy('id', 'DESC')
+    -&gt;limit(20)
+    -&gt;get();
+
+$user = DB::table('users')
+    -&gt;where('id', 1)
+    -&gt;first();
+
+$id = DB::table('users')
+    -&gt;insert([
+        'name' =&gt; 'Sunset',
+        'email' =&gt; 'sunset@example.com',
+        'password' =&gt; password_hash('secret123', PASSWORD_DEFAULT),
+    ]);
+
+DB::table('users')-&gt;where('id', $id)-&gt;update(['role' =&gt; 'admin']);
+DB::table('users')-&gt;where('id', $id)-&gt;delete();</code></pre>
+      </section>
+
+      <!-- 8. AUTH -->
+      <section id="auth" class="card">
+        <div class="section-title-small">Section 8</div>
+        <h2>Authentication (JWT + Refresh)</h2>
+
+        <p>Bastion uses:</p>
+        <ul>
+          <li>JWT access token — short-lived</li>
+          <li>Refresh token — stored in DB, rotated every use</li>
+        </ul>
+
+        <h3>8.1 Accessing current user</h3>
+        <pre><code>$user = auth();
+if ($user) {
+    // $user['email'], $user['role'], etc.
+}</code></pre>
+      </section>
+
+      <!-- 9. MIDDLEWARES -->
+      <section id="middlewares" class="card">
+        <div class="section-title-small">Section 9</div>
+        <h2>Middlewares</h2>
+
+        <p>Order:</p>
+        <pre><code>SecurityHeaders → RateLimit → AuthMiddleware → AdminOnly → Router → Handler</code></pre>
+
+        <p><strong>SecurityHeaders</strong> sets CSP and other security headers.<br>
+           <strong>AuthMiddleware</strong> validates JWT and CSRF for unsafe methods.<br>
+           <strong>AdminOnly</strong> protects <code>/admin</code> routes.</p>
+      </section>
+
+      <!-- 10. CLI -->
+      <section id="cli" class="card">
+        <div class="section-title-small">Section 10</div>
+        <h2>CLI & Workflow</h2>
+
+        <p>Common commands:</p>
+        <pre><code>./bastion run-dev   # start dev server
+./bastion migrate   # run migrations
+./bastion seed      # run seeders</code></pre>
+      </section>
+
+    </main>
   </div>
-</section>
-
-<section>
-  <h2>🧱 File-Based Routing & Layout System (Like Next.js)</h2>
-  <div class="card">
-    <p>The router resolves nested layouts by walking the request path:</p>
-    <p><span class="endpoint">/admin/users/settings</span> resolves stack:</p>
-    <ul class="tree">
-      <li>app/admin/users/settings/layout.php (if exists)</li>
-      <li>app/admin/users/layout.php</li>
-      <li>app/admin/layout.php</li>
-      <li>app/layout.php (root fallback)</li>
-    </ul>
-    <p>Each layout can wrap the inner content by calling <code>$content()</code>:</p>
-
-    <h3>Example folder layout</h3>
-    <pre class="code-block">
-<?php declare(strict_types=1); ?>
-<div class="p-4 border border-slate-800 rounded-xl bg-slate-900/60">
-   <?php $content(); ?>
-</div>
-    </pre>
-  </div>
-</section>
-
-<section>
-  <h2>🧠 Admin Panel (Django-Inspired)</h2>
-  <div class="card">
-    <p>Navigate to:</p>
-    <ul class="text-sm">
-       <li><span class="endpoint">/login</span> → default seeded login (admin@example.com / admin123)</li>
-       <li><span class="endpoint">/admin</span> → protected dashboard</li>
-       <li><span class="endpoint">/admin/users</span> → filterable table</li>
-    </ul>
-  </div>
-</section>
-
-<section>
-  <h2>🧰 Components System</h2>
-  <div class="card">
-    <p>Reusable UI components live at:</p>
-    <ul class="tree">
-      <li>resources/views/components/navbar.php</li>
-      <li>resources/views/components/flash.php</li>
-      <li>resources/views/components/table.php</li>
-      <li>resources/views/components/searchbar.php</li>
-      <li>You can extend this folder like a minimal UI kit</li>
-    </ul>
-
-    <h3>Public Navbar component</h3>
-    <pre class="code-block">
-<nav class="border-b border-slate-700 bg-slate-900/90 px-4 py-3">
-   <div class="max-w-6xl mx-auto flex justify-between">
-      <a href="/">Home</a>
-      <a href="/admin">Admin</a>
-   </div>
-</nav>
-    </pre>
-  </div>
-</section>
-
-<section>
-  <h2>🔐 Middlewares & Security</h2>
-  <div class="card">
-    <ul class="tree">
-      <li>SecurityHeaders → sets CSP + Nonce + frame protection</li>
-      <li>AuthMiddleware → validates user and CSRF when enabled</li>
-      <li>AdminOnly → protects anything under `/admin/*`</li>
-      <li>RateLimit → stub ready for IP-rate limiting</li>
-    </ul>
-
-    <h3>CSRF Token Usage</h3>
-    <pre class="code-block">
-<input type="hidden" name="_token" value="<?= e(CSRF::token()) ?>">
-    </pre>
-
-    <h3>CSP safe script/style tags</h3>
-    <pre class="code-block">
-<script nonce="<?= e($_SESSION['csp_nonce']) ?>" src="..."></script>
-<style nonce="<?= e($_SESSION['csp_nonce']) ?>"></style>
-    </pre>
-  </div>
-</section>
-
-<section>
-  <h2>🗄 Database & Query Builder</h2>
-  <div class="card">
-    <p>Examples:</p>
-    <pre class="code-block">
-DB::table('users')->where('id',1)->first();
-DB::table('users')->orderBy('id','DESC')->limit(10)->get();
-DB::table('users')->insert(['name'=>'Sunset']);
-    </pre>
-  </div>
-</section>
-
-<section>
-  <h2>🧬 Migrations & Seeds</h2>
-  <div class="card">
-    <p>Create a migration manually at <span class="endpoint">database/migrations/NNN_description.sql</span></p>
-    <p>Run:</p>
-    <pre class="code-block">./bastion migrate</pre>
-    <p>Seed demo users:</p>
-    <pre class="code-block">./bastion seed</pre>
-  </div>
-</section>
-
-<section>
-  <h2>🧪 Testing Stubs</h2>
-  <div class="card">
-    <p>You can later expand tests using:</p>
-    <pre class="code-block">
-playwright tests → E2E browser automation (you'll expand this later)
-phpunit tests   → for your core facades and QueryBuilder
-    </pre>
-    <p>Stub example for E2E (to be expanded):</p>
-    <pre class="code-block">
-// e.g: tests/e2e/login.spec.js
-test('user can login', async () => { /* implement */ });
-    </pre>
-  </div>
-</section>
-
-<section class="text-center">
-   <p class="text-slate-500">Bastion PHP © 2025 — Built for speed and security.</p>
-</section>
-
-</main>
 </body>
 </html>
