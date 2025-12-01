@@ -1366,24 +1366,121 @@ npm run build</code></pre>
       <hr />
 
       <section id="security">
-        <h2>Security Protocols</h2>
-        <p>Bastion assumes the environment is hostile. It implements a <strong>Defense in Depth</strong> strategy.</p>
+  <h2>Security Protocols</h2>
+  <p>
+    Bastion assumes the environment is hostile. It implements a
+    <strong>Defense in Depth</strong> strategy: hardened headers, strict CSRF
+    validation, safe rendering helpers, and a clear token model.
+  </p>
 
-        <div class="features-grid">
-          <div class="feature-card">
-            <h4 style="margin-top:0; color:var(--primary)">Native JWT</h4>
-            <p style="font-size:0.9rem;">Zero-dependency implementation using OpenSSL. Handles <code>HttpOnly</code> cookies for Refresh Tokens automatically.</p>
-          </div>
-          <div class="feature-card">
-            <h4 style="margin-top:0; color:var(--accent)">CSRF Fortress</h4>
-            <p style="font-size:0.9rem;">Middleware automatically verifies tokens on all state-changing methods (POST, PUT, DELETE). Integrated with HTMX.</p>
-          </div>
-          <div class="feature-card">
-            <h4 style="margin-top:0; color:var(--warning)">XSS Prevention</h4>
-            <p style="font-size:0.9rem;">The global <code>e()</code> helper escapes all output. Content Security Policy headers are configured by default via middleware.</p>
-          </div>
-        </div>
-      </section>
+  <div class="features-grid">
+    <div class="feature-card">
+      <h4 style="margin-top:0; color:var(--primary)">Native JWT</h4>
+      <p style="font-size:0.9rem;">
+        Zero-dependency implementation using OpenSSL. Handles
+        <code>HttpOnly</code> cookies for Refresh Tokens automatically, while
+        the access token is short-lived and scoped to the current session.
+      </p>
+    </div>
+    <div class="feature-card">
+      <h4 style="margin-top:0; color:var(--accent)">CSRF Fortress</h4>
+      <p style="font-size:0.9rem;">
+        Middleware automatically verifies tokens on all state-changing methods
+        (POST, PUT, PATCH, DELETE). Integrated with HTMX via a dedicated
+        <code>X-CSRF-Token</code> header or hidden form fields.
+      </p>
+    </div>
+    <div class="feature-card">
+      <h4 style="margin-top:0; color:var(--warning)">XSS Prevention</h4>
+      <p style="font-size:0.9rem;">
+        The global <code>e()</code> helper escapes HTML output, and security
+        middleware sets strict Content Security Policy headers by default to
+        reduce the impact of script injection.
+      </p>
+    </div>
+  </div>
+
+  <h3>XSS Protection with <code>e()</code></h3>
+  <p>
+    All untrusted data should be escaped before it reaches your HTML. Bastion
+    provides a small global helper <code>e()</code> that escapes HTML entities
+    and prevents XSS when rendering user-controlled values in templates,
+    layouts or components.
+  </p>
+
+  <pre><code class="language-php">&lt;?php
+// Somewhere in a page or layout:
+
+$user = auth(); // returns current user or null
+
+if ($user) {
+    echo 'Logged in as: ' . e($user['email']);
+}
+</code></pre>
+
+  <p>
+    Always wrap dynamic strings that might contain user input with
+    <code>e()</code>, especially when printing into HTML attributes or text
+    nodes. For values coming from the DV engine, a common pattern is:
+  </p>
+
+  <pre><code class="language-php">&lt;title&gt;&lt;?= e(dv('title', 'Bastion App')) ?&gt;&lt;/title&gt;</code></pre>
+
+  <h3>CSRF Protection</h3>
+  <p>
+    State-changing requests (POST, PUT, PATCH, DELETE) are protected by a CSRF
+    middleware. Forms must include a valid token, and HTMX / AJAX requests
+    should send the token via a dedicated header. If the token is missing or
+    invalid, the middleware will reject the request with a 419/403 response.
+  </p>
+
+  <h4>HTML forms</h4>
+  <p>
+    Use the <code>csrf_field()</code> helper inside your forms. It renders a
+    hidden input with the current CSRF token so you don't have to wire it by
+    hand:
+  </p>
+
+  <pre><code class="language-php">&lt;form method="POST" action="/users/create"&gt;
+    &lt;input type="text" name="name" required&gt;
+    &lt;input type="email" name="email" required&gt;
+
+    &lt;!-- CSRF Token --&gt;
+    &lt;?= csrf_field() ?&gt;
+
+    &lt;button type="submit"&gt;Create User&lt;/button&gt;
+&lt;/form&gt;
+</code></pre>
+
+  <h4>HTMX integration</h4>
+  <p>
+    A common pattern is to expose the token in a meta tag from your base layout
+    and configure HTMX to send it automatically on every request:
+  </p>
+
+  <pre><code class="language-php">&lt;!-- In your base layout (e.g. app/views/layouts/app.php) --&gt;
+&lt;head&gt;
+  ...
+  &lt;meta name="csrf-token" content="&lt;?= csrf_token() ?&gt;"&gt;
+&lt;/head&gt;
+</code></pre>
+
+  <pre><code class="language-js">// In your app.js or inline script
+document.body.addEventListener('htmx:configRequest', (event) =&gt; {
+  const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+  if (tokenMeta) {
+    event.detail.headers['X-CSRF-Token'] = tokenMeta.getAttribute('content');
+  }
+});
+</code></pre>
+
+  <p style="font-size:0.9rem; color:var(--text-dim);">
+    The CSRF middleware validates the token from either a hidden form field
+    (e.g. <code>_csrf</code> via <code>csrf_field()</code>) or the
+    <code>X-CSRF-Token</code> header, making server-driven and HTMX-driven
+    interactions equally safe.
+  </p>
+</section>
 
       <section id="cli">
         <h2>The Bastion CLI</h2>
