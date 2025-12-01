@@ -342,29 +342,170 @@ cd my-project
 php bastion serve</code></pre>
       </section>
 
-      <section id="structure">
-        <h2>Directory Structure</h2>
-        <p>A standardized, predictable structure for teams of any size.</p>
+  <section id="structure">
+  <h2>Directory Structure</h2>
+  <p>
+    A standardized, predictable structure for teams of any size. Bastion generates an
+    enterprise-style monolith where the <code>app/</code> directory doubles as your
+    file-based router, similar to Next.js, but fully in PHP.
+  </p>
 
-        <div class="file-tree" style="background:var(--bg-card); padding:2rem; border-radius:1rem; border:1px solid var(--border-dim);">
-          <div class="tree">
-            <div class="tree-item"><span class="tree-icon">📂</span> <span class="tree-hl">app/</span></div>
-            <div class="tree-item" style="padding-left: 20px;"><span class="tree-icon">📂</span> <span class="tree-hl">api/</span> <span style="margin-left:auto; opacity:0.5;">// REST/HTMX Endpoints</span></div>
-            <div class="tree-item" style="padding-left: 20px;"><span class="tree-icon">📂</span> <span class="tree-hl">components/</span> <span style="margin-left:auto; opacity:0.5;">// Functional UI Components</span></div>
-            <div class="tree-item" style="padding-left: 20px;"><span class="tree-icon">📂</span> <span class="tree-hl" style="color:var(--tok-variable)">core/</span> <span style="margin-left:auto; opacity:0.5;">// THE KERNEL (IoC, Router, DB)</span></div>
-            <div class="tree-item" style="padding-left: 20px;"><span class="tree-icon">📂</span> models/ <span style="margin-left:auto; opacity:0.5;">// Eloquent Models</span></div>
-            <div class="tree-item" style="padding-left: 20px;"><span class="tree-icon">📂</span> providers/ <span style="margin-left:auto; opacity:0.5;">// Service Providers</span></div>
-            <div class="tree-item" style="padding-left: 20px;"><span class="tree-icon">📄</span> page.php <span style="margin-left:auto; opacity:0.5;">// Root Homepage</span></div>
-            
-            <div class="tree-item mt-2"><span class="tree-icon">📂</span> config/</div>
-            <div class="tree-item"><span class="tree-icon">📂</span> database/ <span style="margin-left:auto; opacity:0.5;">// Migrations & Seeds</span></div>
-            <div class="tree-item"><span class="tree-icon">📂</span> public/ <span style="margin-left:auto; opacity:0.5;">// Web Root (index.php)</span></div>
-            <div class="tree-item"><span class="tree-icon">📂</span> resources/ <span style="margin-left:auto; opacity:0.5;">// Raw Assets (Tailwind CSS)</span></div>
-            <div class="tree-item"><span class="tree-icon">📂</span> storage/ <span style="margin-left:auto; opacity:0.5;">// Logs, DB, Cache</span></div>
-            <div class="tree-item mt-2"><span class="tree-icon">⚙️</span> bastion <span style="margin-left:auto; opacity:0.5;">// CLI Tool</span></div>
-          </div>
-        </div>
-      </section>
+  <div class="file-tree">
+    <div class="tree">
+      <!-- APP ROOT -->
+      <div class="tree-item">
+        <span class="tree-icon">📂</span>
+        <span class="tree-hl">app/</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📂</span> api/
+        <span style="margin-left:auto; opacity:0.5;">// REST/HTMX endpoints (+server.php)</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📂</span> components/
+        <span style="margin-left:auto; opacity:0.5;">// Reusable UI components</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📂</span> core/
+        <span style="margin-left:auto; opacity:0.5;">// Framework kernel (App, Router, DV, DB, ...)</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📂</span> http/
+        <span style="margin-left:auto; opacity:0.5;">// Controllers, middleware, form requests</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📂</span> models/
+        <span style="margin-left:auto; opacity:0.5;">// Domain models</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📂</span> providers/
+        <span style="margin-left:auto; opacity:0.5;">// Service providers</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📂</span> services/
+        <span style="margin-left:auto; opacity:0.5;">// Application services</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📂</span> views/
+        <span style="margin-left:auto; opacity:0.5;">// Global layouts & error pages</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 40px;">
+        <span class="tree-icon">📂</span> layouts/
+        <span style="margin-left:auto; opacity:0.5;">// app.php, guest.php, base shells</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 40px;">
+        <span class="tree-icon">📂</span> errors/
+        <span style="margin-left:auto; opacity:0.5;">// 404.php, 500.php, etc.</span>
+      </div>
+
+      <!-- FILE-BASED ROUTER ROOT -->
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📄</span> layout.php
+        <span style="margin-left:auto; opacity:0.5;">// Optional root router layout (wraps all routes)</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📄</span> page.php
+        <span style="margin-left:auto; opacity:0.5;">// Root homepage route (/)</span>
+      </div>
+
+      <!-- EXAMPLE SECTION WITH ITS OWN LAYOUT -->
+      <div class="tree-item" style="padding-left: 20px;">
+        <span class="tree-icon">📂</span> dashboard/
+        <span style="margin-left:auto; opacity:0.5;">// /dashboard section</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 40px;">
+        <span class="tree-icon">📄</span> layout.php
+        <span style="margin-left:auto; opacity:0.5;">// Layout for /dashboard/*</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 40px;">
+        <span class="tree-icon">📄</span> page.php
+        <span style="margin-left:auto; opacity:0.5;">// /dashboard</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 40px;">
+        <span class="tree-icon">📂</span> analytics/
+        <span style="margin-left:auto; opacity:0.5;">// /dashboard/analytics</span>
+      </div>
+
+      <div class="tree-item" style="padding-left: 60px;">
+        <span class="tree-icon">📄</span> page.php
+        <span style="margin-left:auto; opacity:0.5;">// /dashboard/analytics page</span>
+      </div>
+
+      <!-- RESTO DEL PROYECTO -->
+      <div class="tree-item">
+        <span class="tree-icon">📂</span> config/
+        <span style="margin-left:auto; opacity:0.5;">// App, database, auth, cache, mail, ...</span>
+      </div>
+
+      <div class="tree-item">
+        <span class="tree-icon">📂</span> database/
+        <span style="margin-left:auto; opacity:0.5;">// migrations, seeds, factories</span>
+      </div>
+
+      <div class="tree-item">
+        <span class="tree-icon">📂</span> public/
+        <span style="margin-left:auto; opacity:0.5;">// index.php, assets, web root</span>
+      </div>
+
+      <div class="tree-item">
+        <span class="tree-icon">📂</span> resources/
+        <span style="margin-left:auto; opacity:0.5;">// Tailwind CSS, JS entrypoints</span>
+      </div>
+
+      <div class="tree-item">
+        <span class="tree-icon">📂</span> storage/
+        <span style="margin-left:auto; opacity:0.5;">// logs, cache, sessions, compiled views</span>
+      </div>
+
+      <div class="tree-item">
+        <span class="tree-icon">📂</span> tests/
+        <span style="margin-left:auto; opacity:0.5;">// Unit & Feature tests</span>
+      </div>
+
+      <div class="tree-item">
+        <span class="tree-icon">📄</span> bastion
+        <span style="margin-left:auto; opacity:0.5;">// Bastion CLI entrypoint</span>
+      </div>
+
+      <div class="tree-item">
+        <span class="tree-icon">📄</span> composer.json
+        <span style="margin-left:auto; opacity:0.5;">// PHP dependencies & autoload</span>
+      </div>
+
+      <div class="tree-item">
+        <span class="tree-icon">📄</span> package.json
+        <span style="margin-left:auto; opacity:0.5;">// Frontend tooling & scripts</span>
+      </div>
+
+      <div class="tree-item">
+        <span class="tree-icon">📄</span> .env
+        <span style="margin-left:auto; opacity:0.5;">// Environment configuration</span>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:0.9rem; color:var(--text-dim); margin-top:0.75rem;">
+    <strong>Layouts by folder:</strong> any directory under <code>app/</code> can include a
+    <code>layout.php</code> next to its <code>page.php</code>. Bastion will automatically compose
+    all matching <code>layout.php</code> files from the root <code>app/layout.php</code> down to
+    the deepest folder that matches the current route, wrapping your page content layer by
+    layer — just like Next.js App Router, but implemented in clean PHP.
+  </p>
+</section> 
 
       <section id="lifecycle">
         <h2>Request Lifecycle</h2>
