@@ -1,892 +1,622 @@
 <!doctype html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="utf-8">
-  <title>Bastion PHP Framework — Official Documentation</title>
+  <title>Bastion Enterprise v1.0.0 — The Monolith Modular Framework</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="The definitive guide to Bastion PHP. Security-first, rapid development framework for internal tools.">
+  <meta name="description" content="Official documentation for Bastion Enterprise. Secure, API-first PHP framework with Tailwind v4.">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: { 
-            sans: ['Inter', 'sans-serif'], 
-            mono: ['JetBrains Mono', 'monospace'] 
-          },
-          colors: {
-            background: '#0B1120', // Deep Space Blue
-            surface: '#1e293b',    // Slate 800
-            primary: '#38bdf8',    // Sky 400
-            secondary: '#818cf8',  // Indigo 400
-            accent: '#2dd4bf',     // Teal 400
-            purple: '#a78bfa',     // Soft Purple
-            border: '#334155',     // Slate 700
-            success: '#10b981',
-            warning: '#f59e0b',
-            danger: '#ef4444'
-          },
-          maxWidth: { '8xl': '90rem' },
-          boxShadow: {
-            'glow': '0 0 20px rgba(56, 189, 248, 0.15)'
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
-    /* Base Settings */
-    :root { --scroll-padding: 80px; }
-    html { scroll-behavior: smooth; scroll-padding-top: var(--scroll-padding); }
-    body { background-color: #0B1120; color: #e2e8f0; antialiased; }
+    /* * BASTION DESIGN SYSTEM 
+     * Theme: Deep Space / Enterprise Dark
+     */
+    :root {
+      --bg-body: #020617;       /* Slate 950 */
+      --bg-panel: #0f172a;      /* Slate 900 */
+      --bg-card: #1e293b;       /* Slate 800 */
+      --border: #334155;        /* Slate 700 */
+      --text-main: #f8fafc;     /* Slate 50 */
+      --text-muted: #94a3b8;    /* Slate 400 */
+      
+      --primary: #38bdf8;       /* Sky 400 */
+      --primary-dim: rgba(56, 189, 248, 0.1);
+      --secondary: #818cf8;     /* Indigo 400 */
+      --accent: #2dd4bf;        /* Teal 400 */
+      --danger: #ef4444;        /* Red 500 */
+      --warning: #f59e0b;       /* Amber 500 */
+      
+      --code-bg: #0B1120;
+      --sidebar-width: 280px;
+      --header-height: 4rem;
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 { color: #fff; font-weight: 700; letter-spacing: -0.025em; margin-top: 2.5rem; margin-bottom: 1rem; }
+    h1 { font-size: 3rem; line-height: 1; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0; }
+    h2 { font-size: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-top: 4rem; }
+    h3 { font-size: 1.5rem; color: var(--text-main); }
+    h4 { font-size: 1.25rem; color: var(--text-main); margin-top: 2rem; }
     
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0B1120; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    p { margin-bottom: 1.25rem; color: var(--text-muted); font-size: 1.05rem; }
+    a { color: var(--primary); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--secondary); }
+    strong { color: #fff; font-weight: 600; }
+    
+    ul, ol { margin-bottom: 1.5rem; padding-left: 1.5rem; color: var(--text-muted); }
+    li { margin-bottom: 0.5rem; }
 
-    /* Syntax Highlighting Simulation */
-    pre { margin: 0; }
-    .token.k { color: #c084fc; } /* keyword (purple) */
-    .token.s { color: #86efac; } /* string (green) */
-    .token.f { color: #38bdf8; } /* function (blue) */
-    .token.v { color: #fca5a5; } /* variable (red) */
-    .token.c { color: #94a3b8; font-style: italic; } /* comment (gray) */
-    .token.t { color: #2dd4bf; } /* type (teal) */
-    .token.n { color: #fbbf24; } /* number (amber) */
+    /* Layout */
+    .layout { display: flex; min-height: 100vh; }
+    
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      z-index: 50;
+      padding: 2rem 0;
+    }
+    .sidebar-header { padding: 0 1.5rem 2rem; display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 8px; display: grid; place-items: center; font-weight: 900; color: #fff; }
+    .logo-text { font-size: 1.25rem; font-weight: 700; color: #fff; }
+    
+    .nav-group { margin-bottom: 2rem; }
+    .nav-title { padding: 0 1.5rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700; margin-bottom: 0.75rem; }
+    .nav-link { display: block; padding: 0.5rem 1.5rem; color: var(--text-muted); font-size: 0.9rem; transition: all 0.2s; border-left: 2px solid transparent; }
+    .nav-link:hover { color: #fff; background: rgba(255,255,255,0.03); }
+    .nav-link.active { color: var(--primary); border-left-color: var(--primary); background: var(--primary-dim); font-weight: 500; }
 
-    /* Glassmorphism Panels */
-    .glass-panel {
-      background: rgba(30, 41, 59, 0.4);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(51, 65, 85, 0.5);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    /* Main Content */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 4rem 5rem;
+      max-width: 1200px;
+    }
+
+    /* Code Blocks */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      overflow-x: auto;
+      margin: 1.5rem 0 2.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    :not(pre) > code {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--primary-dim);
+      color: var(--primary);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-size: 0.85em;
     }
     
-    .glass-panel.highlight {
-      border-left: 4px solid #38bdf8;
-      background: linear-gradient(90deg, rgba(56, 189, 248, 0.05) 0%, rgba(30, 41, 59, 0.4) 100%);
-    }
+    /* Code Highlighting Simulation */
+    .token.k { color: #c084fc; } /* keyword */
+    .token.s { color: #86efac; } /* string */
+    .token.f { color: #38bdf8; } /* function */
+    .token.c { color: #64748b; font-style: italic; } /* comment */
+    .token.t { color: #2dd4bf; } /* type */
+    .token.v { color: #fca5a5; } /* variable */
 
-    /* Gradients */
-    .text-gradient {
-      background: linear-gradient(to right, #38bdf8, #818cf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+    /* Components */
+    .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge-primary { background: var(--primary-dim); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.2); }
     
-    /* Navigation Links */
-    .nav-link {
-      display: flex;
-      align-items: center;
-      border-left: 2px solid transparent;
-      transition: all 0.2s ease-in-out;
-    }
-    .nav-link:hover {
-      color: #f8fafc;
-      border-left-color: #475569;
-    }
-    .nav-link.active {
-      color: #38bdf8;
-      border-left-color: #38bdf8;
-      background: linear-gradient(90deg, rgba(56,189,248,0.1) 0%, transparent 100%);
-    }
+    .alert { padding: 1.25rem; border-radius: 0.75rem; border-left: 4px solid; margin: 2rem 0; background: rgba(30, 41, 59, 0.5); }
+    .alert-info { border-color: var(--primary); }
+    .alert-warn { border-color: var(--warning); }
+    .alert-danger { border-color: var(--danger); }
+    .alert-title { display: block; font-weight: 700; margin-bottom: 0.5rem; color: #fff; }
 
-    /* Code Block Header */
-    .code-header {
-      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-      background: rgba(15, 23, 42, 0.5);
+    .grid-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 3rem 0; }
+    .feature-card { background: var(--bg-card); padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--border); transition: transform 0.2s, border-color 0.2s; }
+    .feature-card:hover { transform: translateY(-2px); border-color: var(--primary); }
+    .feature-icon { width: 48px; height: 48px; background: var(--bg-panel); border-radius: 12px; display: grid; place-items: center; font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary); }
+
+    /* Directory Tree */
+    .tree { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--text-muted); }
+    .tree-item { padding: 0.25rem 0; display: flex; align-items: center; }
+    .tree-icon { margin-right: 0.75rem; color: var(--border); }
+    .tree-name { color: var(--text-main); }
+    .tree-desc { margin-left: auto; color: var(--text-muted); font-size: 0.8rem; font-style: italic; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 2rem; }
     }
   </style>
 </head>
-<body class="relative">
+<body>
 
-  <button id="mobile-menu-btn" class="lg:hidden fixed bottom-6 right-6 z-50 p-4 bg-primary text-slate-900 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-  </button>
-
-  <header class="fixed top-0 w-full z-40 bg-[#0B1120]/80 backdrop-blur-md border-b border-border transition-all duration-200">
-    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-cyan-500/20">BP</div>
-        <span class="font-bold text-lg tracking-tight text-slate-100">Bastion<span class="text-primary">PHP</span></span>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-icon">B</div>
+        <div class="logo-text">Bastion <span style="color:var(--primary)">PHP</span></div>
       </div>
-      <div class="flex items-center gap-6">
-        <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-          v0.1.0
-        </span>
-        <a href="https://github.com/alexmejiaImpro/BastionPHP" target="_blank" class="text-slate-400 hover:text-white transition-colors">
-          <span class="sr-only">GitHub</span>
-          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
-        </a>
-      </div>
-    </div>
-  </header>
 
-  <div class="max-w-8xl mx-auto flex pt-16">
-    
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-72 bg-[#0B1120] border-r border-border transform -translate-x-full lg:translate-x-0 lg:static lg:h-[calc(100vh-4rem)] lg:top-16 overflow-y-auto transition-transform duration-300 pt-20 lg:pt-8 pb-10">
-      <nav class="px-6 space-y-9">
-        
-        <div>
-          <h5 class="mb-4 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            Getting Started
-          </h5>
-          <ul class="space-y-1.5 border-l border-slate-800 ml-2">
-            <li><a href="#introduction" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Introduction</a></li>
-            <li><a href="#quick-start" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Quick Start</a></li>
-            <li><a href="#structure" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Directory Structure</a></li>
-          </ul>
+      <nav>
+        <div class="nav-group">
+          <div class="nav-title">Overview</div>
+          <a href="#introduction" class="nav-link">Introduction</a>
+          <a href="#architecture" class="nav-link">Architecture Logic</a>
+          <a href="#directory-structure" class="nav-link">Directory Structure</a>
         </div>
 
-        <div>
-          <h5 class="mb-4 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-            Core Features
-          </h5>
-          <ul class="space-y-1.5 border-l border-slate-800 ml-2">
-            <li><a href="#global-styling" class="nav-link block pl-4 py-1.5 text-sm text-primary font-medium">🎨 Global Styling</a></li>
-            <li><a href="#routing" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Routing & Layouts</a></li>
-            <li><a href="#api-endpoints" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">API Routes</a></li>
-            <li><a href="#components" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Components & HTMX</a></li>
-          </ul>
+        <div class="nav-group">
+          <div class="nav-title">The Core</div>
+          <a href="#ioc-container" class="nav-link">IoC Container</a>
+          <a href="#service-providers" class="nav-link">Service Providers</a>
+          <a href="#facades-helpers" class="nav-link">Facades & Helpers</a>
+          <a href="#config-system" class="nav-link">Configuration</a>
         </div>
 
-        <div>
-          <h5 class="mb-4 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            Security & Data
-          </h5>
-          <ul class="space-y-1.5 border-l border-slate-800 ml-2">
-            <li><a href="#authentication" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Authentication (JWT)</a></li>
-            <li><a href="#database" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Database & Models</a></li>
-            <li><a href="#security" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Security Practices</a></li>
-          </ul>
+        <div class="nav-group">
+          <div class="nav-title">Routing & State</div>
+          <a href="#hybrid-router" class="nav-link">Hybrid Router</a>
+          <a href="#api-endpoints" class="nav-link">API (+server.php)</a>
+          <a href="#page-views" class="nav-link">UI Pages (page.php)</a>
+          <a href="#dv-engine" class="nav-link" style="color:var(--accent)">DV Engine (State)</a>
         </div>
 
-        <div>
-          <h5 class="mb-4 text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-            Operations
-          </h5>
-          <ul class="space-y-1.5 border-l border-slate-800 ml-2">
-            <li><a href="#testing" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Testing & Benchmarks</a></li>
-            <li><a href="#deployment" class="nav-link block pl-4 py-1.5 text-sm text-slate-400">Deployment</a></li>
-            <li><a href="#multi-plant" class="nav-link block pl-4 py-1.5 text-sm text-secondary">Multi-Plant Strategy</a></li>
-          </ul>
+        <div class="nav-group">
+          <div class="nav-title">Data & Models</div>
+          <a href="#database-orm" class="nav-link">Database & ORM</a>
+          <a href="#migrations" class="nav-link">Migrations & Schema</a>
+          <a href="#query-builder" class="nav-link">Query Builder</a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Frontend</div>
+          <a href="#tailwind-v4" class="nav-link">Tailwind v4 (CSS-First)</a>
+          <a href="#components" class="nav-link">Functional Components</a>
+          <a href="#htmx" class="nav-link">HTMX Integration</a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security & CLI</div>
+          <a href="#security" class="nav-link">Security Protocols</a>
+          <a href="#bastion-cli" class="nav-link">Bastion CLI</a>
+          <a href="#deployment" class="nav-link">Deployment</a>
         </div>
       </nav>
     </aside>
 
-    <main class="flex-1 min-w-0 px-4 sm:px-8 lg:px-16 py-12 scroll-mt-16">
+    <main class="main-content">
       
-      <section id="introduction" class="mb-24 scroll-mt-32">
-        <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight mb-8 text-slate-50 leading-tight">
-          The <span class="text-gradient">Bastion</span> Guide
-        </h1>
-        <p class="text-xl sm:text-2xl text-slate-400 leading-relaxed max-w-4xl mb-12">
-          Bastion is an enterprise-grade PHP framework designed to standardize development across organizations. It combines the <strong>Next.js App Router</strong> experience with battle-tested PHP technologies.
+      <section id="introduction" class="mb-20">
+        <div class="badge badge-primary mb-4">v1.0.0 Stable</div>
+        <h1>The Fortress for your<br>Internal Tools.</h1>
+        <p class="text-xl mt-6 max-w-3xl">
+          Bastion is an <strong>Enterprise-Grade PHP Framework</strong> designed for the modern era. 
+          It abandons the "vendor-lock" of traditional frameworks in favor of a 
+          <strong>Monolith Modular Architecture</strong> that lives entirely within your project.
         </p>
         
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="glass-panel p-6 rounded-2xl">
-            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-            </div>
-            <h3 class="text-lg font-bold text-slate-200 mb-2">Secure by Default</h3>
-            <p class="text-sm text-slate-400 leading-relaxed">Path traversal protection, CSRF, CSP nonces, session regeneration, and more enabled out of the box.</p>
+        <div class="grid-features">
+          <div class="feature-card">
+            <div class="feature-icon">🏗️</div>
+            <h3>Monolith Modular</h3>
+            <p>The entire framework core lives in <code>app/core/</code>. You own 100% of the code. No black magic in <code>vendor/</code>.</p>
           </div>
-          <div class="glass-panel p-6 rounded-2xl">
-            <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary mb-4">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-            </div>
-            <h3 class="text-lg font-bold text-slate-200 mb-2">File-Based Routing</h3>
-            <p class="text-sm text-slate-400 leading-relaxed">Organize your app with intuitive folder structure. No route definitions needed. Just like Next.js.</p>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Hybrid Routing</h3>
+            <p>Combines the best of <strong>Next.js</strong> (File-based Routing) and <strong>FastAPI</strong> (Typed API Endpoints).</p>
           </div>
-          <div class="glass-panel p-6 rounded-2xl">
-            <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-4">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
-            </div>
-            <h3 class="text-lg font-bold text-slate-200 mb-2">Global Styling</h3>
-            <p class="text-sm text-slate-400 leading-relaxed">One config file controls styling for the entire app. Switch between Tailwind CDN, Build, or Custom CSS instantly.</p>
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>Tailwind v4 Native</h3>
+            <p>Built for the future with <strong>CSS-First configuration</strong>. No <code>tailwind.config.js</code> required.</p>
           </div>
         </div>
       </section>
 
-      <section id="quick-start" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-          <h2 class="text-3xl font-bold text-slate-200">Quick Start</h2>
-          <span class="h-px flex-1 bg-border"></span>
-        </div>
+      <hr class="border-gray-800 my-16">
+
+      <section id="architecture" class="scroll-mt-24 mb-20">
+        <h2>Architecture Logic</h2>
+        <p>
+          Most PHP frameworks (Laravel, Symfony) hide their logic deep inside the <code>vendor</code> folder. 
+          Bastion takes a different approach: <strong>Transparency</strong>.
+        </p>
+        <p>
+          When you install Bastion, the kernel is scaffolded directly into <code>app/core/</code>. 
+          This means if you need to change how the Router handles regex, or how the Auth system sets cookies, 
+          you simply edit the file. You don't "extend" the framework; you <strong>are</strong> the framework.
+        </p>
         
-        <div class="glass-panel rounded-xl overflow-hidden mb-8">
-          <div class="flex items-center justify-between px-4 py-3 bg-slate-900/50 border-b border-border">
-            <div class="flex gap-2">
-              <span class="w-3 h-3 rounded-full bg-red-500/50"></span>
-              <span class="w-3 h-3 rounded-full bg-yellow-500/50"></span>
-              <span class="w-3 h-3 rounded-full bg-green-500/50"></span>
-            </div>
-            <span class="text-xs font-mono text-slate-500">Terminal</span>
-          </div>
-          <div class="p-6 overflow-x-auto font-mono text-sm text-slate-300">
-<pre>
-<span class="token c"># 1. Create New Project</span>
-bash create-php-app.sh my-app --with-auth
-
-<span class="token c"># 2. Install Dependencies</span>
-cd my-app
-composer install
-npm install
-
-<span class="token c"># 3. Setup Database</span>
-php artisan migrate
-php artisan db:seed
-
-<span class="token c"># 4. Start Development Server</span>
-php artisan serve
-</pre>
-          </div>
+        <div class="alert alert-info">
+          <span class="alert-title">The "Battery Pack" Philosophy</span>
+          Bastion comes with zero-dependency implementations of JWT, QueryBuilder, and Migrations. 
+          We rely on <code>composer</code> only for low-level utilities (DotEnv, PHP-JWT helper), keeping the core logic clear and debuggable.
         </div>
+      </section>
+
+      <section id="directory-structure" class="scroll-mt-24 mb-20">
+        <h2>Directory Structure</h2>
+        <p>A place for everything, and everything in its place.</p>
         
-        <div class="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-200 text-sm flex gap-3 items-start">
-          <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <div>
-            <strong class="block mb-1">Development Port</strong>
-            Bastion PHP uses port <code>9876</code> by default. Visit <a href="http://127.0.0.1:9876" class="underline">http://127.0.0.1:9876</a>.
+        <div class="bg-[#0B1120] border border-gray-700 rounded-xl p-6 font-mono text-sm">
+          <div class="tree">
+            <div class="tree-item"><span class="tree-icon">📂</span> <span class="tree-name text-blue-400">app/</span></div>
+            <div class="tree-item pl-6"><span class="tree-icon">📂</span> <span class="tree-name text-purple-400">api/</span> <span class="tree-desc">API Endpoints (+server.php)</span></div>
+            <div class="tree-item pl-6"><span class="tree-icon">📂</span> <span class="tree-name text-yellow-400">components/</span> <span class="tree-desc">Functional UI Components</span></div>
+            <div class="tree-item pl-6"><span class="tree-icon">📂</span> <span class="tree-name text-red-400">core/</span> <span class="tree-desc">THE FRAMEWORK KERNEL (Do not touch unless necessary)</span></div>
+            <div class="tree-item pl-6"><span class="tree-icon">📂</span> <span class="tree-name text-green-400">models/</span> <span class="tree-desc">Database Models</span></div>
+            <div class="tree-item pl-6"><span class="tree-icon">📂</span> <span class="tree-name text-blue-400">dashboard/</span> <span class="tree-desc">Route: /dashboard</span></div>
+            <div class="tree-item pl-6"><span class="tree-icon">📄</span> <span class="tree-name">page.php</span> <span class="tree-desc">Root Route (/)</span></div>
+            
+            <div class="tree-item mt-4"><span class="tree-icon">📂</span> <span class="tree-name text-blue-400">config/</span> <span class="tree-desc">App Configuration</span></div>
+            <div class="tree-item"><span class="tree-icon">📂</span> <span class="tree-name text-blue-400">database/</span> <span class="tree-desc">Migrations & Seeds</span></div>
+            <div class="tree-item"><span class="tree-icon">📂</span> <span class="tree-name text-blue-400">public/</span> <span class="tree-desc">Web Root (index.php)</span></div>
+            <div class="tree-item"><span class="tree-icon">📂</span> <span class="tree-name text-blue-400">resources/</span> <span class="tree-desc">CSS & JS Assets</span></div>
+            <div class="tree-item"><span class="tree-icon">📂</span> <span class="tree-name text-blue-400">storage/</span> <span class="tree-desc">Logs, DB, Cache (Secured)</span></div>
+            <div class="tree-item mt-4"><span class="tree-icon">⚙️</span> <span class="tree-name">bastion</span> <span class="tree-desc">CLI Tool</span></div>
           </div>
         </div>
       </section>
 
-      <section id="structure" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-          <h2 class="text-3xl font-bold text-slate-200">Project Structure</h2>
-          <span class="h-px flex-1 bg-border"></span>
-        </div>
-        
-        <div class="grid lg:grid-cols-2 gap-12">
-          <div class="glass-panel rounded-xl p-8 font-mono text-sm leading-relaxed text-slate-400">
-            <ul class="space-y-2">
-              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> <span class="text-primary font-bold">app/</span></li>
-              <li class="pl-6 border-l border-slate-800 ml-2">├── <span class="text-slate-200">api/</span> <span class="text-slate-600 float-right text-xs pt-1">API Endpoints</span></li>
-              <li class="pl-6 border-l border-slate-800 ml-2">├── <span class="text-slate-200">components/</span> <span class="text-slate-600 float-right text-xs pt-1">Functional Components</span></li>
-              <li class="pl-6 border-l border-slate-800 ml-2">├── <span class="text-slate-200">core/</span> <span class="text-slate-600 float-right text-xs pt-1">Framework Core</span></li>
-              <li class="pl-6 border-l border-slate-800 ml-2">├── <span class="text-slate-200">models/</span> <span class="text-slate-600 float-right text-xs pt-1">Data Models</span></li>
-              <li class="pl-6 border-l border-slate-800 ml-2">├── <span class="text-accent font-bold">layout.php</span> <span class="text-slate-600 float-right text-xs pt-1">Root Layout</span></li>
-              <li class="pl-6 border-l border-slate-800 ml-2">└── <span class="text-secondary font-bold">page.php</span> <span class="text-slate-600 float-right text-xs pt-1">Home Page</span></li>
-              
-              <li class="flex items-center gap-2 mt-4"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> <span>config/</span> <span class="text-slate-600 float-right text-xs pt-1">style.php, app.php</span></li>
-              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg> <span>storage/</span> <span class="text-slate-600 float-right text-xs pt-1">DB, Logs, Cache</span></li>
-            </ul>
-          </div>
-          <div class="space-y-6">
-            <div>
-              <h4 class="text-lg font-semibold text-primary mb-2">The <code>app/</code> Directory</h4>
-              <p class="text-sm text-slate-400 leading-relaxed">
-                Contains your routing logic, views, and functional components. The folder structure corresponds directly to the URL paths.
-              </p>
-            </div>
-            <div>
-              <h4 class="text-lg font-semibold text-secondary mb-2">The <code>core/</code> Directory</h4>
-              <p class="text-sm text-slate-400 leading-relaxed">
-                Contains the engine: <code>Router.php</code>, <code>Auth.php</code>, <code>DB.php</code>, etc. You rarely need to touch this unless extending the framework.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="global-styling" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white font-bold shadow-lg shadow-pink-500/30">GS</div>
-          <div>
-            <h2 class="text-3xl font-bold text-slate-200">Global Styling System</h2>
-            <p class="text-sm text-slate-400">Centralized styling management. No manual <code>&lt;link&gt;</code> tags needed.</p>
-          </div>
-        </div>
-        
-        <div class="glass-panel highlight p-6 rounded-xl mb-10">
-          <p class="text-slate-300">
-            <strong>One of Bastion PHP's most powerful features.</strong> The Global Styling System automatically injects the correct CSS/JavaScript into your pages based on a single configuration file. It supports Tailwind (CDN or Build mode) and Custom CSS out of the box.
-          </p>
-        </div>
-
-        <div class="grid lg:grid-cols-2 gap-8 mb-10">
-          <div>
-             <div class="flex items-center justify-between mb-3">
-              <h3 class="text-lg font-semibold text-slate-200">Configuration</h3>
-              <code class="text-xs text-slate-500 font-mono">config/style.php</code>
-            </div>
-            <div class="glass-panel rounded-xl overflow-hidden h-full">
-              <div class="p-6 font-mono text-sm text-slate-300">
-<pre><span class="token k">return</span> [
-    <span class="token c">// Enable/disable Tailwind CSS globally</span>
-    <span class="token s">'useTailwind'</span> => <span class="token k">true</span>,
-
-    <span class="token c">// 'cdn' (Dev) or 'build' (Production)</span>
-    <span class="token s">'tailwindMode'</span> => <span class="token s">'cdn'</span>,
-
-    <span class="token c">// Fallback if useTailwind is false</span>
-    <span class="token s">'fallbackCss'</span> => <span class="token s">'/css/fallback.css'</span>,
-];</pre>
-              </div>
-            </div>
-          </div>
-          
-          <div>
-             <div class="flex items-center justify-between mb-3">
-              <h3 class="text-lg font-semibold text-slate-200">Helper Functions</h3>
-              <code class="text-xs text-slate-500 font-mono">Any .php view</code>
-            </div>
-            <div class="glass-panel rounded-xl overflow-hidden h-full">
-              <div class="p-6 font-mono text-sm text-slate-300">
-<pre><span class="token c">// Check if Tailwind is active</span>
-<span class="token k">if</span> (<span class="token f">use_tailwind</span>()) {
-    <span class="token k">echo</span> <span class="token s">'&lt;div class="bg-blue-500"&gt;'</span>;
-}
-
-<span class="token c">// Check mode ('cdn' or 'build')</span>
-<span class="token v">$mode</span> = <span class="token f">tailwind_mode</span>();
-
-<span class="token c">// Get any style config</span>
-<span class="token v">$fallback</span> = <span class="token f">style_config</span>(<span class="token s">'fallbackCss'</span>);</pre>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <h3 class="text-xl font-bold text-white mb-4">Tailwind Modes Explained</h3>
-        <div class="grid md:grid-cols-2 gap-6">
-          <div class="glass-panel p-6 rounded-2xl">
-            <h4 class="text-lg font-bold text-primary mb-2">Mode 1: CDN (Development)</h4>
-            <p class="text-sm text-slate-400 mb-4">Best for local development and rapid prototyping.</p>
-            <ul class="text-sm text-slate-300 space-y-2 list-disc pl-4">
-              <li>Loads Tailwind via CDN script.</li>
-              <li>JIT (Just-In-Time) compilation in browser.</li>
-              <li>No build step required.</li>
-              <li>Slightly slower initial load (~200ms).</li>
-            </ul>
-          </div>
-          <div class="glass-panel p-6 rounded-2xl">
-            <h4 class="text-lg font-bold text-secondary mb-2">Mode 2: Build (Production)</h4>
-            <p class="text-sm text-slate-400 mb-4">Best for production deployments.</p>
-            <ul class="text-sm text-slate-300 space-y-2 list-disc pl-4">
-              <li>Loads pre-compiled CSS from <code>/public/css/app.css</code>.</li>
-              <li>Zero runtime overhead.</li>
-              <li>Requires <code>npm run build</code>.</li>
-              <li>Optimized and purged CSS.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section id="routing" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-          <h2 class="text-3xl font-bold text-slate-200">Routing & Layouts</h2>
-          <span class="h-px flex-1 bg-border"></span>
-        </div>
-        
-        <p class="text-slate-400 mb-8 max-w-2xl">
-          Bastion PHP uses file-based routing. Drop a <code>page.php</code> file anywhere in your <code>app/</code> directory and it becomes a route.
+      <section id="ioc-container" class="scroll-mt-24 mb-20">
+        <h2>The IoC Container</h2>
+        <p>
+          At the heart of Bastion is a powerful <strong>Inversion of Control (IoC) Container</strong>. 
+          It manages class dependencies and performs dependency injection automatically.
         </p>
 
-        <div class="overflow-hidden rounded-xl border border-border shadow-2xl mb-10">
-          <table class="w-full text-sm text-left">
-            <thead class="bg-slate-900 text-slate-400 uppercase font-bold tracking-wider">
-              <tr>
-                <th class="px-6 py-4">File Path</th>
-                <th class="px-6 py-4">URL</th>
-                <th class="px-6 py-4">Params</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-border bg-slate-900/50">
-              <tr class="hover:bg-slate-800/50 transition-colors">
-                <td class="px-6 py-4 font-mono text-primary">app/page.php</td>
-                <td class="px-6 py-4 text-slate-300">/</td>
-                <td class="px-6 py-4 text-slate-500">-</td>
-              </tr>
-              <tr class="hover:bg-slate-800/50 transition-colors">
-                <td class="px-6 py-4 font-mono text-primary">app/about/page.php</td>
-                <td class="px-6 py-4 text-slate-300">/about</td>
-                <td class="px-6 py-4 text-slate-500">-</td>
-              </tr>
-              <tr class="hover:bg-slate-800/50 transition-colors">
-                <td class="px-6 py-4 font-mono text-primary">app/users/[id]/page.php</td>
-                <td class="px-6 py-4 text-slate-300">/users/123</td>
-                <td class="px-6 py-4 text-slate-300 font-mono">$params['id']</td>
-              </tr>
-              <tr class="hover:bg-slate-800/50 transition-colors">
-                <td class="px-6 py-4 font-mono text-primary">app/blog/[slug]/page.php</td>
-                <td class="px-6 py-4 text-slate-300">/blog/hello-world</td>
-                <td class="px-6 py-4 text-slate-300 font-mono">$params['slug']</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3 class="text-xl font-bold text-white mb-4">Nested Layouts</h3>
-        <p class="text-slate-400 mb-6">Layouts wrap your pages. Bastion supports nested layouts, meaning a page is rendered inside its parent folder's layout, which is rendered inside <i>its</i> parent, up to the root.</p>
-
-        <div class="grid lg:grid-cols-2 gap-8">
-           <div class="glass-panel rounded-xl overflow-hidden">
-            <div class="code-header px-6 py-3">
-              <span class="text-xs font-mono text-slate-400">app/layout.php (Root)</span>
-            </div>
-            <div class="p-6 font-mono text-sm text-slate-300">
-<pre>&lt;!doctype html&gt;
-&lt;html&gt;
-&lt;body&gt;
-    &lt;nav&gt;Main Navigation&lt;/nav&gt;
-    
-    &lt;!-- Child content injected here --&gt;
-    <span class="token f">&lt;?=</span> <span class="token v">$content</span> <span class="token f">?&gt;</span>
-    
-    &lt;footer&gt;Main Footer&lt;/footer&gt;
-&lt;/body&gt;
-&lt;/html&gt;</pre>
-            </div>
-          </div>
-          
-          <div class="glass-panel rounded-xl overflow-hidden">
-             <div class="code-header px-6 py-3">
-              <span class="text-xs font-mono text-slate-400">app/dashboard/layout.php (Nested)</span>
-            </div>
-            <div class="p-6 font-mono text-sm text-slate-300">
-<pre>&lt;div class="dashboard-grid"&gt;
-    &lt;aside&gt;Sidebar&lt;/aside&gt;
-    
-    &lt;main&gt;
-        &lt;!-- Page content injected here --&gt;
-        <span class="token f">&lt;?=</span> <span class="token v">$content</span> <span class="token f">?&gt;</span>
-    &lt;/main&gt;
-&lt;/div&gt;</pre>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="api-endpoints" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-          <h2 class="text-3xl font-bold text-slate-200">API Routes</h2>
-          <span class="h-px flex-1 bg-border"></span>
-        </div>
-
-        <p class="text-slate-400 mb-8">
-          API endpoints are defined using <code>+server.php</code> files. These files return an array of closures keyed by HTTP method.
+        <h3>Automatic Injection</h3>
+        <p>
+          You rarely need to instantiate classes manually. Type-hint dependencies in your constructors or methods, 
+          and the container will resolve them.
         </p>
 
-        <div class="glass-panel rounded-xl overflow-hidden">
-          <div class="code-header px-6 py-3 flex justify-between">
-            <span class="text-xs font-mono text-slate-400">app/api/users/[id]/+server.php</span>
-            <span class="text-xs font-bold text-secondary">DYNAMIC ROUTE</span>
-          </div>
-          <div class="p-6 font-mono text-sm text-slate-300">
-<pre>
-<span class="token k">use</span> App\Core\Request;
-<span class="token k">use</span> App\Core\Response;
-<span class="token k">use</span> App\Models\User;
-
-<span class="token k">return</span> [
-    <span class="token c">// GET /api/users/123</span>
-    <span class="token s">'get'</span> => <span class="token k">function</span> (Request <span class="token v">$req</span>) {
-        <span class="token v">$id</span> = <span class="token v">$req</span>->meta[<span class="token s">'params'</span>][<span class="token s">'id'</span>];
-        
-        <span class="token v">$user</span> = User::find(<span class="token v">$id</span>);
-        
-        <span class="token k">if</span> (!<span class="token v">$user</span>) {
-            <span class="token f">Response::json</span>([<span class="token s">'error'</span> => <span class="token s">'Not found'</span>], <span class="token n">404</span>);
-        }
-        
-        <span class="token f">Response::json</span>(<span class="token v">$user</span>);
-    },
-
-    <span class="token c">// DELETE /api/users/123</span>
-    <span class="token s">'delete'</span> => <span class="token k">function</span> (Request <span class="token v">$req</span>) {
-        <span class="token v">$id</span> = <span class="token v">$req</span>->meta[<span class="token s">'params'</span>][<span class="token s">'id'</span>];
-        User::delete(<span class="token v">$id</span>);
-        
-        <span class="token f">Response::json</span>([<span class="token s">'success'</span> => <span class="token k">true</span>]);
-    }
-];
-</pre>
-          </div>
-        </div>
-      </section>
-
-      <section id="components" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-          <h2 class="text-3xl font-bold text-slate-200">Components & HTMX</h2>
-          <span class="h-px flex-1 bg-border"></span>
-        </div>
-
-        <div class="glass-panel highlight p-6 rounded-xl mb-10">
-          <p class="text-slate-300">
-             Bastion PHP encourages using <strong>Functional Components</strong> instead of complex template engines. Combine PHP functions with Heredoc syntax and HTMX for a React-like experience with zero build steps.
-          </p>
-        </div>
-
-        <div class="grid lg:grid-cols-2 gap-8">
-           <div>
-            <h4 class="text-lg font-semibold text-slate-200 mb-3">1. Define Component</h4>
-            <div class="glass-panel rounded-xl overflow-hidden">
-               <div class="code-header px-4 py-2 text-xs font-mono text-slate-500">app/components/UserCard.php</div>
-               <div class="p-6 font-mono text-sm text-slate-300">
-<pre><span class="token k">function</span> <span class="token f">UserCard</span>(<span class="token v">$user</span>) {
-    <span class="token v">$name</span> = <span class="token f">e</span>(<span class="token v">$user</span>[<span class="token s">'name'</span>]);
-    <span class="token v">$id</span> = <span class="token v">$user</span>[<span class="token s">'id'</span>];
-    
-    <span class="token k">return</span> &lt;&lt;&lt;HTML
-    &lt;div class="card" id="user-$id"&gt;
-        &lt;h3&gt;$name&lt;/h3&gt;
-        &lt;button 
-            hx-delete="/api/users/$id"
-            hx-target="#user-$id"
-            hx-swap="outerHTML"&gt;
-            Delete
-        &lt;/button&gt;
-    &lt;/div&gt;
-    HTML;
-}</pre>
-               </div>
-            </div>
-           </div>
-
-           <div>
-            <h4 class="text-lg font-semibold text-slate-200 mb-3">2. Use in Page</h4>
-            <div class="glass-panel rounded-xl overflow-hidden">
-               <div class="code-header px-4 py-2 text-xs font-mono text-slate-500">app/users/page.php</div>
-               <div class="p-6 font-mono text-sm text-slate-300">
-<pre><span class="token k">require_once</span> <span class="token s">'../components/UserCard.php'</span>;
-
-<span class="token v">$users</span> = User::all();
-<span class="token f">?&gt;</span>
-
-&lt;div class="grid"&gt;
-    <span class="token f">&lt;?php</span> <span class="token k">foreach</span> (<span class="token v">$users</span> <span class="token k">as</span> <span class="token v">$user</span>): <span class="token f">?&gt;</span>
-        <span class="token f">&lt;?=</span> <span class="token f">UserCard</span>(<span class="token v">$user</span>) <span class="token f">?&gt;</span>
-    <span class="token f">&lt;?php</span> <span class="token k">endforeach</span>; <span class="token f">?&gt;</span>
-&lt;/div&gt;</pre>
-               </div>
-            </div>
-           </div>
-        </div>
-      </section>
-      <section id="authentication" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-purple-500/30">Auth</div>
-          <div>
-            <h2 class="text-3xl font-bold text-slate-200">Authentication (JWT)</h2>
-            <p class="text-sm text-slate-400">Secure Access & Refresh Token implementation.</p>
-          </div>
-        </div>
-
-        <p class="text-slate-400 mb-8 max-w-2xl">
-          Bastion includes a complete JWT authentication system. It uses short-lived Access Tokens (15 min) for requests and long-lived HttpOnly Refresh Tokens (7 days) for session maintenance.
-        </p>
-
-        <div class="grid lg:grid-cols-2 gap-8 mb-8">
-          <div class="glass-panel rounded-xl p-6">
-            <h4 class="text-secondary font-bold mb-4 uppercase text-xs tracking-wider">Issuing Tokens (Login)</h4>
-            <pre class="font-mono text-sm text-slate-300 overflow-x-auto">
+<pre><code class="language-php"><span class="token c">// Inside a Controller or Service</span>
 <span class="token k">use</span> App\Core\Auth;
+<span class="token k">use</span> App\Core\Http\Request;
 
-<span class="token v">$tokens</span> = <span class="token f">Auth::issueTokens</span>(<span class="token v">$userId</span>);
+<span class="token k">class</span> <span class="token t">UserController</span> {
+    <span class="token k">protected</span> <span class="token v">$auth</span>;
+    <span class="token k">protected</span> <span class="token v">$request</span>;
 
-<span class="token c">// Set Secure HttpOnly Cookie</span>
-<span class="token f">setcookie</span>(<span class="token s">'refresh'</span>, <span class="token v">$tokens</span>[<span class="token s">'refresh'</span>], [
-    <span class="token s">'expires'</span> => <span class="token f">time</span>() + <span class="token n">604800</span>,
-    <span class="token s">'path'</span> => <span class="token s">'/'</span>,
-    <span class="token s">'httponly'</span> => <span class="token k">true</span>,
-    <span class="token s">'secure'</span> => <span class="token k">true</span>,
-    <span class="token s">'samesite'</span> => <span class="token s">'Lax'</span>
-]);</pre>
-          </div>
-
-          <div class="glass-panel rounded-xl p-6">
-             <h4 class="text-secondary font-bold mb-4 uppercase text-xs tracking-wider">Protecting Routes</h4>
-            <pre class="font-mono text-sm text-slate-300 overflow-x-auto">
-<span class="token c">// In page.php</span>
-<span class="token k">if</span> (!<span class="token f">auth</span>()) {
-    <span class="token f">redirect</span>(<span class="token s">'/login'</span>);
-}
-
-<span class="token c">// In API +server.php</span>
-<span class="token k">return</span> [
-    <span class="token s">'get'</span> => <span class="token k">function</span>(<span class="token v">$req</span>) {
-        Auth::requireAuth(<span class="token v">$req</span>, <span class="token k">function</span>() {
-            <span class="token c">// Protected logic</span>
-        });
+    <span class="token c">// The container automatically injects Auth and Request instances</span>
+    <span class="token k">public function</span> <span class="token f">__construct</span>(Auth <span class="token v">$auth</span>, Request <span class="token v">$request</span>) {
+        <span class="token v">$this</span>->auth = <span class="token v">$auth</span>;
+        <span class="token v">$this</span>->request = <span class="token v">$request</span>;
     }
-];</pre>
-          </div>
-        </div>
+}</code></pre>
+
+        <h3>Manual Binding</h3>
+        <p>In your Service Providers, you can bind interfaces to implementations or create singletons.</p>
+
+<pre><code class="language-php"><span class="token c">// app/providers/AppServiceProvider.php</span>
+
+<span class="token k">public function</span> <span class="token f">register</span>() {
+    <span class="token c">// Singleton: Same instance every time</span>
+    <span class="token v">$this</span>->app-><span class="token f">singleton</span>(PaymentGateway::class, <span class="token k">function</span>() {
+        <span class="token k">return new</span> StripeGateway(env(<span class="token s">'STRIPE_KEY'</span>));
+    });
+}</code></pre>
       </section>
 
-      <section id="database" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-          <h2 class="text-3xl font-bold text-slate-200">Database & Models</h2>
-          <span class="h-px flex-1 bg-border"></span>
-        </div>
-
-        <p class="text-slate-400 mb-8">
-            Bastion uses SQLite with WAL mode enabled by default for 10-100x faster concurrent writes. MySQL and PostgreSQL are also supported via <code>.env</code> configuration.
+      <section id="hybrid-router" class="scroll-mt-24 mb-20">
+        <h2>Hybrid Routing System</h2>
+        <p>
+          Bastion introduces a unique routing paradigm that separates <strong>UI Logic</strong> from <strong>Data Logic</strong> 
+          using file conventions.
         </p>
 
-        <div class="grid lg:grid-cols-2 gap-8 mb-8">
-          <div class="glass-panel rounded-xl p-6">
-            <h4 class="text-accent font-bold mb-4 uppercase text-xs tracking-wider">Fluent Query Builder</h4>
-            <pre class="font-mono text-sm text-slate-300 overflow-x-auto">
-<span class="token v">$users</span> = <span class="token f">DB::table</span>(<span class="token s">'users'</span>)
-    -><span class="token f">where</span>(<span class="token s">'role'</span>, <span class="token s">'admin'</span>)
-    -><span class="token f">orderBy</span>(<span class="token s">'created_at'</span>, <span class="token s">'DESC'</span>)
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+          <div class="bg-[#0B1120] border border-gray-700 rounded-xl p-6">
+            <h4 class="mt-0 text-blue-400">1. UI Routes (page.php)</h4>
+            <p class="text-sm">Used for rendering HTML. Executed when the user visits the URL in the browser.</p>
+            <ul class="text-sm">
+              <li>Returns HTML (via View/Layouts).</li>
+              <li>Has access to <code>DV::set()</code> for state.</li>
+              <li>Can use <code>layout.php</code> for wrapping.</li>
+            </ul>
+            <div class="mt-4 p-2 bg-black rounded border border-gray-800 font-mono text-xs">
+              app/dashboard/page.php -> /dashboard
+            </div>
+          </div>
+
+          <div class="bg-[#0B1120] border border-gray-700 rounded-xl p-6">
+            <h4 class="mt-0 text-purple-400">2. API Routes (+server.php)</h4>
+            <p class="text-sm">Used for handling data submissions (POST, DELETE) or JSON APIs.</p>
+            <ul class="text-sm">
+              <li>Returns an array of Closures.</li>
+              <li>Strict HTTP Method handling.</li>
+              <li>Returns JSON automatically.</li>
+            </ul>
+            <div class="mt-4 p-2 bg-black rounded border border-gray-800 font-mono text-xs">
+              app/api/users/+server.php -> /api/users
+            </div>
+          </div>
+        </div>
+
+        <h3 class="mt-12">Dynamic Parameters</h3>
+        <p>Use square brackets <code>[param]</code> to define dynamic segments.</p>
+
+<pre><code class="language-php"><span class="token c">// File: app/users/[id]/page.php</span>
+<span class="token c">// URL: /users/42</span>
+
+<span class="token v">$id</span> = <span class="token v">$request</span>->attributes[<span class="token s">'id'</span>]; <span class="token c">// 42</span>
+<span class="token v">$user</span> = User::<span class="token f">find</span>(<span class="token v">$id</span>);
+</code></pre>
+      </section>
+
+      <section id="dv-engine" class="scroll-mt-24 mb-20">
+        <h2>The DV Engine (Data View)</h2>
+        <div class="alert alert-warn">
+          <span class="alert-title">Solving the Global Variable Problem</span>
+          In traditional PHP, passing data from a child script (<code>page.php</code>) to a parent wrapper (<code>layout.php</code>) 
+          often requires global variables. <strong>Bastion eliminates this.</strong>
+        </div>
+
+        <p>
+          The <code>DV</code> class is a static state container that persists data across the request lifecycle 
+          and can "Flash" data to the session for the next request.
+        </p>
+
+<pre><code class="language-php"><span class="token c">// 1. In app/dashboard/page.php (Controller Logic)</span>
+<span class="token k">use</span> App\Core\DV;
+
+<span class="token c">// Set data for the view</span>
+DV::<span class="token f">set</span>(<span class="token s">'title'</span>, <span class="token s">'Sales Dashboard'</span>);
+DV::<span class="token f">set</span>(<span class="token s">'stats'</span>, [<span class="token s">'revenue'</span> => <span class="token n">5000</span>]);
+
+<span class="token c">// 2. In app/views/layouts/app.php (View Logic)</span>
+&lt;title&gt;<span class="token f">&lt;?=</span> DV::<span class="token f">get</span>(<span class="token s">'title'</span>, <span class="token s">'Default Title'</span>) <span class="token f">?&gt;</span>&lt;/title&gt;
+
+&lt;div&gt;Revenue: <span class="token f">&lt;?=</span> DV::<span class="token f">get</span>(<span class="token s">'stats'</span>)[<span class="token s">'revenue'</span>] <span class="token f">?&gt;</span>&lt;/div&gt;
+</code></pre>
+      </section>
+
+      <section id="database-orm" class="scroll-mt-24 mb-20">
+        <h2>Database & ORM</h2>
+        <p>
+          Bastion includes a powerful Query Builder and an Active Record implementation similar to Eloquent.
+          It supports <strong>SQLite (WAL Mode)</strong>, MySQL, and PostgreSQL out of the box.
+        </p>
+
+        <h3>The Model</h3>
+<pre><code class="language-php"><span class="token k">namespace</span> App\Models;
+<span class="token k">use</span> App\Core\Database\Model;
+
+<span class="token k">class</span> <span class="token t">User</span> <span class="token k">extends</span> <span class="token t">Model</span> {
+    <span class="token k">protected static string</span> <span class="token v">$table</span> = <span class="token s">'users'</span>;
+}
+
+<span class="token c">// Usage</span>
+<span class="token v">$users</span> = User::<span class="token f">where</span>(<span class="token s">'role'</span>, <span class="token s">'admin'</span>)-><span class="token f">get</span>();
+<span class="token v">$user</span> = User::<span class="token f">create</span>([<span class="token s">'name'</span> => <span class="token s">'Bastion'</span>, <span class="token s">'email'</span> => <span class="token s">'admin@bastion.com'</span>]);
+</code></pre>
+
+        <h3>Fluent Query Builder</h3>
+<pre><code class="language-php"><span class="token k">use</span> App\Core\Database\DB;
+
+<span class="token v">$result</span> = DB::<span class="token f">table</span>(<span class="token s">'orders'</span>)
+    -><span class="token f">select</span>(<span class="token s">'id'</span>, <span class="token s">'total'</span>)
+    -><span class="token f">where</span>(<span class="token s">'status'</span>, <span class="token s">'paid'</span>)
+    -><span class="token f">orderBy</span>(<span class="token s">'created_at'</span>, <span class="token s">'desc'</span>)
     -><span class="token f">limit</span>(<span class="token n">10</span>)
     -><span class="token f">get</span>();
+</code></pre>
+      </section>
 
-<span class="token v">$id</span> = <span class="token f">DB::table</span>(<span class="token s">'users'</span>)-><span class="token f">insert</span>([
-    <span class="token s">'email'</span> => <span class="token s">'jane@example.com'</span>,
-    <span class="token s">'active'</span> => <span class="token n">1</span>
-]);</pre>
+      ```
+
+### Parte 2: Frontend, Seguridad, CLI y Despliegue
+
+Esta parte cubre la integración de **Tailwind v4**, el sistema de seguridad (JWT, CSRF), la herramienta CLI `bastion` y la guía de despliegue.
+
+**(Copia y pega esto justo después de la Parte 1)**
+
+```html
+      <section id="tailwind-v4" class="scroll-mt-24 mb-20">
+        <h2>Frontend: Tailwind v4 (CSS-First)</h2>
+        <div class="alert alert-warn">
+          <span class="alert-title">No more JS Config</span>
+          Bastion v1.0.0 embraces the <strong>Tailwind CSS v4</strong> architecture. 
+          We no longer use <code>tailwind.config.js</code>. All configuration lives in your CSS.
+        </div>
+
+        <h3>Theme Configuration</h3>
+        <p>Edit <code>resources/css/app.css</code> to configure your theme variables and imports.</p>
+
+<pre><code class="language-css"><span class="token c">/* resources/css/app.css */</span>
+<span class="token k">@import</span> "tailwindcss";
+
+<span class="token k">@theme</span> {
+  <span class="token c">/* Define custom colors */</span>
+  --color-slate-950: #020617;
+  
+  <span class="token c">/* Define fonts */</span>
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+<span class="token k">@layer</span> components {
+  .btn-primary {
+    <span class="token k">@apply</span> bg-sky-500 text-white px-4 py-2 rounded hover:bg-sky-600 transition;
+  }
+}</code></pre>
+
+        <h3>Building Assets</h3>
+        <p>We use the new <strong>Oxide Engine</strong> (Rust-based) via the CLI for lightning-fast builds.</p>
+<pre><code class="language-bash"><span class="token c"># Watch for changes (JIT)</span>
+npm run dev
+
+<span class="token c"># Build for Production (Minified)</span>
+npm run build</code></pre>
+      </section>
+
+      <section id="components" class="scroll-mt-24 mb-20">
+        <h2>Functional Components</h2>
+        <p>
+          Why use a heavy template engine like Blade or Twig when PHP 8+ is already fast and expressive?
+          Bastion uses <strong>Functional Components</strong>: simple PHP functions that return HTML strings.
+        </p>
+
+<pre><code class="language-php"><span class="token c">// app/components/Alert.php</span>
+<span class="token k">function</span> <span class="token f">Alert</span>(<span class="token v">$message</span>, <span class="token v">$type</span> = <span class="token s">'info'</span>) {
+    <span class="token v">$color</span> = <span class="token v">$type</span> === <span class="token s">'error'</span> ? <span class="token s">'red'</span> : <span class="token s">'blue'</span>;
+    <span class="token k">return</span> &lt;&lt;&lt;HTML
+    &lt;div class="p-4 bg-<span class="token v">$color</span>-100 text-<span class="token v">$color</span>-800 rounded border border-<span class="token v">$color</span>-200"&gt;
+        <span class="token v">$message</span>
+    &lt;/div&gt;
+    HTML;
+}
+
+<span class="token c">// Usage in any view/page:</span>
+<span class="token f">&lt;?=</span> <span class="token f">component</span>(<span class="token s">'Alert'</span>, [<span class="token s">'message'</span> => <span class="token s">'User Saved!'</span>, <span class="token s">'type'</span> => <span class="token s">'success'</span>]) <span class="token f">?&gt;</span>
+</code></pre>
+      </section>
+
+      <section id="security" class="scroll-mt-24 mb-20">
+        <h2>Security Protocols</h2>
+        <p>Bastion is designed for internal tools where security is non-negotiable. We implement a <strong>Defense in Depth</strong> strategy.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div class="feature-card">
+            <h4>Native JWT</h4>
+            <p class="text-sm text-gray-400">Zero-dependency implementation using OpenSSL. Handles <code>HttpOnly</code> cookies for Refresh Tokens automatically.</p>
           </div>
-
-          <div class="glass-panel rounded-xl p-6">
-            <h4 class="text-accent font-bold mb-4 uppercase text-xs tracking-wider">Data Models</h4>
-            <pre class="font-mono text-sm text-slate-300 overflow-x-auto">
-<span class="token k">namespace</span> App\Models;
-<span class="token k">use</span> App\Core\DB;
-
-<span class="token k">class</span> <span class="token t">User</span> {
-    <span class="token k">public static function</span> <span class="token f">find</span>(<span class="token v">$id</span>) {
-        <span class="token k">return</span> <span class="token f">DB::pdo</span>()
-            -><span class="token f">prepare</span>(<span class="token s">"SELECT * FROM users WHERE id=?"</span>)
-            -><span class="token f">execute</span>([<span class="token v">$id</span>])
-            -><span class="token f">fetch</span>();
-    }
-}</pre>
+          <div class="feature-card">
+            <h4>CSRF Protection</h4>
+            <p class="text-sm text-gray-400">Middleware automatically verifies tokens on all state-changing methods (POST, PUT, DELETE).</p>
+          </div>
+          <div class="feature-card">
+            <h4>XSS Prevention</h4>
+            <p class="text-sm text-gray-400">The global <code>e()</code> helper escapes all output. CSP headers are configured by default.</p>
+          </div>
+          <div class="feature-card">
+            <h4>Encryption Service</h4>
+            <p class="text-sm text-gray-400">AES-256-CBC encryption service accessible via <code>app('encrypter')</code>.</p>
           </div>
         </div>
       </section>
 
-      <section id="security" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-           <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 mb-4">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            </div>
-          <h2 class="text-3xl font-bold text-slate-200">Security Best Practices</h2>
-          <span class="h-px flex-1 bg-border"></span>
-        </div>
+      <section id="bastion-cli" class="scroll-mt-24 mb-20">
+        <h2>The Bastion CLI</h2>
+        <p>
+          Say goodbye to Artisan. Bastion includes its own lightweight console application located at the project root.
+        </p>
 
-        <div class="glass-panel border-l-4 border-l-red-500 p-6 rounded-xl mb-10">
-            <strong class="text-red-400 block mb-2">🔒 Critical Security Checklist</strong>
-            <p class="text-slate-300 text-sm">Review these items before deploying to production.</p>
-        </div>
+<pre><code class="language-bash"><span class="token c"># List available commands</span>
+php bastion
 
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="glass-panel p-6 rounded-xl">
-                <h4 class="font-bold text-slate-200 mb-2">Environment</h4>
-                <ul class="text-sm text-slate-400 space-y-2">
-                    <li class="flex gap-2">✅ <span>Set <code>APP_ENV=production</code></span></li>
-                    <li class="flex gap-2">✅ <span>Set <code>APP_DEBUG=false</code></span></li>
-                    <li class="flex gap-2">✅ <span>Generate new <code>APP_KEY</code> and <code>JWT_SECRET</code></span></li>
-                </ul>
-            </div>
-            <div class="glass-panel p-6 rounded-xl">
-                <h4 class="font-bold text-slate-200 mb-2">Database & Input</h4>
-                <ul class="text-sm text-slate-400 space-y-2">
-                    <li class="flex gap-2">✅ <span>Use Prepared Statements (default in QueryBuilder)</span></li>
-                    <li class="flex gap-2">✅ <span>Escape outputs with <code>e()</code> helper</span></li>
-                    <li class="flex gap-2">✅ <span>Set <code>SECURE_COOKIES=true</code> (Requires HTTPS)</span></li>
-                </ul>
-            </div>
-        </div>
+<span class="token c"># Start Development Server</span>
+php bastion serve
+
+<span class="token c"># Run Database Migrations</span>
+php bastion migrate
+
+<span class="token c"># Seed Database</span>
+php bastion db:seed
+
+<span class="token c"># Scaffold a New Page</span>
+php bastion make:page dashboard/stats</code></pre>
       </section>
 
-       <section id="testing" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-          <h2 class="text-3xl font-bold text-slate-200">Testing & Benchmarks</h2>
-          <span class="h-px flex-1 bg-border"></span>
-        </div>
+      <section id="deployment" class="scroll-mt-24 mb-20">
+        <h2>Deployment</h2>
+        <p>Deploying Bastion is simple because it relies on standard PHP technologies.</p>
 
-        <p class="text-slate-400 mb-6">Bastion includes a comprehensive test suite. Run <code>php test_all_features.php</code> to validate.</p>
+        <h3 class="mt-8">1. Requirements</h3>
+        <ul class="text-sm">
+          <li>PHP 8.1+</li>
+          <li>Nginx or Apache</li>
+          <li>SQLite, MySQL, or PostgreSQL</li>
+        </ul>
 
-        <div class="overflow-hidden rounded-xl border border-border shadow-2xl mb-8">
-            <table class="w-full text-sm text-left">
-                <thead class="bg-slate-900 text-slate-400 uppercase font-bold tracking-wider">
-                    <tr>
-                        <th class="px-6 py-4">Component</th>
-                        <th class="px-6 py-4">Operation</th>
-                        <th class="px-6 py-4">Performance</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-border bg-slate-900/50">
-                    <tr>
-                        <td class="px-6 py-4 text-primary font-mono">Route Compiler</td>
-                        <td class="px-6 py-4 text-slate-300">Cached Read</td>
-                        <td class="px-6 py-4 text-green-400">25,000 ops/sec</td>
-                    </tr>
-                    <tr>
-                        <td class="px-6 py-4 text-primary font-mono">Middleware</td>
-                        <td class="px-6 py-4 text-slate-300">5 Layer Stack</td>
-                        <td class="px-6 py-4 text-green-400">150,000 ops/sec</td>
-                    </tr>
-                    <tr>
-                        <td class="px-6 py-4 text-primary font-mono">JWT Auth</td>
-                        <td class="px-6 py-4 text-slate-300">Validation</td>
-                        <td class="px-6 py-4 text-green-400">329,000 ops/sec</td>
-                    </tr>
-                     <tr>
-                        <td class="px-6 py-4 text-primary font-mono">Memory</td>
-                        <td class="px-6 py-4 text-slate-300">Per Request</td>
-                        <td class="px-6 py-4 text-green-400">~256 KB</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-      </section>
+        <h3 class="mt-8">2. Nginx Configuration</h3>
+        <p>Point your web server root to the <code>public/</code> directory.</p>
 
-      <section id="deployment" class="mb-32 scroll-mt-28">
-        <div class="flex items-center gap-4 mb-8">
-          <h2 class="text-3xl font-bold text-slate-200">Deployment</h2>
-          <span class="h-px flex-1 bg-border"></span>
-        </div>
-
-        <div class="glass-panel rounded-xl overflow-hidden mb-8">
-          <div class="flex items-center justify-between px-4 py-3 bg-slate-900/50 border-b border-border">
-            <span class="text-xs font-mono text-slate-500">Standard Deployment Script</span>
-          </div>
-          <div class="p-6 overflow-x-auto font-mono text-sm text-slate-300">
-<pre>
-<span class="token c"># 1. Clone & Install</span>
-git clone https://github.com/your-org/app.git
-cd app
-composer install --no-dev --optimize-autoloader
-
-<span class="token c"># 2. Permissions</span>
-chmod 755 storage/
-chmod 664 storage/db/app.db
-
-<span class="token c"># 3. Environment</span>
-cp .env.example .env
-php artisan key:generate
-<span class="token c"># Edit .env for production DB credentials</span>
-
-<span class="token c"># 4. Build Assets (Tailwind)</span>
-npm install
-npm run build
-
-<span class="token c"># 5. Migrate</span>
-php artisan migrate
-</pre>
-          </div>
-        </div>
-
-        <h3 class="text-xl font-bold text-white mb-4">Web Server Configuration</h3>
-        <p class="text-slate-400 mb-6">Point your web server document root to the <code>public/</code> folder.</p>
-
-        <div class="grid md:grid-cols-2 gap-6">
-             <div class="glass-panel p-6 rounded-xl">
-                <h4 class="font-bold text-slate-200 mb-2">Nginx</h4>
-                <pre class="text-xs font-mono text-slate-400">
-server {
-    root /var/www/app/public;
+<pre><code class="language-nginx">server {
+    listen 80;
+    server_name my-tool.internal;
+    root /var/www/bastion/public;
+    
     index index.php;
 
     location / {
         try_files $uri $uri/ /index.php?$query_string;
     }
-}</pre>
-             </div>
-             <div class="glass-panel p-6 rounded-xl">
-                <h4 class="font-bold text-slate-200 mb-2">Apache</h4>
-                <p class="text-xs text-slate-400">Bastion includes a <code>.htaccess</code> file in the public directory that handles URL rewriting automatically.</p>
-             </div>
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+    }
+    
+    # Security: Deny access to .env and storage
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}</code></pre>
+
+        <h3 class="mt-8">3. Production Checklist</h3>
+        <div class="bg-gray-900 border border-gray-700 rounded p-4">
+          <ul class="list-none pl-0 mb-0">
+            <li>✅ Run <code>composer install --no-dev --optimize-autoloader</code></li>
+            <li>✅ Run <code>npm run build</code> to generate minified CSS</li>
+            <li>✅ Set <code>APP_ENV=production</code> in <code>.env</code></li>
+            <li>✅ Set <code>APP_DEBUG=false</code></li>
+            <li>✅ Ensure <code>storage/</code> directory is writable by the web server user</li>
+          </ul>
         </div>
       </section>
 
-      <section id="multi-plant" class="mb-32 scroll-mt-28">
-         <div class="flex items-center gap-4 mb-8">
-          <h2 class="text-3xl font-bold text-slate-200">Multi-Plant Deployment</h2>
-          <span class="h-px flex-1 bg-border"></span>
-        </div>
-        
-        <p class="text-slate-400 mb-8">
-            Strategies for deploying standard tools across multiple physical locations (plants) with minimal friction.
-        </p>
-
-        <div class="space-y-8">
-             <div class="glass-panel p-6 rounded-xl">
-                 <h3 class="text-lg font-bold text-secondary mb-2">Phase 1: Pilot (Week 1-2)</h3>
-                 <p class="text-sm text-slate-400 mb-4">Deploy to a single "tech-savvy" plant to validate the folder structure and dev experience.</p>
-                 <code class="block bg-slate-900/50 p-3 rounded text-xs font-mono text-slate-300">./deploy.sh "Plant A" "PL01"</code>
-             </div>
-
-             <div class="glass-panel p-6 rounded-xl">
-                 <h3 class="text-lg font-bold text-secondary mb-2">Phase 2: Rollout & Sharing</h3>
-                 <p class="text-sm text-slate-400 mb-4">Use a centralized "Modules" repository. Plants can pull specific modules (e.g., Quality Control, Maintenance) into their <code>app/</code> folder.</p>
-                 <pre class="bg-slate-900/50 p-3 rounded text-xs font-mono text-slate-300">
-<span class="token c"># Installing a shared module</span>
-git clone git@github.com:org/modules.git /tmp/modules
-cp -r /tmp/modules/quality-control/app/quality app/
-php artisan migrate</pre>
-             </div>
-             
-             <div class="glass-panel p-6 rounded-xl border-l-4 border-l-purple-500">
-                 <h3 class="text-lg font-bold text-purple-400 mb-2">Styling Consistency</h3>
-                 <p class="text-sm text-slate-300">
-                    Use <code>config/style.php</code> to manage consistency. 
-                    Plant A can run in 'Build' mode for stability, while Plant B runs in 'CDN' mode for rapid development of a new feature, using the exact same codebase.
-                 </p>
-             </div>
-        </div>
-      </section>
-
-      <footer class="mt-32 pt-8 border-t border-border text-center">
-        <div class="flex items-center justify-center gap-2 mb-4 text-slate-100 font-bold">
-          <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Bastion PHP</span>
-          <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400">v0.1.0</span>
-        </div>
-        <p class="text-slate-500 text-sm">
-          &copy; 2025 Bastion PHP. Released under the MIT License.
-        </p>
-        <p class="text-slate-600 text-xs mt-2">
-            Security Score: 9/10 | Production Ready | Enterprise Standard
-        </p>
+      <footer class="mt-24 pt-12 border-t border-gray-800 text-center text-gray-500 text-sm pb-12">
+        <p>&copy; 2025 Bastion Framework. Released under MIT License.</p>
+        <p>Forged for the bold. Built for the enterprise.</p>
       </footer>
 
     </main>
   </div>
 
   <script>
-    // Mobile Menu Logic
-    const btn = document.getElementById('mobile-menu-btn');
-    const sidebar = document.getElementById('sidebar');
-    
-    btn.addEventListener('click', () => {
-      sidebar.classList.toggle('-translate-x-full');
-    });
-
-    // Active Link Highlighting
+    // Simple Scrollspy for Sidebar
+    const links = document.querySelectorAll('.nav-link');
     const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('.nav-link');
 
     window.addEventListener('scroll', () => {
       let current = '';
       sections.forEach(section => {
         const sectionTop = section.offsetTop;
-        if (pageYOffset >= sectionTop - 150) {
+        if (pageYOffset >= sectionTop - 100) {
           current = section.getAttribute('id');
         }
       });
 
-      navLinks.forEach(link => {
+      links.forEach(link => {
         link.classList.remove('active');
         if (link.getAttribute('href').includes(current)) {
           link.classList.add('active');
