@@ -525,7 +525,151 @@ $table = component('Data.Table', [
             </li>
           </ul>
         </div>
+<h4>Note: Reusable components (tables &amp; buttons)</h4>
+      <p>
+        The Employee Directory example above is intentionally verbose so you can
+        see every step. In a real project, if you know you will reuse a complex
+        table or button pattern across multiple pages, the best practice in
+        Bastion is to extract it into a <code>app/components</code> file and keep
+        your <code>page.php</code> as thin as possible.
+      </p>
 
+      <div class="alert alert-info">
+        <strong>Rule of thumb:</strong>
+        <ul>
+          <li>
+            <strong>Small, one-off UI</strong> → call components inline inside
+            <code>page.php</code> (e.g. a single button).
+          </li>
+          <li>
+            <strong>Big, reusable UI blocks</strong> (tables, dashboards, cards)
+            → create a dedicated component under <code>app/components</code> and
+            call it from your page.
+          </li>
+        </ul>
+      </div>
+
+      <h5>Example A – Big reusable table component</h5>
+      <p>
+        Create a reusable employees table under
+        <code>app/components/Data/EmployeesTable.php</code>:
+      </p>
+
+      <pre><code class="language-php">&lt;?php
+// File: app/components/Data/EmployeesTable.php
+
+/** @var array $props */
+/** @var array&lt;array&lt;string,mixed&gt;&gt; $employees */
+$employees = $props['employees'] ?? [];
+?&gt;
+
+&lt;section class="space-y-4"&gt;
+  &lt;div class="flex items-center justify-between"&gt;
+    &lt;h2 class="text-lg font-semibold text-white"&gt;Employees&lt;/h2&gt;
+
+    &lt;?= component('Forms.Button', [
+      'text'    =&gt; 'New Employee',
+      'href'    =&gt; '/admin/employees/create',
+      'variant' =&gt; 'primary',
+      'size'    =&gt; 'sm',
+    ]) ?&gt;
+  &lt;/div&gt;
+
+  &lt;div class="overflow-hidden rounded-xl border border-slate-700 bg-slate-900/60"&gt;
+    &lt;table class="w-full text-sm"&gt;
+      &lt;thead class="bg-slate-900/80 text-slate-400"&gt;
+        &lt;tr&gt;
+          &lt;th class="px-4 py-2 text-left"&gt;Name&lt;/th&gt;
+          &lt;th class="px-4 py-2 text-left"&gt;Email&lt;/th&gt;
+          &lt;th class="px-4 py-2 text-left"&gt;Position&lt;/th&gt;
+          &lt;th class="px-4 py-2 text-left"&gt;Status&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody class="divide-y divide-slate-800"&gt;
+        &lt;?php foreach ($employees as $employee): ?&gt;
+          &lt;tr&gt;
+            &lt;td class="px-4 py-2"&gt;<?= e($employee['name'] ?? '') ?&gt;&lt;/td&gt;
+            &lt;td class="px-4 py-2 text-slate-400"&gt;<?= e($employee['email'] ?? '') ?&gt;&lt;/td&gt;
+            &lt;td class="px-4 py-2 text-slate-400"&gt;<?= e($employee['position'] ?? '') ?&gt;&lt;/td&gt;
+            &lt;td class="px-4 py-2"&gt;
+              &lt;?= component('Data.Badge', [
+                'text'  =&gt; ucfirst($employee['status'] ?? 'unknown'),
+                'color' =&gt; ($employee['status'] ?? '') === 'active' ? 'success' : 'warning',
+              ]) ?&gt;
+            &lt;/td&gt;
+          &lt;/tr&gt;
+        &lt;?php endforeach; ?&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+
+      <p>
+        Then your <code>page.php</code> becomes just “auth + data + composition”:
+      </p>
+
+      <pre><code class="language-php">&lt;?php
+
+use App\Core\Auth;
+use App\Core\DV;
+use App\Core\Database\DB;
+use App\Core\Http\Response;
+
+// Guard: only admin or supervisor
+if (!Auth::check()) {
+    return Response::redirect('/login');
+}
+
+$user = Auth::user();
+
+if (!in_array($user['role'], ['admin', 'supervisor'], true)) {
+    return Response::redirect('/dashboard');
+}
+
+// Page title for layout
+DV::set('title', 'Employees');
+
+// Fetch data
+$employees = DB::table('employees')
+    -&gt;orderBy('created_at', 'desc')
+    -&gt;limit(100)
+    -&gt;get();
+
+// Render big reusable component
+?&gt;
+
+&lt;div class="space-y-6"&gt;
+  &lt;?= component('Data.EmployeesTable', [
+    'employees' =&gt; $employees,
+  ]) ?&gt;
+&lt;/div&gt;
+</code></pre>
+
+      <h5>Example B – Short inline button component</h5>
+      <p>
+        For very small UI pieces, it is fine to call the component directly
+        inside <code>page.php</code> as shown in the Quickstart:
+      </p>
+
+      <pre><code class="language-php">&lt;div class="flex items-center justify-between mb-6"&gt;
+  &lt;h1 class="text-2xl font-bold text-white"&gt;Employees&lt;/h1&gt;
+
+  &lt;?= component('Forms.Button', [
+    'text'    =&gt; 'New Employee',
+    'href'    =&gt; '/admin/employees/create',
+    'variant' =&gt; 'primary',
+    'size'    =&gt; 'sm',
+  ]) ?&gt;
+&lt;/div&gt;
+</code></pre>
+
+      <p>
+        Both approaches are valid. Use inline components when you only need them
+        in one place, and promote them into <code>app/components</code> when you
+        notice duplication or want a “single source of truth” for a table,
+        button or card across multiple screens.
+      </p>
         <h4>2. Layout: how the page is wrapped</h4>
         <p>
           The layout <code>app/views/layouts/app.php</code> is applied automatically. 
