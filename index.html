@@ -605,7 +605,98 @@ php bastion serve</code></pre>
 <span style="color:var(--tok-keyword)">echo</span> <span style="color:var(--tok-function)">component</span>(<span style="color:var(--tok-string)">'Layout.WelcomeBanner'</span>, [<span style="color:var(--tok-string)">'user'</span> => Auth::<span style="color:var(--tok-function)">user</span>()]);
 </code></pre>
       </section>
+<section id="layouts">
+  <h2>Layouts (layout.php)</h2>
+  <p>
+    Bastion usa un sistema de <strong>layouts por carpeta</strong> muy parecido al
+    <strong>App Router de Next.js</strong>. Cualquier carpeta dentro de <code>app/</code> puede definir
+    un <code>layout.php</code> junto a su <code>page.php</code>. Ese layout envuelve a todas las páginas
+    y subrutas que cuelgan de esa carpeta.
+  </p>
 
+  <h3>Regla mental</h3>
+  <p>
+    Para una URL dada, el router:
+  </p>
+  <ol>
+    <li>Resuelve la carpeta donde está el <code>page.php</code> que coincide con la ruta.</li>
+    <li>Sube carpeta por carpeta hasta la raíz de <code>app/</code>.</li>
+    <li>En cada nivel, si existe un <code>layout.php</code>, lo añade a la cadena de layouts.</li>
+    <li>Renderiza el <code>page.php</code> y va envolviendo su HTML con cada <code>layout.php</code> desde el más general al más específico.</li>
+  </ol>
+
+  <h3>Ejemplo de árbol por ruta</h3>
+  <p>Supongamos esta estructura en <code>app/</code>:</p>
+
+  <pre><code class="language-text">app/
+  layout.php               // Layout global de rutas
+  page.php                 // Home "/"
+
+  dashboard/
+    layout.php             // Layout de todo "/dashboard"
+    page.php               // Página "/dashboard"
+
+    analytics/
+      page.php             // Página "/dashboard/analytics"
+</code></pre>
+
+  <p>Para la URL <code>/dashboard/analytics</code>, el orden es:</p>
+
+  <ol>
+    <li><code>app/layout.php</code> (outermost layout de rutas)</li>
+    <li><code>app/dashboard/layout.php</code></li>
+    <li><code>app/dashboard/analytics/page.php</code> (contenido interno)</li>
+  </ol>
+
+  <p>
+    Encima de todo, el contenido final suele vivir dentro del layout de vistas global
+    <code>app/views/layouts/app.php</code>, que define el &lt;html&gt;, el &lt;head&gt; y la barra
+    de navegación compartida del sistema. 5
+  </p>
+
+  <h3>Escribiendo un layout de sección</h3>
+  <p>Un <code>layout.php</code> es simplemente una plantilla PHP que recibe una variable <code>$content</code> con el HTML de la página hija:</p>
+
+  <pre><code class="language-php">&lt;?php
+// app/dashboard/layout.php
+
+// Opcional: ajustar el título usando el DV Engine
+dv('title', 'Dashboard · ' . dv('title', 'Bastion App'));
+?&gt;
+
+&lt;div class="min-h-screen bg-slate-950 text-slate-100"&gt;
+  &lt;div class="flex"&gt;
+    &lt;aside class="w-64 border-r border-slate-800 p-4"&gt;
+      &lt;h1 class="text-lg font-semibold mb-4"&gt;Dashboard&lt;/h1&gt;
+      &lt;nav class="space-y-2 text-sm text-slate-400"&gt;
+        &lt;a href="/dashboard" class="block hover:text-white"&gt;Overview&lt;/a&gt;
+        &lt;a href="/dashboard/analytics" class="block hover:text-white"&gt;Analytics&lt;/a&gt;
+      &lt;/nav&gt;
+    &lt;/aside&gt;
+
+    &lt;main class="flex-1 p-8"&gt;
+      &lt;?= $content ?&gt;
+    &lt;/main&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+  <h3>Comparación con Next.js</h3>
+  <p>
+    Si vienes de Next.js (App Router), puedes pensar en:
+  </p>
+  <ul>
+    <li><code>app/views/layouts/app.php</code> ≈ <code>app/layout.tsx</code> global del proyecto.</li>
+    <li><code>app/layout.php</code> ≈ layout de la raíz del router.</li>
+    <li><code>app/dashboard/layout.php</code> ≈ layout de la sección <code>/dashboard</code>.</li>
+    <li><code>page.php</code> ≈ páginas concretas de cada ruta.</li>
+  </ul>
+
+  <p>
+    El Router de Bastion se encarga de construir esta cadena de layouts automáticamente
+    recorriendo las carpetas y aplicándolas en orden de fuera hacia adentro. 6
+  </p>
+</section>
       <section id="api-endpoints">
         <h2>API Endpoints (+server.php)</h2>
         <p>
