@@ -393,95 +393,75 @@ php bastion serve</code></pre>
         <pre><code class="language-php">&lt;?php
 // File: app/admin/employees/page.php
 
+
 use App\Core\Auth;
 use App\Core\DV;
-use App\Core\Http\Response;
 use App\Core\Database\DB;
+use App\Core\Http\Response;
 
-// Only allow access to admins and supervisors.
-if (!Auth::check() || !in_array(Auth::user()['role'], ['admin', 'supervisor'])) {
+// 1) Guard: only admin or supervisor can see this page
+if (!Auth::check()) {
     return Response::redirect('/login');
 }
 
-// Set the page title that the layout will read.
-DV::set('title', 'Employees Directory');
+$user = Auth::user();
 
-// Read an optional search term from the query string: ?q=john
-$search = request()->get('q', '');
-
-// Build a query using the DB helper and the query builder.
-$employeesQuery = DB::table('employees')
-    ->where('status', '=', 'active')
-    ->whereIn('role', ['employee', 'supervisor'])
-    ->orderBy('created_at', 'desc');
-
-// If the user typed a search term, filter by name or email.
-if ($search !== '') {
-    $employeesQuery
-        ->where(function ($q) use ($search) {
-            $q->where('name', 'LIKE', '%' . $search . '%')
-              ->orWhere('email', 'LIKE', '%' . $search . '%');
-        });
+if (!in_array($user['role'], ['admin', 'supervisor'], true)) {
+    return Response::redirect('/dashboard');
 }
 
-// Only show the first 50 results (pagination can be added later).
-$employees = $employeesQuery
-    ->limit(50)
-    ->offset(0)
-    ->get();
+// 2) Page state for layouts (DV Engine)
+DV::set('title', 'Employees');
 
-// Prepare table data for a reusable component.
-$headers = ['Name', 'Email', 'Role', 'Position', 'Department'];
+// 3) Fetch employees using the Query Builder
+$employees = DB::table('employees')
+    -&gt;orderBy('created_at', 'desc')
+    -&gt;limit(100)
+    -&gt;get();
+
+// 4) Prepare headers and rows for the Data.Table component
+$headers = ['ID', 'Name', 'Email', 'Position', 'Department', 'Status'];
+
 $rows = array_map(function ($e) {
     return [
-        $e['name'],
-        $e['email'],
-        ucfirst($e['role']),
-        $e['position'],
-        $e['department'] ?? '-',
+        $e['id'],
+        e($e['name']),
+        e($e['email']),
+        e($e['position']),
+        e($e['department']),
+        component('Data.Badge', [
+            'text'  =&gt; ucfirst($e['status']),
+            'color' =&gt; $e['status'] === 'active' ? 'success' : 'warning',
+        ]),
     ];
 }, $employees);
 
-// Render a reusable table component.
 $table = component('Data.Table', [
     'headers' =&gt; $headers,
     'rows'    =&gt; $rows,
 ]);
+
 ?&gt;
 
-&lt;section class="space-y-6"&gt;
-  &lt;header class="flex items-center justify-between gap-4"&gt;
-    &lt;div&gt;
-      &lt;h1 class="text-2xl font-bold"&gt;Employees&lt;/h1&gt;
-      &lt;p class="text-sm text-slate-400"&gt;
-        Admins &amp; supervisors can manage all active employees.
-      &lt;/p&gt;
-    &lt;/div&gt;
+&lt;div class="space-y-6"&gt;
+  &lt;div class="flex items-center justify-between"&gt;
+    &lt;h1 class="text-2xl font-bold text-white"&gt;Employees&lt;/h1&gt;
 
-    &lt;div class="flex items-center gap-3"&gt;
-      &lt;form method="GET" class="flex items-center gap-2"&gt;
-        &lt;input 
-          type="text"
-          name="q"
-          value="&lt;?= htmlspecialchars($search) ?&gt;"
-          placeholder="Search by name or email..."
-          class="rounded-md bg-slate-900 border border-slate-700 px-3 py-1.5 text-sm"
-        /&gt;
-        &lt;button type="submit" class="text-sm px-3 py-1.5 rounded-md bg-slate-800 border border-slate-700"&gt;
-          Search
-        &lt;/button&gt;
-      &lt;/form&gt;
-
+    &lt;div class="flex gap-2"&gt;
+      &lt;!-- You can hook this button to an HTMX form or modal --&gt;
       &lt;?= component('Forms.Button', [
-        'text' =&gt; 'New Employee',
-        'href' =&gt; '/admin/employees/create',
-        'variant' =&gt; 'primary',
+            'text'    =&gt; 'New Employee',
+            'href'    =&gt; '/admin/employees/create',
+            'variant' =&gt; 'primary',
+            'size'    =&gt; 'sm',
       ]) ?&gt;
     &lt;/div&gt;
-  &lt;/header&gt;
+  &lt;/div&gt;
 
-  &lt;?= $table ?&gt;
-&lt;/section&gt;
+  &lt;div class="bg-slate-900/40 border border-slate-700 rounded-xl p-4"&gt;
+    &lt;?= $table ?&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
 </code></pre>
 
         <div class="syntax-explanation">
