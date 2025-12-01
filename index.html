@@ -223,6 +223,7 @@
         <a href="#ioc" class="nav-link">IoC Container</a>
         <a href="#providers" class="nav-link">Service Providers</a>
         <a href="#config" class="nav-link">Configuration</a>
+<a href="#helpers" class="nav-link">Helpers Reference</a>
         <a href="#facades" class="nav-link">Global Helpers</a>
       </div>
 
@@ -231,6 +232,7 @@
         <a href="#hybrid-routing" class="nav-link">Hybrid Routing</a>
         <a href="#api-endpoints" class="nav-link">API (+server.php)</a>
         <a href="#ui-pages" class="nav-link">UI Pages (page.php)</a>
+<a href="#layouts" class="nav-link"> Layouts (layout.php)</a>
         <a href="#middleware" class="nav-link">Middleware</a>
       </div>
 
@@ -445,7 +447,7 @@ php bastion serve</code></pre>
         <span style="margin-left:auto; opacity:0.5;">// /dashboard/analytics page</span>
       </div>
 
-      <!-- RESTO DEL PROYECTO -->
+      <!-- REST OF THE PROJECT -->
       <div class="tree-item">
         <span class="tree-icon">📂</span> config/
         <span style="margin-left:auto; opacity:0.5;">// App, database, auth, cache, mail, ...</span>
@@ -501,12 +503,11 @@ php bastion serve</code></pre>
   <p style="font-size:0.9rem; color:var(--text-dim); margin-top:0.75rem;">
     <strong>Layouts by folder:</strong> any directory under <code>app/</code> can include a
     <code>layout.php</code> next to its <code>page.php</code>. Bastion will automatically compose
-    all matching <code>layout.php</code> files from the root <code>app/layout.php</code> down to
-    the deepest folder that matches the current route, wrapping your page content layer by
-    layer — just like Next.js App Router, but implemented in clean PHP.
+    all matching <code>layout.php</code> files from the root <code>app/layout.php</code> down to the
+    deepest folder that matches the current route, wrapping your page content layer by layer —
+    just like the Next.js App Router, but implemented in clean PHP.
   </p>
-</section> 
-
+</section>
       <section id="lifecycle">
         <h2>Request Lifecycle</h2>
         <p>Understanding the flow of a request in Bastion is key to mastering the framework.</p>
@@ -658,7 +659,110 @@ php bastion serve</code></pre>
 <span style="color:var(--tok-variable)">$driver</span> = <span style="color:var(--tok-function)">config</span>(<span style="color:var(--tok-string)">'database.connections.mysql.driver'</span>, <span style="color:var(--tok-string)">'sqlite'</span>);
 </code></pre>
       </section>
+<section id="helpers">
+  <h2>Helpers Reference</h2>
+  <p>
+    Bastion exposes a small set of global helper functions to keep your
+    <code>page.php</code>, <code>layout.php</code> and components clean. They are registered
+    by the core and available everywhere.
+  </p>
 
+  <table>
+    <thead>
+      <tr>
+        <th>Helper</th>
+        <th>Description</th>
+        <th>Example</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>dv($key, $value = null)</code></td>
+        <td>
+          Get or set a value in the DV (Data View) engine. When called with two args,
+          it sets. With one arg, it gets.
+        </td>
+        <td><code>dv('title', 'Dashboard'); dv('title');</code></td>
+      </tr>
+      <tr>
+        <td><code>component($name, array $props = [])</code></td>
+        <td>
+          Render a PHP component from <code>app/components</code> using dotted notation.
+        </td>
+        <td><code>component('Forms.Button', ['text' =&gt; 'Save']);</code></td>
+      </tr>
+      <tr>
+        <td><code>config($key, $default = null)</code></td>
+        <td>
+          Read configuration values from <code>config/*.php</code> using dot notation.
+        </td>
+        <td><code>config('app.name');</code></td>
+      </tr>
+      <tr>
+        <td><code>env($key, $default = null)</code></td>
+        <td>
+          Read environment variables from <code>.env</code> or the process environment.
+        </td>
+        <td><code>env('APP_ENV', 'production');</code></td>
+      </tr>
+      <tr>
+        <td><code>request()</code></td>
+        <td>
+          Get the current <code>Request</code> instance inside a view or component.
+        </td>
+        <td><code>request()->path;</code></td>
+      </tr>
+      <tr>
+        <td><code>response()</code></td>
+        <td>
+          Shortcut to <code>Response</code> static helpers (HTML, JSON, redirect).
+        </td>
+        <td><code>return response()->redirect('/login');</code></td>
+      </tr>
+      <tr>
+        <td><code>asset($path)</code></td>
+        <td>
+          Generate the correct public URL for compiled assets under <code>public/</code>.
+        </td>
+        <td><code>&lt;link rel="stylesheet" href="&lt;?= asset('assets/css/app.css') ?&gt;"&gt;</code></td>
+      </tr>
+      <tr>
+        <td><code>csrf_token()</code></td>
+        <td>
+          Get the current CSRF token stored in the session.
+        </td>
+        <td><code>&lt;meta name="csrf-token" content="&lt;?= csrf_token() ?&gt;"&gt;</code></td>
+      </tr>
+      <tr>
+        <td><code>csrf_field()</code></td>
+        <td>
+          Render a hidden input with the CSRF token to include inside forms.
+        </td>
+        <td><code>&lt;form&gt; &lt;?= csrf_field() ?&gt; ... &lt;/form&gt;</code></td>
+      </tr>
+      <tr>
+        <td><code>auth()</code></td>
+        <td>
+          Access authentication helpers, current user, guards and checks.
+        </td>
+        <td><code>if (auth()-&gt;check()) { echo auth()-&gt;user()['email']; }</code></td>
+      </tr>
+      <tr>
+        <td><code>logger()</code></td>
+        <td>
+          Write messages to the Bastion log file in <code>storage/logs</code>.
+        </td>
+        <td><code>logger()-&gt;info('User logged in', ['id' =&gt; $userId]);</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:0.9rem; color:var(--text-dim);">
+    These helpers are registered by the <code>AppServiceProvider</code> when the framework
+    boots. You can add your own helpers in <code>app/core/helpers.php</code> or a similar
+    file and include them from the bootstrap code.
+  </p>
+</section>
       <section id="facades">
         <h2>Global Helpers</h2>
         <p>
@@ -749,59 +853,62 @@ php bastion serve</code></pre>
 <section id="layouts">
   <h2>Layouts (layout.php)</h2>
   <p>
-    Bastion usa un sistema de <strong>layouts por carpeta</strong> muy parecido al
-    <strong>App Router de Next.js</strong>. Cualquier carpeta dentro de <code>app/</code> puede definir
-    un <code>layout.php</code> junto a su <code>page.php</code>. Ese layout envuelve a todas las páginas
-    y subrutas que cuelgan de esa carpeta.
+    Bastion uses a <strong>per-folder layout system</strong> very similar to the
+    <strong>Next.js App Router</strong>. Any directory inside <code>app/</code> can define a
+    <code>layout.php</code> next to its <code>page.php</code>. That layout wraps all pages
+    and nested routes inside that directory.
   </p>
 
-  <h3>Regla mental</h3>
+  <h3>Mental model</h3>
   <p>
-    Para una URL dada, el router:
+    For a given URL, the router:
   </p>
   <ol>
-    <li>Resuelve la carpeta donde está el <code>page.php</code> que coincide con la ruta.</li>
-    <li>Sube carpeta por carpeta hasta la raíz de <code>app/</code>.</li>
-    <li>En cada nivel, si existe un <code>layout.php</code>, lo añade a la cadena de layouts.</li>
-    <li>Renderiza el <code>page.php</code> y va envolviendo su HTML con cada <code>layout.php</code> desde el más general al más específico.</li>
+    <li>Resolves the directory that contains the matching <code>page.php</code>.</li>
+    <li>Walks up directory by directory until it reaches the <code>app/</code> root.</li>
+    <li>At each level, if a <code>layout.php</code> exists, it is added to a layout chain.</li>
+    <li>Renders the <code>page.php</code> and wraps its HTML with each <code>layout.php</code> from outermost to innermost.</li>
   </ol>
 
-  <h3>Ejemplo de árbol por ruta</h3>
-  <p>Supongamos esta estructura en <code>app/</code>:</p>
+  <h3>Example route tree</h3>
+  <p>Consider this structure inside <code>app/</code>:</p>
 
   <pre><code class="language-text">app/
-  layout.php               // Layout global de rutas
+  layout.php               // Router root layout (optional)
   page.php                 // Home "/"
 
   dashboard/
-    layout.php             // Layout de todo "/dashboard"
-    page.php               // Página "/dashboard"
+    layout.php             // Layout for all "/dashboard/*"
+    page.php               // "/dashboard"
 
     analytics/
-      page.php             // Página "/dashboard/analytics"
-</code></pre>
+      page.php             // "/dashboard/analytics"</code></pre>
 
-  <p>Para la URL <code>/dashboard/analytics</code>, el orden es:</p>
+  <p>For the URL <code>/dashboard/analytics</code>, the layout order is:</p>
 
   <ol>
-    <li><code>app/layout.php</code> (outermost layout de rutas)</li>
-    <li><code>app/dashboard/layout.php</code></li>
-    <li><code>app/dashboard/analytics/page.php</code> (contenido interno)</li>
+    <li><code>app/layout.php</code> (router root layout, if present)</li>
+    <li><code>app/dashboard/layout.php</code> (dashboard section layout)</li>
+    <li><code>app/dashboard/analytics/page.php</code> (leaf page content)</li>
   </ol>
 
   <p>
-    Encima de todo, el contenido final suele vivir dentro del layout de vistas global
-    <code>app/views/layouts/app.php</code>, que define el &lt;html&gt;, el &lt;head&gt; y la barra
-    de navegación compartida del sistema. 5
+    On top of that, the final HTML is usually wrapped by the global view layout
+    <code>app/views/layouts/app.php</code>, which defines the <code>&lt;html&gt;</code>,
+    <code>&lt;head&gt;</code> and shared navigation shell of the system.
   </p>
 
-  <h3>Escribiendo un layout de sección</h3>
-  <p>Un <code>layout.php</code> es simplemente una plantilla PHP que recibe una variable <code>$content</code> con el HTML de la página hija:</p>
+  <h3>Writing a section layout</h3>
+  <p>
+    A <code>layout.php</code> file is just a PHP template that receives a
+    <code>$content</code> variable containing the inner page HTML. You can also interact
+    with the DV (Data View) engine from here.
+  </p>
 
   <pre><code class="language-php">&lt;?php
 // app/dashboard/layout.php
 
-// Opcional: ajustar el título usando el DV Engine
+// Optionally adjust the title using the DV engine
 dv('title', 'Dashboard · ' . dv('title', 'Bastion App'));
 ?&gt;
 
@@ -822,53 +929,121 @@ dv('title', 'Dashboard · ' . dv('title', 'Bastion App'));
 &lt;/div&gt;
 </code></pre>
 
-  <h3>Comparación con Next.js</h3>
+  <h3>Comparison with Next.js</h3>
   <p>
-    Si vienes de Next.js (App Router), puedes pensar en:
+    If you come from Next.js (App Router), think of it like this:
   </p>
   <ul>
-    <li><code>app/views/layouts/app.php</code> ≈ <code>app/layout.tsx</code> global del proyecto.</li>
-    <li><code>app/layout.php</code> ≈ layout de la raíz del router.</li>
-    <li><code>app/dashboard/layout.php</code> ≈ layout de la sección <code>/dashboard</code>.</li>
-    <li><code>page.php</code> ≈ páginas concretas de cada ruta.</li>
+    <li><code>app/views/layouts/app.php</code> ≈ global <code>app/layout.tsx</code> for the whole project.</li>
+    <li><code>app/layout.php</code> ≈ router root layout.</li>
+    <li><code>app/dashboard/layout.php</code> ≈ section layout for <code>/dashboard</code>.</li>
+    <li><code>page.php</code> ≈ individual page components at each route level.</li>
   </ul>
 
   <p>
-    El Router de Bastion se encarga de construir esta cadena de layouts automáticamente
-    recorriendo las carpetas y aplicándolas en orden de fuera hacia adentro. 6
+    The Bastion router automatically discovers and composes all relevant
+    <code>layout.php</code> files by walking directories from the route root down to the
+    deepest folder for the current request.
   </p>
 </section>
       <section id="api-endpoints">
-        <h2>API Endpoints (+server.php)</h2>
-        <p>
-          Inspired by SvelteKit and FastAPI, <code>+server.php</code> files return an <strong>array of closures</strong> keyed by HTTP method.
-          This enforces strict method handling and separation of concerns. This is the preferred way to handle form submissions and AJAX requests.
-        </p>
+  <h2>API Endpoints (+server.php)</h2>
+  <p>
+    Bastion treats any <code>+server.php</code> file under <code>app/api</code> as an HTTP
+    endpoint. Each file returns an associative array that maps HTTP methods (in lowercase)
+    to handler functions, similar to FastAPI’s <em>path operations</em>.
+  </p>
 
-        <pre><code class="language-php"><span style="color:var(--tok-keyword)">use</span> App\Core\Http\Response;
-<span style="color:var(--tok-keyword)">use</span> App\Models\User;
+  <h3>Rule of the game</h3>
+  <ul>
+    <li>Folder path under <code>app/api</code> = URL path under <code>/api</code>.</li>
+    <li>File name is always <code>+server.php</code>.</li>
+    <li>The file must <strong>return an array</strong> with keys like <code>'get'</code>, <code>'post'</code>, <code>'delete'</code>, etc.</li>
+    <li>Each value is a <code>callable</code> that receives a <code>Request</code> and returns a <code>Response</code> or raw output.</li>
+  </ul>
 
-<span style="color:var(--tok-keyword)">return</span> [
-    <span style="color:var(--tok-string)">'get'</span> => <span style="color:var(--tok-keyword)">function</span>(<span style="color:var(--tok-variable)">$req</span>) {
-        <span style="color:var(--tok-comment)">// Return JSON list</span>
-        <span style="color:var(--tok-keyword)">return</span> Response::<span style="color:var(--tok-function)">json</span>(User::<span style="color:var(--tok-function)">all</span>());
+  <h3>Example: users collection</h3>
+  <pre><code class="language-php">&lt;?php
+// app/api/users/+server.php
+
+use App\Core\Request;
+use App\Core\Response;
+use App\Models\User;
+use App\Core\Auth;
+
+return [
+
+    // GET /api/users
+    'get' =&gt; function (Request $request) {
+        if (!Auth::check()) {
+            return Response::json(['error' =&gt; 'Unauthorized'], 401);
+        }
+
+        $users = User::all();
+        return Response::json($users);
     },
 
-    <span style="color:var(--tok-string)">'post'</span> => <span style="color:var(--tok-keyword)">function</span>(<span style="color:var(--tok-variable)">$req</span>) {
-        <span style="color:var(--tok-comment)">// Validate Input</span>
-        <span style="color:var(--tok-variable)">$data</span> = <span style="color:var(--tok-variable)">$req</span>-><span style="color:var(--tok-function)">validate</span>([
-            <span style="color:var(--tok-string)">'email'</span> => <span style="color:var(--tok-string)">'required|email'</span>,
-            <span style="color:var(--tok-string)">'role'</span>  => <span style="color:var(--tok-string)">'required'</span>
+    // POST /api/users
+    'post' =&gt; function (Request $request) {
+        $data = $request->validate([
+            'name'  =&gt; 'required|string|min:3',
+            'email' =&gt; 'required|email',
         ]);
-        
-        <span style="color:var(--tok-comment)">// Create Resource</span>
-        User::<span style="color:var(--tok-function)">create</span>(<span style="color:var(--tok-variable)">$data</span>);
-        
-        <span style="color:var(--tok-comment)">// Return Response (201 Created)</span>
-        <span style="color:var(--tok-keyword)">return</span> Response::<span style="color:var(--tok-function)">json</span>([<span style="color:var(--tok-string)">'status'</span> => <span style="color:var(--tok-string)">'created'</span>], <span style="color:var(--tok-class)">201</span>);
-    }
+
+        $user = User::create($data);
+
+        return Response::json($user, 201);
+    },
+
 ];</code></pre>
-      </section>
+
+  <h3>Dynamic routes</h3>
+  <p>
+    Dynamic segments work the same way they do for <code>page.php</code> files. Use square brackets
+    in folder names:
+  </p>
+
+  <pre><code class="language-text">app/api/
+  users/
+    +server.php          →  /api/users
+  users/[id]/
+    +server.php          →  /api/users/123</code></pre>
+
+  <p>
+    Inside the handler you can access route parameters via
+    <code>$request->attributes['id']</code>:
+  </p>
+
+  <pre><code class="language-php">&lt;?php
+// app/api/users/[id]/+server.php
+
+use App\Core\Request;
+use App\Core\Response;
+use App\Models\User;
+
+return [
+
+    // DELETE /api/users/{id}
+    'delete' =&gt; function (Request $request) {
+        $id = $request->attributes['id'] ?? null;
+
+        if (!$id || !User::find($id)) {
+            return Response::json(['error' =&gt; 'User not found'], 404);
+        }
+
+        User::delete($id);
+        return Response::json(null, 204);
+    },
+
+];</code></pre>
+
+  <h3>Method not allowed (405)</h3>
+  <p>
+    If the request’s HTTP method does not exist in the returned array, Bastion automatically
+    responds with <code>405 Method Not Allowed</code>. To support a new method, just add the
+    corresponding key to the array (<code>'put'</code>, <code>'patch'</code>, etc.).
+  </p>
+</section>
 
       <section id="middleware">
         <h2>Middleware System</h2>
