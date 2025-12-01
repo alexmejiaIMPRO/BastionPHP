@@ -1,185 +1,111 @@
-Bastion PHP
+# Bastion PHP
 
-> Bastion PHP is a security-first, file-based PHP framework designed for fast, modern development inside hostile environments (enterprise, legacy infra, untrusted networks).
-Think: Next.js–style routing, FastAPI–like endpoints, Tailwind + HTMX UI, and hardened security — all in clean, framework-less PHP.
-
-
-
+> **Bastion PHP** is a security-first, file-based PHP framework designed for fast, modern development inside hostile environments (enterprise, legacy infra, untrusted networks).  
+> Think: **Next.js–style routing**, **FastAPI–like endpoints**, **Tailwind + HTMX UI**, and **hardened security** — all in clean, framework-less PHP.
 
 ---
 
-Table of Contents
+## Table of Contents
 
-Philosophy
-
-Key Features
-
-Getting Started
-
-Requirements
-
-Quickstart
-
-Typical CLI Workflow
-
-
-Directory Structure
-
-Request Lifecycle
-
-Routing & Views
-
-Hybrid Routing
-
-UI Pages (page.php)
-
-Layouts (layout.php)
-
-Components
-
-API Endpoints (+server.php)
-
-Middleware
-
-
-DV Engine (Data View)
-
-Helpers Reference
-
-Security Protocols
-
-XSS Protection with e()
-
-CSRF Protection
-
-
-Authentication
-
-Database & Migrations
-
-The Bastion CLI
-
-Testing (High Level)
-
-Roadmap / Ideas
-
-License
-
-
+- [Philosophy](#philosophy)
+- [Key Features](#key-features)
+- [Getting Started](#getting-started)
+  - [Requirements](#requirements)
+  - [Quickstart](#quickstart)
+  - [Typical CLI Workflow](#typical-cli-workflow)
+- [Directory Structure](#directory-structure)
+- [Request Lifecycle](#request-lifecycle)
+- [Routing & Views](#routing--views)
+  - [Hybrid Routing](#hybrid-routing)
+  - [UI Pages (`page.php`)](#ui-pages-pagephp)
+  - [Layouts (`layout.php`)](#layouts-layoutphp)
+  - [Components](#components)
+  - [API Endpoints (`+server.php`)](#api-endpoints-serverphp)
+  - [Middleware](#middleware)
+- [DV Engine (Data View)](#dv-engine-data-view)
+- [Helpers Reference](#helpers-reference)
+- [Security Protocols](#security-protocols)
+  - [XSS Protection with `e()`](#xss-protection-with-e)
+  - [CSRF Protection](#csrf-protection)
+- [Authentication](#authentication)
+- [Database & Migrations](#database--migrations)
+- [The Bastion CLI](#the-bastion-cli)
+- [Testing (High Level)](#testing-high-level)
+- [Roadmap / Ideas](#roadmap--ideas)
+- [License](#license)
 
 ---
 
-Philosophy
+## Philosophy
 
 Bastion is built on three simple ideas:
 
-1. Security first.
-Assume the environment is hostile: untrusted input, legacy proxies, misconfigured servers. Make the secure path the default path.
+1. **Security first.**  
+   Assume the environment is hostile: untrusted input, legacy proxies, misconfigured servers. Make the secure path the default path.
 
+2. **Fast, file-based development.**  
+   Use the filesystem as the router:  
+   - `app/page.php` → `/`  
+   - `app/dashboard/page.php` → `/dashboard`  
+   - `app/api/users/+server.php` → `/api/users`
 
-2. Fast, file-based development.
-Use the filesystem as the router:
+3. **Zero framework magic.**  
+   No huge dependency trees. Just:
+   - A small **kernel** (`App`, `Router`, `Request`, `Response`, `DV`, `DB`)
+   - Thin **helpers** (`dv()`, `e()`, `csrf_field()`, `auth()`, etc.)
+   - A CLI script: `php bastion ...`
 
-app/page.php → /
-
-app/dashboard/page.php → /dashboard
-
-app/api/users/+server.php → /api/users
-
-
-
-3. Zero framework magic.
-No huge dependency trees. Just:
-
-A small kernel (App, Router, Request, Response, DV, DB)
-
-Thin helpers (dv(), e(), csrf_field(), auth(), etc.)
-
-A CLI script: php bastion ...
-
-
-
-
-Bastion is meant to be understandable by a mid-level PHP dev and configurable by a senior without losing control of what actually runs in production.
-
+Bastion is meant to be **understandable by a mid-level PHP dev** and **configurable by a senior** without losing control of what actually runs in production.
 
 ---
 
-Key Features
+## Key Features
 
-🗂 File-based router (Next.js-style)
+- 🗂 **File-based router** (Next.js-style)  
+  - `page.php` + `layout.php` per folder  
+  - Dynamic segments with `[id]` directories  
+  - `+server.php` endpoints for APIs
 
-page.php + layout.php per folder.
+- ⚙️ **DV Engine (Data View)**  
+  - Request-scoped view context via `DV` + `dv()` helper  
+  - Pass data from pages to layouts and components without random globals
 
-Dynamic segments with [id] directories.
+- 🧩 **Components in plain PHP**  
+  - Reusable UI components under `app/components`  
+  - Simple `component('Forms.Button', ['text' => 'Save'])` helper
 
-+server.php endpoints for APIs.
+- 🛡️ **Security-first core**  
+  - Hardened headers (CSP, X-Frame-Options, X-Content-Type-Options)  
+  - HTML escaping via `e()`  
+  - CSRF middleware + helpers (`csrf_token()`, `csrf_field()`)  
+  - JWT auth, HttpOnly refresh tokens, short-lived access tokens
 
+- 🎨 **Tailwind & HTMX friendly**  
+  - Tailwind CSS for styling  
+  - HTMX for partial updates and server-driven UX  
+  - CSRF integration with HTMX via `X-CSRF-Token`
 
-⚙️ DV Engine (Data View)
-
-Request-scoped view context via DV + dv() helper.
-
-Pass data from pages to layouts and components without random globals.
-
-
-🧩 Components in plain PHP
-
-Reusable UI components under app/components.
-
-Simple component('Forms.Button', ['text' => 'Save']) helper.
-
-
-🛡️ Security-first core
-
-Hardened headers (CSP, X-Frame-Options, X-Content-Type-Options).
-
-HTML escaping via e().
-
-CSRF middleware + helpers (csrf_token(), csrf_field()).
-
-JWT auth, HttpOnly refresh tokens, short-lived access tokens.
-
-
-🎨 Tailwind & HTMX friendly
-
-Tailwind CSS for styling.
-
-HTMX for partial updates and server-driven UX.
-
-CSRF integration with HTMX via X-CSRF-Token.
-
-
-🧪 Testable architecture
-
-Thin controllers.
-
-Pure PHP services and models.
-
-CLI hooks for migrations and seeding.
-
-
-
+- 🧪 **Testable architecture**  
+  - Thin controllers  
+  - Pure PHP services and models  
+  - CLI hooks for migrations and seeding
 
 ---
 
-Getting Started
+## Getting Started
 
-Requirements
+### Requirements
 
-PHP 8.1+
+- PHP **8.1+**
+- Composer
+- SQLite / MySQL / other DB (depending on config)
+- Node.js (for Tailwind build, optional but recommended)
 
-Composer
+### Quickstart
 
-SQLite / MySQL / other DB (depending on config)
+Assuming you have the installer script named `install-bastion.sh`:
 
-Node.js (for Tailwind build, optional but recommended)
-
-
-Quickstart
-
-Assuming you have the installer script named install-bastion.sh:
-
+~~~bash
 # 1. Create project
 ./install-bastion.sh my-bastion-app
 
@@ -200,17 +126,21 @@ php bastion db:seed
 
 # 6. Start dev server
 php bastion serve
+~~~
 
 Navigate to:
 
+~~~text
 http://127.0.0.1:8000
+~~~
 
 You should see the default Bastion landing page.
 
-Typical CLI Workflow
+### Typical CLI Workflow
 
 During development you will usually:
 
+~~~bash
 # Apply DB schema changes
 php bastion migrate
 
@@ -225,14 +155,15 @@ php bastion make:page Dashboard/Analytics
 
 # Scaffold new API endpoint
 php bastion make:api Users
-
+~~~
 
 ---
 
-Directory Structure
+## Directory Structure
 
-Bastion generates a predictable structure where app/ is both your domain layer and your file-based router.
+Bastion generates a predictable structure where `app/` is both your **domain layer** and your **file-based router**.
 
+~~~text
 app/
   api/                      // REST/HTMX endpoints (+server.php)
   components/               // Reusable UI components
@@ -266,123 +197,84 @@ bastion                     // Bastion CLI entrypoint
 composer.json               // PHP dependencies & autoload
 package.json                // Frontend tooling & scripts
 .env                        // Environment configuration
+~~~
 
-> Layouts by folder:
-Any directory under app/ can include a layout.php next to its page.php.
-Bastion automatically composes all matching layout.php files from the root app/layout.php down to the deepest folder for the current route — very similar to Next.js App Router.
-
-
-
+> **Layouts by folder:**  
+> Any directory under `app/` can include a `layout.php` next to its `page.php`.  
+> Bastion automatically composes all matching `layout.php` files from the root `app/layout.php` down to the deepest folder for the current route — very similar to the Next.js App Router.
 
 ---
 
-Request Lifecycle
+## Request Lifecycle
 
 High-level flow for each incoming request:
 
-1. Bootstrap
+1. **Bootstrap**  
+   - Load `.env` and configuration  
+   - Initialize `App` singleton  
+   - Register error/exception handlers  
+   - Start session (if needed)  
+   - Flush DV engine (`DV::flush()`)
 
-Load .env and configuration.
+2. **Create Request**  
+   - Normalize superglobals into an `App\Core\Request` instance  
+   - Extract path, method, headers, cookies, query, body, etc.
 
-Initialize App singleton.
+3. **Middleware Pipeline**  
+   - Apply global middleware (security headers, CSRF, logging)  
+   - Apply per-route middleware (auth, role checks, etc.)
 
-Register error/exception handlers.
+4. **Routing**  
+   - First, try matching an **API endpoint** (`+server.php` under `app/api`)  
+   - If not found, try matching a **UI page** (`page.php` under `app/`)  
+   - Resolve dynamic segments (`[id]` directories)
 
-Start session (if needed).
+5. **Views & Layouts**  
+   - Execute the matching `page.php`, capturing its HTML into `$content`  
+   - Resolve all `layout.php` files from `app/` down to the page directory  
+   - Wrap `$content` through each layout (outermost to innermost)  
+   - Optionally wrap with `app/views/layouts/app.php`
 
-Flush DV engine (DV::flush()).
-
-
-
-2. Create Request
-
-Normalize superglobals into an App\Core\Request instance.
-
-Extract path, method, headers, cookies, query, body, etc.
-
-
-
-3. Middleware Pipeline
-
-Apply global middleware (security headers, CSRF, logging).
-
-Apply per-route middleware (auth, role checks, etc.).
-
-
-
-4. Routing
-
-First, try matching an API endpoint (+server.php under app/api).
-
-If not found, try matching a UI page (page.php under app/).
-
-Resolve dynamic segments ([id] directories).
-
-
-
-5. Views & Layouts
-
-Execute the matching page.php, capturing its HTML into $content.
-
-Resolve all layout.php files from app/ down to the page directory.
-
-Wrap $content through each layout (outermost to innermost).
-
-Optionally wrap with app/views/layouts/app.php.
-
-
-
-6. Response
-
-Send headers and status via App\Core\Response.
-
-Output final HTML or JSON.
-
-
-
-
+6. **Response**  
+   - Send headers and status via `App\Core\Response`  
+   - Output final HTML or JSON
 
 ---
 
-Routing & Views
+## Routing & Views
 
-Hybrid Routing
+### Hybrid Routing
 
 Bastion uses a hybrid router:
 
-Under app/ → UI routes (page.php + layout.php)
-
-Under app/api/ → API routes (+server.php)
-
-Dynamic segments → [param] directories
-
+- Under `app/` → **UI routes** (`page.php` + `layout.php`)  
+- Under `app/api/` → **API routes** (`+server.php`)  
+- Dynamic segments → `[param]` directories
 
 Examples:
 
+~~~text
 app/page.php                     → GET /
 app/dashboard/page.php           → GET /dashboard
 app/dashboard/[id]/page.php      → GET /dashboard/123
 app/api/users/+server.php        → /api/users (GET, POST, ...)
 app/api/users/[id]/+server.php   → /api/users/123 (GET, DELETE, ...)
-
+~~~
 
 ---
 
-UI Pages (page.php)
+### UI Pages (`page.php`)
 
-A page.php file represents the final content of a route. It can:
+A `page.php` file represents the final content of a route. It can:
 
-Read from the Request object.
+- Read from the `Request` object  
+- Query models/services  
+- Set DV values (`dv('title', '...')`) for layouts  
+- Render HTML
 
-Query models/services.
+Example: `app/dashboard/page.php`:
 
-Set DV values (dv('title', '...')) for layouts.
-
-Render HTML.
-
-
-Example: app/dashboard/page.php:
-
+~~~php
 <?php
 
 // app/dashboard/page.php
@@ -412,23 +304,21 @@ dv('stats', $stats);
     </div>
   </div>
 </section>
-
+~~~
 
 ---
 
-Layouts (layout.php)
+### Layouts (`layout.php`)
 
-Bastion uses a per-folder layout system, similar to the Next.js App Router:
+Bastion uses a **per-folder layout system**, similar to the Next.js App Router:
 
-Any directory inside app/ can define a layout.php next to its page.php.
-
-For a given route, Bastion walks from the page directory up to app/, collecting layout.php files.
-
-It then wraps the page content with each layout from outermost to innermost.
-
+- Any directory inside `app/` can define a `layout.php` next to its `page.php`  
+- For a given route, Bastion walks from the page directory up to `app/`, collecting `layout.php` files  
+- It then wraps the page content with each layout from outermost to innermost
 
 Example tree:
 
+~~~text
 app/
   layout.php               // Router root layout (optional)
   page.php                 // "/"
@@ -439,21 +329,17 @@ app/
 
     analytics/
       page.php             // "/dashboard/analytics"
+~~~
 
-For /dashboard/analytics the order is:
+For `/dashboard/analytics` the order is:
 
-1. app/layout.php (router root layout, if present)
-
-
-2. app/dashboard/layout.php
-
-
-3. app/dashboard/analytics/page.php (leaf)
-
-
+1. `app/layout.php` (router root layout, if present)  
+2. `app/dashboard/layout.php`  
+3. `app/dashboard/analytics/page.php` (leaf)
 
 Example layout:
 
+~~~php
 <?php
 // app/dashboard/layout.php
 
@@ -474,16 +360,17 @@ dv('title', 'Dashboard · ' . dv('title', 'Bastion App'));
     </main>
   </div>
 </div>
+~~~
 
-The global HTML shell typically lives in app/views/layouts/app.php (global <html>, <head>, <body>).
-
+The global HTML shell typically lives in `app/views/layouts/app.php` (global `<html>`, `<head>`, `<body>`).
 
 ---
 
-Components
+### Components
 
-Components live under app/components and are simple PHP templates. They are rendered via the component() helper:
+Components live under `app/components` and are simple PHP templates. They are rendered via the `component()` helper:
 
+~~~php
 <?php
 // app/components/Forms/Button.php
 
@@ -499,27 +386,27 @@ $variant = $variant ?? 'primary';
 >
   <?= e($text) ?>
 </button>
+~~~
 
 Usage in a page:
 
+~~~php
 <?php component('Forms.Button', ['text' => 'Save changes']); ?>
-
+~~~
 
 ---
 
-API Endpoints (+server.php)
+### API Endpoints (`+server.php`)
 
-Any +server.php file under app/api is treated as an HTTP endpoint:
+Any `+server.php` file under `app/api` is treated as an HTTP endpoint:
 
-The folder path under app/api becomes the URL path under /api.
+- The folder path under `app/api` becomes the URL path under `/api`  
+- The file returns an **array mapping HTTP methods to handlers** (FastAPI-style)  
+- Methods are in lowercase: `'get'`, `'post'`, `'put'`, `'patch'`, `'delete'`, etc.
 
-The file returns an array mapping HTTP methods to handlers (FastAPI-style).
+Example: `app/api/users/+server.php` → `/api/users`:
 
-Methods are in lowercase: 'get', 'post', 'put', 'patch', 'delete', etc.
-
-
-Example: app/api/users/+server.php → /api/users
-
+~~~php
 <?php
 // app/api/users/+server.php
 
@@ -552,17 +439,21 @@ return [
     },
 
 ];
+~~~
 
-Dynamic segments use [id] folders:
+Dynamic segments use `[id]` folders:
 
+~~~text
 app/api/
   users/
     +server.php          → /api/users
   users/[id]/
     +server.php          → /api/users/{id}
+~~~
 
-Example for /api/users/{id}:
+Example for `/api/users/{id}`:
 
+~~~php
 <?php
 // app/api/users/[id]/+server.php
 
@@ -585,16 +476,17 @@ return [
     },
 
 ];
+~~~
 
-If a request method has no handler in the array, Bastion responds with 405 Method Not Allowed.
-
+If a request method has no handler in the array, Bastion responds with `405 Method Not Allowed`.
 
 ---
 
-Middleware
+### Middleware
 
-Middleware are classes under app/http/Middleware with a handle() method:
+Middleware are classes under `app/http/Middleware` with a `handle()` method:
 
+~~~php
 <?php
 
 namespace App\Http\Middleware;
@@ -626,29 +518,26 @@ class SecurityHeaders
         return $next($request);
     }
 }
+~~~
 
 Middleware are registered in the kernel and applied to every request, or per route where configured.
 
-
 ---
 
-DV Engine (Data View)
+## DV Engine (Data View)
 
-The DV (Data View) engine is a request-scoped state container used to pass structured data between page.php, layout.php files and components, without relying on random globals.
+The **DV (Data View) engine** is a request-scoped state container used to pass structured data between `page.php`, `layout.php` files and components, without relying on random globals.
 
-Core idea
+### Core idea
 
-DV::set($key, $value) → store a value for this request.
-
-DV::get($key, $default = null) → read it back (or default).
-
-DV::flash($key, $value) → store for the next request via session (flash messages).
-
-DV::flush() → reset DV at the beginning of the request, pulling flash data from the session.
-
+- `DV::set($key, $value)` → store a value for this request  
+- `DV::get($key, $default = null)` → read it back (or default)  
+- `DV::flash($key, $value)` → store for the **next** request via session (flash messages)  
+- `DV::flush()` → reset DV at the beginning of the request, pulling flash data from the session
 
 Simplified implementation:
 
+~~~php
 <?php
 
 namespace App\Core;
@@ -697,11 +586,13 @@ class DV
         return array_merge(self::$flashed, self::$data);
     }
 }
+~~~
 
-The dv() helper
+### The `dv()` helper
 
-To avoid importing App\Core\DV in every view, Bastion exposes a global helper:
+To avoid importing `App\Core\DV` in every view, Bastion exposes a global helper:
 
+~~~php
 <?php
 
 use App\Core\DV;
@@ -719,20 +610,19 @@ function dv($key, $value = null)
 
     DV::set($key, $value);
 }
+~~~
 
 Equivalences:
 
-dv('title', 'Dashboard') → DV::set('title', 'Dashboard')
+- `dv('title', 'Dashboard')` → `DV::set('title', 'Dashboard')`  
+- `dv('title')` → `DV::get('title')`  
+- If you need a default, use `DV::get('title', 'Fallback')` directly.
 
-dv('title') → DV::get('title')
+### Typical usage
 
-If you need a default, use DV::get('title', 'Fallback') directly.
+In a **page**:
 
-
-Typical usage
-
-In a page:
-
+~~~php
 <?php
 // app/dashboard/page.php
 
@@ -747,9 +637,11 @@ dv('breadcrumbs', [
   <h1 class="text-2xl font-semibold">Dashboard</h1>
   <p class="text-slate-400">Welcome back.</p>
 </div>
+~~~
 
-In a layout:
+In a **layout**:
 
+~~~php
 <?php
 // app/layout.php
 
@@ -784,60 +676,56 @@ $crumbs = DV::get('breadcrumbs', []);
   </main>
 </body>
 </html>
-
+~~~
 
 ---
 
-Helpers Reference
+## Helpers Reference
 
 Bastion registers a small, focused set of global helpers.
-Here is a quick reference:
 
-Helper	Description	Example
+| Helper                           | Description                                                             | Example                                                                 |
+| -------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `dv($key, $value = null)`       | Set/get view data in the DV engine                                      | `dv('title', 'Dashboard'); dv('title');`                                |
+| `config($key, $default = null)` | Read config value from `config/*.php` using dot notation               | `config('app.name');`                                                   |
+| `env($key, $default = null)`    | Read environment variable                                               | `env('APP_ENV', 'production');`                                         |
+| `component($name, $props = [])` | Render a component from `app/components`                               | `component('Forms.Button', ['text' => 'Save']);`                        |
+| `request()`                     | Get current `Request` instance inside views                             | `request()->path;`                                                      |
+| `response()`                    | Shortcut to response helpers (html/json/redirect)                      | `return response()->redirect('/login');`                                |
+| `asset($path)`                  | Generate URL for public assets                                         | `<link rel="stylesheet" href="<?= asset('assets/css/app.css') ?>">`    |
+| `e($str)`                       | Escape HTML entities (XSS protection)                                  | `echo e($user['email']);`                                               |
+| `csrf_token()`                  | Get current CSRF token string                                          | `<meta name="csrf-token" content="<?= csrf_token() ?>">`               |
+| `csrf_field()`                  | Render hidden CSRF input for forms                                     | `<?= csrf_field() ?>`                                                   |
+| `auth()`                        | Access auth helpers/current user                                       | `if (auth()->check()) echo auth()->user()['email'];`                    |
+| `logger()`                      | Log messages to `storage/logs`                                         | `logger()->info('User logged in', ['id' => $userId]);`                  |
 
-dv($key, $value = null)	Set/get view data in the DV engine.	dv('title', 'Dashboard'); dv('title');
-config($key, $default = null)	Read config value from config/*.php using dot notation.	config('app.name');
-env($key, $default = null)	Read environment variable.	env('APP_ENV', 'production');
-component($name, $props = [])	Render a component from app/components.	component('Forms.Button', ['text' => 'Save']);
-request()	Get current Request instance inside views.	request()->path;
-response()	Shortcut to response helpers (html/json/redirect).	return response()->redirect('/login');
-asset($path)	Generate URL for public assets.	<link rel="stylesheet" href="<?= asset('assets/css/app.css') ?>">
-e($str)	Escape HTML entities (XSS protection).	echo e($user['email']);
-csrf_token()	Get current CSRF token string.	<meta name="csrf-token" content="<?= csrf_token() ?>">
-csrf_field()	Render hidden CSRF input for forms.	<?= csrf_field() ?>
-auth()	Access auth helpers/current user.	if (auth()->check()) echo auth()->user()['email'];
-logger()	Log messages to storage/logs.	logger()->info('User logged in', ['id' => $userId]);
-
-
-You can also add your own helpers in app/core/helpers.php and include them from the bootstrap.
-
+You can also add your own helpers in `app/core/helpers.php` and include them from the bootstrap.
 
 ---
 
-Security Protocols
+## Security Protocols
 
-Bastion assumes the environment is hostile.
-It implements a Defense in Depth strategy: hardened headers, strict CSRF validation, safe rendering helpers, and a clear token model.
+Bastion assumes the environment is hostile.  
+It implements a **Defense in Depth** strategy: hardened headers, strict CSRF validation, safe rendering helpers, and a clear token model.
 
-Security Highlights
+### Security Highlights
 
-Native JWT
-Zero-dependency implementation using OpenSSL. Handles HttpOnly cookies for refresh tokens automatically, while the access token is short-lived and scoped to the current session.
+- **Native JWT**  
+  Zero-dependency implementation using OpenSSL. Handles `HttpOnly` cookies for refresh tokens automatically, while the access token is short-lived and scoped to the current session.
 
-CSRF Fortress
-Middleware automatically verifies tokens on all state-changing methods (POST, PUT, PATCH, DELETE). Integrated with HTMX via a dedicated X-CSRF-Token header or hidden form fields.
+- **CSRF Fortress**  
+  Middleware automatically verifies tokens on all state-changing methods (`POST`, `PUT`, `PATCH`, `DELETE`). Integrated with HTMX via a dedicated `X-CSRF-Token` header or hidden form fields.
 
-XSS Prevention
-The global e() helper escapes HTML output, and security middleware sets strict Content Security Policy headers by default to reduce the impact of script injection.
-
-
+- **XSS Prevention**  
+  The global `e()` helper escapes HTML output, and security middleware sets strict Content Security Policy headers by default to reduce the impact of script injection.
 
 ---
 
-XSS Protection with e()
+### XSS Protection with `e()`
 
-All untrusted data should be escaped before it reaches your HTML. Bastion provides the e() helper:
+All untrusted data should be escaped before it reaches your HTML. Bastion provides the `e()` helper:
 
+~~~php
 <?php
 // Somewhere in a page or layout:
 
@@ -846,24 +734,27 @@ $user = auth(); // returns current user or null
 if ($user) {
     echo 'Logged in as: ' . e($user['email']);
 }
+~~~
 
 When using the DV engine:
 
+~~~php
 <title><?= e(dv('title', 'Bastion App')) ?></title>
+~~~
 
-Always wrap dynamic strings that might contain user input with e(), especially in attributes and text nodes.
-
+Always wrap dynamic strings that might contain user input with `e()`, especially in attributes and text nodes.
 
 ---
 
-CSRF Protection
+### CSRF Protection
 
-State-changing requests (POST, PUT, PATCH, DELETE) are protected by a CSRF middleware. If the token is missing or invalid, the middleware rejects the request with a 419/403 response.
+State-changing requests (`POST`, `PUT`, `PATCH`, `DELETE`) are protected by a CSRF middleware. If the token is missing or invalid, the middleware rejects the request with a 419/403 response.
 
-HTML Forms
+#### HTML Forms
 
-Use the csrf_field() helper inside forms:
+Use the `csrf_field()` helper inside forms:
 
+~~~php
 <form method="POST" action="/users/create">
     <input type="text" name="name" required>
     <input type="email" name="email" required>
@@ -873,17 +764,21 @@ Use the csrf_field() helper inside forms:
 
     <button type="submit">Create User</button>
 </form>
+~~~
 
-HTMX Integration
+#### HTMX Integration
 
 Expose the token from your base layout and configure HTMX:
 
+~~~php
 <!-- In app/views/layouts/app.php -->
 <head>
   ...
   <meta name="csrf-token" content="<?= csrf_token() ?>">
 </head>
+~~~
 
+~~~js
 // In app.js or an inline script
 document.body.addEventListener('htmx:configRequest', (event) => {
   const tokenMeta = document.querySelector('meta[name="csrf-token"]');
@@ -891,34 +786,28 @@ document.body.addEventListener('htmx:configRequest', (event) => {
     event.detail.headers['X-CSRF-Token'] = tokenMeta.getAttribute('content');
   }
 });
+~~~
 
 The middleware accepts the token from either:
 
-Hidden form field (e.g. _csrf via csrf_field()), or
-
-X-CSRF-Token header.
-
-
+- Hidden form field (e.g. `_csrf` via `csrf_field()`)  
+- `X-CSRF-Token` header
 
 ---
 
-Authentication
+## Authentication
 
 Bastion includes a simple JWT-based auth flow (exact shape depends on your config), typically:
 
-Access token: short-lived, passed in headers or local storage (optional).
-
-Refresh token: long-lived, stored in an HttpOnly, Secure cookie.
-
-Login: exchange credentials for tokens.
-
-Refresh: rotate tokens via a refresh endpoint.
-
-Logout: invalidate refresh token and clear cookie.
-
+- **Access token**: short-lived, passed in headers or local storage (optional)  
+- **Refresh token**: long-lived, stored in an `HttpOnly`, `Secure` cookie  
+- **Login**: exchange credentials for tokens  
+- **Refresh**: rotate tokens via a refresh endpoint  
+- **Logout**: invalidate refresh token and clear cookie
 
 Example snippet to read the authenticated user:
 
+~~~php
 <?php
 
 $user = auth(); // helper alias
@@ -928,26 +817,29 @@ if ($user) {
 } else {
     echo 'Guest';
 }
+~~~
 
-You can enforce authentication on routes via middleware, e.g. an AuthMiddleware that redirects unauthenticated users to /login.
-
+You can enforce authentication on routes via middleware, e.g. an `AuthMiddleware` that redirects unauthenticated users to `/login`.
 
 ---
 
-Database & Migrations
+## Database & Migrations
 
 Bastion uses a simple DB abstraction (or your preferred PDO wrapper) and migrations.
 
 Typical workflow:
 
+~~~bash
 # Run migrations
 php bastion migrate
 
 # Seed database
 php bastion db:seed
+~~~
 
 A migration might look like:
 
+~~~php
 <?php
 
 use App\Core\Schema;
@@ -969,26 +861,29 @@ return new class {
         Schema::dropIfExists('users');
     }
 };
+~~~
 
 You are free to adapt this layer (swap DB, change schema builder) as long as the CLI commands know how to run your migrations.
 
-
 ---
 
-The Bastion CLI
+## The Bastion CLI
 
-The bastion executable at project root replaces Artisan for this framework. It is a small PHP script meant to be understandable and hackable.
+The `bastion` executable at project root replaces Artisan for this framework. It is a small PHP script meant to be understandable and hackable.
 
 Common commands:
 
+~~~bash
 php bastion serve        # Start local dev server (127.0.0.1:8000)
 php bastion migrate      # Run pending migrations
 php bastion db:seed      # Seed database with fake/dev data
 php bastion make:page    # Scaffold a new UI route directory
 php bastion make:api     # Scaffold a new API endpoint
+~~~
 
-Example serve command (simplified):
+Example `serve` command (simplified):
 
+~~~php
 <?php
 
 class ServeCommand extends Command
@@ -1007,32 +902,32 @@ class ServeCommand extends Command
         passthru("php -S $host:$port -t public");
     }
 }
-
+~~~
 
 ---
 
-Testing (High Level)
+## Testing (High Level)
 
 Bastion is designed so you can test:
 
-Pure services/models with PHPUnit.
-
-HTTP layer using a small HTTP client (symfony/http-foundation style) or built-in test helpers.
-
-End-to-end flows by booting the app and issuing requests against the router.
-
+- **Pure services/models** with PHPUnit  
+- **HTTP layer** using a small HTTP client or built-in test helpers  
+- **End-to-end flows** by booting the app and issuing requests against the router
 
 A typical test structure:
 
+~~~text
 tests/
   Unit/
     UserServiceTest.php
   Feature/
     Auth/LoginTest.php
     Dashboard/DashboardTest.php
+~~~
 
 Example unit test (simplified):
 
+~~~php
 <?php
 
 use PHPUnit\Framework\TestCase;
@@ -1053,24 +948,19 @@ class UserServiceTest extends TestCase
         $this->assertSame('Alice', $user['name']);
     }
 }
-
+~~~
 
 ---
 
-Roadmap / Ideas
+## Roadmap / Ideas
 
 Some ideas that fit well with Bastion’s architecture:
 
-First-class observability (structured logs, trace IDs, correlation IDs).
-
-Built-in rate limiting per route (e.g. login throttling).
-
-Native WebSockets/real-time integration for dashboards.
-
-More generators: make:middleware, make:model, make:service, etc.
-
-Optional admin panel for internal tools.
-
-
+- First-class **observability** (structured logs, trace IDs, correlation IDs)  
+- Built-in **rate limiting** per route (e.g. login throttling)  
+- Native **WebSockets/real-time** integration for dashboards  
+- More generators: `make:middleware`, `make:model`, `make:service`, etc.  
+- Optional **admin panel** for internal tools
 
 ---
+
