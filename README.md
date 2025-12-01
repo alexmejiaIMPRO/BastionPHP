@@ -1,111 +1,185 @@
-# Bastion PHP
+Bastion PHP
 
-> **Bastion PHP** is a security-first, file-based PHP framework designed for fast, modern development inside hostile environments (enterprise, legacy infra, untrusted networks).  
-> Think: **Next.js–style routing**, **FastAPI–like endpoints**, **Tailwind + HTMX UI**, and **hardened security** — all in clean, framework-less PHP.
+> Bastion PHP is a security-first, file-based PHP framework designed for fast, modern development inside hostile environments (enterprise, legacy infra, untrusted networks).
+Think: Next.js–style routing, FastAPI–like endpoints, Tailwind + HTMX UI, and hardened security — all in clean, framework-less PHP.
 
----
 
-## Table of Contents
 
-- [Philosophy](#philosophy)
-- [Key Features](#key-features)
-- [Getting Started](#getting-started)
-  - [Requirements](#requirements)
-  - [Quickstart](#quickstart)
-  - [Typical CLI Workflow](#typical-cli-workflow)
-- [Directory Structure](#directory-structure)
-- [Request Lifecycle](#request-lifecycle)
-- [Routing & Views](#routing--views)
-  - [Hybrid Routing](#hybrid-routing)
-  - [UI Pages (`pagephp`)](#ui-pages-pagephp)
-  - [Layouts (`layoutphp`)](#layouts-layoutphp)
-  - [Components](#components)
-  - [API Endpoints (`+serverphp`)](#api-endpoints-serverphp)
-  - [Middleware](#middleware)
-- [DV Engine (Data View)](#dv-engine-data-view)
-- [Helpers Reference](#helpers-reference)
-- [Security Protocols](#security-protocols)
-  - [XSS Protection with `e()`](#xss-protection-with-e)
-  - [CSRF Protection](#csrf-protection)
-- [Authentication](#authentication)
-- [Database & Migrations](#database--migrations)
-- [The Bastion CLI](#the-bastion-cli)
-- [Testing (High Level)](#testing-high-level)
-- [Roadmap / Ideas](#roadmap--ideas)
-- [License](#license)
 
 ---
 
-## Philosophy
+Table of Contents
+
+Philosophy
+
+Key Features
+
+Getting Started
+
+Requirements
+
+Quickstart
+
+Typical CLI Workflow
+
+
+Directory Structure
+
+Request Lifecycle
+
+Routing & Views
+
+Hybrid Routing
+
+UI Pages (page.php)
+
+Layouts (layout.php)
+
+Components
+
+API Endpoints (+server.php)
+
+Middleware
+
+
+DV Engine (Data View)
+
+Helpers Reference
+
+Security Protocols
+
+XSS Protection with e()
+
+CSRF Protection
+
+
+Authentication
+
+Database & Migrations
+
+The Bastion CLI
+
+Testing (High Level)
+
+Roadmap / Ideas
+
+License
+
+
+
+---
+
+Philosophy
 
 Bastion is built on three simple ideas:
 
-1. **Security first.**  
-   Assume the environment is hostile: untrusted input, legacy proxies, misconfigured servers. Make the secure path the default path.
+1. Security first.
+Assume the environment is hostile: untrusted input, legacy proxies, misconfigured servers. Make the secure path the default path.
 
-2. **Fast, file-based development.**  
-   Use the filesystem as the router:  
-   - `app/page.php` → `/`  
-   - `app/dashboard/page.php` → `/dashboard`  
-   - `app/api/users/+server.php` → `/api/users`  
 
-3. **Zero framework magic.**  
-   No huge dependency trees. Just:
-   - A small **kernel** (`App`, `Router`, `Request`, `Response`, `DV`, `DB`)
-   - Thin **helpers** (`dv()`, `e()`, `csrf_field()`, `auth()`, etc.)
-   - A CLI script: `php bastion ...`
+2. Fast, file-based development.
+Use the filesystem as the router:
 
-Bastion is meant to be **understandable by a mid-level PHP dev** and **configurable by a senior** without losing control of what actually runs in production.
+app/page.php → /
 
----
+app/dashboard/page.php → /dashboard
 
-## Key Features
+app/api/users/+server.php → /api/users
 
-- 🗂 **File-based router** (Next.js-style)  
-  - `page.php` + `layout.php` per folder.
-  - Dynamic segments with `[id]` directories.
-  - `+server.php` endpoints for APIs.
 
-- ⚙️ **DV Engine (Data View)**  
-  - Request-scoped view context via `DV` + `dv()` helper.
-  - Pass data from pages to layouts and components without random globals.
 
-- 🧩 **Components in plain PHP**  
-  - Reusable UI components under `app/components`.
-  - Simple `component('Forms.Button', ['text' => 'Save'])` helper.
+3. Zero framework magic.
+No huge dependency trees. Just:
 
-- 🛡️ **Security-first core**
-  - Hardened headers (CSP, X-Frame-Options, X-Content-Type-Options).
-  - HTML escaping via `e()`.
-  - CSRF middleware + helpers (`csrf_token()`, `csrf_field()`).
-  - JWT auth, HttpOnly refresh tokens, short-lived access tokens.
+A small kernel (App, Router, Request, Response, DV, DB)
 
-- 🎨 **Tailwind & HTMX friendly**
-  - Tailwind CSS for styling.
-  - HTMX for partial updates and server-driven UX.
-  - CSRF integration with HTMX via `X-CSRF-Token`.
+Thin helpers (dv(), e(), csrf_field(), auth(), etc.)
 
-- 🧪 **Testable architecture**
-  - Thin controllers.
-  - Pure PHP services and models.
-  - CLI hooks for migrations and seeding.
+A CLI script: php bastion ...
+
+
+
+
+Bastion is meant to be understandable by a mid-level PHP dev and configurable by a senior without losing control of what actually runs in production.
+
 
 ---
 
-## Getting Started
+Key Features
 
-### Requirements
+🗂 File-based router (Next.js-style)
 
-- PHP **8.1+**
-- Composer
-- SQLite / MySQL / other DB (depending on config)
-- Node.js (for Tailwind build, optional but recommended)
+page.php + layout.php per folder.
 
-### Quickstart
+Dynamic segments with [id] directories.
 
-Assuming you have the installer script named `install-bastion.sh`:
++server.php endpoints for APIs.
 
-```bash
+
+⚙️ DV Engine (Data View)
+
+Request-scoped view context via DV + dv() helper.
+
+Pass data from pages to layouts and components without random globals.
+
+
+🧩 Components in plain PHP
+
+Reusable UI components under app/components.
+
+Simple component('Forms.Button', ['text' => 'Save']) helper.
+
+
+🛡️ Security-first core
+
+Hardened headers (CSP, X-Frame-Options, X-Content-Type-Options).
+
+HTML escaping via e().
+
+CSRF middleware + helpers (csrf_token(), csrf_field()).
+
+JWT auth, HttpOnly refresh tokens, short-lived access tokens.
+
+
+🎨 Tailwind & HTMX friendly
+
+Tailwind CSS for styling.
+
+HTMX for partial updates and server-driven UX.
+
+CSRF integration with HTMX via X-CSRF-Token.
+
+
+🧪 Testable architecture
+
+Thin controllers.
+
+Pure PHP services and models.
+
+CLI hooks for migrations and seeding.
+
+
+
+
+---
+
+Getting Started
+
+Requirements
+
+PHP 8.1+
+
+Composer
+
+SQLite / MySQL / other DB (depending on config)
+
+Node.js (for Tailwind build, optional but recommended)
+
+
+Quickstart
+
+Assuming you have the installer script named install-bastion.sh:
+
 # 1. Create project
 ./install-bastion.sh my-bastion-app
 
@@ -494,7 +568,7 @@ Example for /api/users/{id}:
 
 use App\Core\Request;
 use App\Core\Response;
-use App\Models<User;
+use App\Models\User;
 
 return [
 
@@ -539,7 +613,6 @@ class SecurityHeaders
         header("X-Content-Type-Options: nosniff");
         header("Referrer-Policy: strict-origin-when-cross-origin");
 
-        // Example CSP; you can tune this based on your asset strategy.
         header(
             "Content-Security-Policy: " .
             "default-src 'self'; " .
