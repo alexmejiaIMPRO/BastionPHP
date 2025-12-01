@@ -353,6 +353,928 @@ cd my-project
 
 <span style="color:var(--text-dim)"># 4. Ignite</span>
 php bastion serve</code></pre>
+<h3>Quickstart: Roles & Enterprise Employee Module</h3>
+        <p>
+          This example shows how to use Bastion’s boilerplate to build a real 
+          internal tool: an <strong>Employee Directory</strong> with roles 
+          <code>admin</code>, <code>supervisor</code> and <code>employee</code>. 
+          It combines:
+        </p>
+        <ul>
+          <li>Layouts (<code>app/views/layouts/app.php</code>)</li>
+          <li>Components (<code>component('Forms.Input')</code>, <code>component('Forms.Button')</code>, etc.)</li>
+          <li>Helpers (<code>Auth</code>, <code>DV</code>, <code>DB</code>, <code>csrf_field()</code>, <code>request()</code>, <code>response()</code>)</li>
+          <li>API endpoints with file-based routing (<code>app/api/employees/+server.php</code>)</li>
+          <li>A page using the layout to render a complete screen (<code>app/admin/employees/page.php</code>)</li>
+        </ul>
+
+        <div class="alert alert-info">
+          <span class="alert-title">Mental model</span>
+          Every business feature in Bastion is usually:
+          <strong>Model + Migration + Queries + Endpoint + Page + Layout + Components</strong>.
+          Same pattern, different table and different screen.
+        </div>
+
+        <h4>1. Roles: admin, supervisor, employee</h4>
+        <p>
+          Bastion’s user table already has a <code>role</code> column. A very simple 
+          enterprise setup is:
+        </p>
+        <ul>
+          <li><code>admin</code>: full access to all modules and user management.</li>
+          <li><code>supervisor</code>: can view and manage employees inside specific modules.</li>
+          <li><code>employee</code>: can only see their own data or limited dashboards.</li>
+        </ul>
+
+        <p>
+          You can enforce these roles at the top of a page using the <code>Auth</code> helper:
+        </p>
+
+        <pre><code class="language-php">&lt;?php
+// File: app/admin/employees/page.php
+
+use App\Core\Auth;
+use App\Core\DV;
+use App\Core\Http\Response;
+use App\Core\Database\DB;
+
+// Only allow access to admins and supervisors.
+if (!Auth::check() || !in_array(Auth::user()['role'], ['admin', 'supervisor'])) {
+    return Response::redirect('/login');
+}
+
+// Set the page title that the layout will read.
+DV::set('title', 'Employees Directory');
+
+// Read an optional search term from the query string: ?q=john
+$search = request()->get('q', '');
+
+// Build a query using the DB helper and the query builder.
+$employeesQuery = DB::table('employees')
+    ->where('status', '=', 'active')
+    ->whereIn('role', ['employee', 'supervisor'])
+    ->orderBy('created_at', 'desc');
+
+// If the user typed a search term, filter by name or email.
+if ($search !== '') {
+    $employeesQuery
+        ->where(function ($q) use ($search) {
+            $q->where('name', 'LIKE', '%' . $search . '%')
+              ->orWhere('email', 'LIKE', '%' . $search . '%');
+        });
+}
+
+// Only show the first 50 results (pagination can be added later).
+$employees = $employeesQuery
+    ->limit(50)
+    ->offset(0)
+    ->get();
+
+// Prepare table data for a reusable component.
+$headers = ['Name', 'Email', 'Role', 'Position', 'Department'];
+$rows = array_map(function ($e) {
+    return [
+        $e['name'],
+        $e['email'],
+        ucfirst($e['role']),
+        $e['position'],
+        $e['department'] ?? '-',
+    ];
+}, $employees);
+
+// Render a reusable table component.
+$table = component('Data.Table', [
+    'headers' =&gt; $headers,
+    'rows'    =&gt; $rows,
+]);
+?&gt;
+
+&lt;section class="space-y-6"&gt;
+  &lt;header class="flex items-center justify-between gap-4"&gt;
+    &lt;div&gt;
+      &lt;h1 class="text-2xl font-bold"&gt;Employees&lt;/h1&gt;
+      &lt;p class="text-sm text-slate-400"&gt;
+        Admins &amp; supervisors can manage all active employees.
+      &lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;div class="flex items-center gap-3"&gt;
+      &lt;form method="GET" class="flex items-center gap-2"&gt;
+        &lt;input 
+          type="text"
+          name="q"
+          value="&lt;?= htmlspecialchars($search) ?&gt;"
+          placeholder="Search by name or email..."
+          class="rounded-md bg-slate-900 border border-slate-700 px-3 py-1.5 text-sm"
+        /&gt;
+        &lt;button type="submit" class="text-sm px-3 py-1.5 rounded-md bg-slate-800 border border-slate-700"&gt;
+          Search
+        &lt;/button&gt;
+      &lt;/form&gt;
+
+      &lt;?= component('Forms.Button', [
+        'text' =&gt; 'New Employee',
+        'href' =&gt; '/admin/employees/create',
+        'variant' =&gt; 'primary',
+      ]) ?&gt;
+    &lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;?= $table ?&gt;
+&lt;/section&gt;
+</code></pre>
+
+        <div class="syntax-explanation">
+          <h5>Syntax Explanation (page.php)</h5>
+          <ul>
+            <li>
+              <code>&lt;?php ... ?&gt;</code> opens and closes PHP code. 
+              Anything inside runs on the server before the HTML is sent.
+            </li>
+            <li>
+              <code>use App\Core\Auth;</code> and similar lines import Bastion classes. 
+              <strong>Do not rename</strong> the parts like <code>App\Core\Auth</code> 
+              unless you know what you are doing.
+            </li>
+            <li>
+              <code>Auth::check()</code> and <code>Auth::user()</code> are 
+              <strong>Bastion helpers</strong> to read the logged-in user. 
+              These names are <strong>fixed API</strong>, not examples.
+            </li>
+            <li>
+              <code>if (...)</code>, <code>return</code>, <code>function</code>, 
+              <code>use</code>, <code>class</code> are PHP <strong>keywords</strong>. 
+              They cannot be changed.
+            </li>
+            <li>
+              Names like <code>$employeesQuery</code>, <code>$headers</code>, 
+              <code>$rows</code>, <code>$search</code> are 
+              <strong>your own variable names</strong>. You can rename them
+              as long as you change them consistently everywhere in the file.
+            </li>
+            <li>
+              <code>DB::table('employees')</code> means “start a query on the 
+              <code>employees</code> table”. The <code>DB</code> and 
+              <code>table</code> words are part of Bastion’s database API 
+              (fixed), but the string <code>'employees'</code> is the table 
+              name in your database (you can change it if your table is called 
+              something else and your migration matches it).
+            </li>
+            <li>
+              The arrow <code>-&gt;</code> means “call a method on the thing 
+              before the arrow”. Example:
+              <code>$employeesQuery-&gt;where(...)</code> = “take the query and 
+              add a WHERE clause”.
+            </li>
+            <li>
+              Common query builder methods in this example:
+              <ul>
+                <li><code>where('column', '=', 'value')</code></li>
+                <li><code>whereIn('column', ['a','b'])</code></li>
+                <li><code>orWhere(...)</code> inside a closure</li>
+                <li><code>orderBy('column', 'desc')</code></li>
+                <li><code>limit(50)</code> and <code>offset(0)</code></li>
+                <li><code>get()</code> (run the query and return a list of rows)</li>
+              </ul>
+            </li>
+            <li>
+              <code>component('Data.Table', ...)</code> is a Bastion view helper 
+              that returns a ready-made HTML table. 
+              <code>'Data.Table'</code> is a fixed component name; the arrays 
+              <code>'headers'</code> and <code>'rows'</code> are your data.
+            </li>
+          </ul>
+        </div>
+
+        <h4>2. Layout: how the page is wrapped</h4>
+        <p>
+          The layout <code>app/views/layouts/app.php</code> is applied automatically. 
+          You usually <strong>do not</strong> include HTML <code>&lt;html&gt;</code> or 
+          <code>&lt;body&gt;</code> tags in <code>page.php</code> files. 
+          The layout does that for you and injects your content where 
+          <code>$content</code> appears.
+        </p>
+
+        <pre><code class="language-php">&lt;?php
+// File: app/views/layouts/app.php (simplified excerpt)
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="&lt;?= env('APP_LOCALE', 'en') ?&gt;" class="dark h-full"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;meta name="csrf-token" content="&lt;?= csrf_token() ?&gt;"&gt;
+  &lt;title&gt;&lt;?= \App\Core\DV::get('title', env('APP_NAME')) ?&gt;&lt;/title&gt;
+  &lt;link rel="stylesheet" href="/assets/css/app.css"&gt;
+&lt;/head&gt;
+&lt;body class="h-full bg-slate-950 text-slate-200"&gt;
+
+  &lt;?= \App\Core\View\View::component('Navigation.Navbar') ?&gt;
+
+  &lt;div class="min-h-full pt-16"&gt;
+    &lt;main class="py-10"&gt;
+      &lt;div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"&gt;
+        &lt;?= $content ?&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+  &lt;/div&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+        <div class="syntax-explanation">
+          <h5>Syntax Explanation (layout)</h5>
+          <ul>
+            <li>
+              <code>DV::get('title')</code> reads the title set in 
+              <code>page.php</code> (<code>DV::set('title', 'Employees Directory')</code>).
+            </li>
+            <li>
+              <code>$content</code> is a special variable where Bastion injects the 
+              rendered content of your current <code>page.php</code>.
+            </li>
+            <li>
+              <code>View::component('Navigation.Navbar')</code> renders a reusable 
+              navigation bar component. The string <code>'Navigation.Navbar'</code> 
+              is a fixed component name; the component’s implementation lives under 
+              <code>app/components/Navigation/Navbar.php</code>.
+            </li>
+          </ul>
+        </div>
+
+        <h4>3. API endpoint: /api/employees</h4>
+        <p>
+          The API lives under <code>app/api</code> following file-based routing. 
+          The file <code>app/api/employees/+server.php</code> becomes 
+          <code>/api/employees</code>.
+        </p>
+
+        <pre><code class="language-php">&lt;?php
+// File: app/api/employees/+server.php
+
+use App\Core\Http\Request;
+use App\Core\Http\Response;
+use App\Models\Employee;
+
+return [
+
+    // GET /api/employees
+    'get' =&gt; function (Request $request) {
+        $search = $request-&gt;get('q', '');
+
+        $query = Employee::query()
+            -&gt;where('status', '=', 'active')
+            -&gt;whereIn('role', ['employee', 'supervisor'])
+            -&gt;orderBy('created_at', 'desc');
+
+        if ($search !== '') {
+            $query-&gt;where(function ($q) use ($search) {
+                $q-&gt;where('name', 'LIKE', '%' . $search . '%')
+                  -&gt;orWhere('email', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        $employees = $query-&gt;limit(50)-&gt;offset(0)-&gt;get();
+
+        return Response::json($employees);
+    },
+
+    // POST /api/employees
+    'post' =&gt; function (Request $request) {
+        $data = $request-&gt;validate([
+            'name'       =&gt; 'required|string',
+            'email'      =&gt; 'required|email',
+            'role'       =&gt; 'required|in:employee,supervisor',
+            'position'   =&gt; 'required|string',
+            'department' =&gt; 'nullable|string',
+        ]);
+
+        $employee = Employee::create($data);
+
+        return Response::json($employee, 201);
+    },
+];
+</code></pre>
+
+        <div class="syntax-explanation">
+          <h5>Syntax Explanation (API + queries)</h5>
+          <ul>
+            <li>
+              The file returns an <strong>array of HTTP methods</strong>:
+              keys like <code>'get'</code> and <code>'post'</code> map to functions
+              that handle each HTTP verb.
+            </li>
+            <li>
+              <code>Employee::query()</code> starts a query builder for the 
+              <code>employees</code> table through the <code>Employee</code> model.
+            </li>
+            <li>
+              The query builder uses method chaining with <code>-&gt;</code>:
+              each call returns the same query object with more conditions.
+            </li>
+            <li>
+              Query builder methods used here:
+              <ul>
+                <li><code>where('column', '=', 'value')</code> – basic filter</li>
+                <li><code>whereIn('column', ['a','b'])</code> – “column is one of these”</li>
+                <li>
+                  <code>where(function ($q) { ... })</code> – group conditions with 
+                  inner <code>where</code> + <code>orWhere</code>
+                </li>
+                <li><code>orWhere(...)</code> – logical OR inside a group</li>
+                <li><code>orderBy('created_at', 'desc')</code> – sort results</li>
+                <li><code>limit(50)</code>, <code>offset(0)</code> – pagination controls</li>
+                <li><code>get()</code> – execute and return an array of rows</li>
+              </ul>
+            </li>
+            <li>
+              <code>Response::json($employees)</code> sends a JSON response to the client.
+              <code>201</code> is the HTTP status code for “Created”.
+            </li>
+            <li>
+              <strong>Fixed names you should not change:</strong>
+              <code>Request</code>, <code>Response</code>, <code>Employee::query</code>,
+              <code>where</code>, <code>orderBy</code>, <code>limit</code>, 
+              <code>offset</code>, <code>get</code>, <code>create</code>.
+            </li>
+            <li>
+              <strong>Example names you can change:</strong>
+              <code>Employee</code> (the model, if you create another model), 
+              column names like <code>'position'</code>, <code>'department'</code>, 
+              and variable names like <code>$query</code>, <code>$employees</code>, 
+              <code>$data</code>.
+            </li>
+          </ul>
+        </div>
+
+        <h4>4. Form page: creating employees with components & CSRF</h4>
+        <p>
+          The “New Employee” page shows how to combine forms, components, roles, 
+          CSRF protection and HTMX / POST requests.
+        </p>
+
+        <pre><code class="language-php">&lt;?php
+// File: app/admin/employees/create/page.php
+
+use App\Core\Auth;
+use App\Core\DV;
+use App\Core\Http\Response;
+
+if (!Auth::check() || !in_array(Auth::user()['role'], ['admin'])) {
+    return Response::redirect('/login');
+}
+
+DV::set('title', 'Create Employee');
+
+$nameInput = component('Forms.Input', [
+    'name'    =&gt; 'name',
+    'label'   =&gt; 'Full Name',
+    'required' =&gt; true,
+]);
+
+$emailInput = component('Forms.Input', [
+    'name'    =&gt; 'email',
+    'label'   =&gt; 'Email Address',
+    'type'    =&gt; 'email',
+    'required' =&gt; true,
+]);
+
+$roleInput = component('Forms.Select', [
+    'name'    =&gt; 'role',
+    'label'   =&gt; 'Role',
+    'options' =&gt; [
+        'employee'   =&gt; 'Employee',
+        'supervisor' =&gt; 'Supervisor',
+    ],
+    'required' =&gt; true,
+]);
+
+$positionInput = component('Forms.Input', [
+    'name'    =&gt; 'position',
+    'label'   =&gt; 'Position',
+    'required' =&gt; true,
+]);
+
+$departmentInput = component('Forms.Input', [
+    'name'    =&gt; 'department',
+    'label'   =&gt; 'Department',
+    'required' =&gt; false,
+]);
+?&gt;
+
+&lt;form 
+  hx-post="/api/employees"
+  hx-target="closest form"
+  hx-swap="outerHTML"
+  method="post"
+  class="space-y-4"
+&gt;
+  &lt;?= csrf_field() ?&gt;
+
+  &lt;?= $nameInput ?&gt;
+  &lt;?= $emailInput ?&gt;
+  &lt;?= $roleInput ?&gt;
+  &lt;?= $positionInput ?&gt;
+  &lt;?= $departmentInput ?&gt;
+
+  &lt;div class="pt-4 flex justify-end"&gt;
+    &lt;?= component('Forms.Button', [
+      'text'    =&gt; 'Save Employee',
+      'type'    =&gt; 'submit',
+      'variant' =&gt; 'primary',
+    ]) ?&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+</code></pre>
+
+        <div class="syntax-explanation">
+          <h5>Syntax Explanation (form + components)</h5>
+          <ul>
+            <li>
+              <code>component('Forms.Input', [...])</code> and 
+              <code>component('Forms.Button', [...])</code> call reusable UI components.
+              The string (e.g. <code>'Forms.Input'</code>) is the component name 
+              (fixed). The array is configuration (you can change labels, names, etc.).
+            </li>
+            <li>
+              <code>csrf_field()</code> prints a hidden input with a CSRF token.
+              This is <strong>required for security</strong> on POST requests.
+            </li>
+            <li>
+              <code>hx-post</code>, <code>hx-target</code> and <code>hx-swap</code> are 
+              <strong>HTMX attributes</strong> (frontend library) that send the form via 
+              AJAX and replace the HTML of the form with the server’s response.
+            </li>
+            <li>
+              <strong>Fixed names:</strong> <code>component</code>, 
+              <code>csrf_field</code>, <code>hx-post</code>, <code>hx-target</code>, 
+              <code>hx-swap</code>, HTTP method <code>post</code>.
+            </li>
+            <li>
+              <strong>Example names:</strong> <code>'Create Employee'</code>, 
+              input <code>name="department"</code>, placeholder text, button text, etc.
+              You can adapt them to any business module (vacations, incidents, payroll, etc.).
+            </li>
+          </ul>
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-title">Enterprise pattern to remember</span>
+          In Bastion, any enterprise tool (employees, roles, vacation requests,
+          incident reports, approvals) is built the same way:
+          <strong>Role check + DV (page title) + Layout + Components + Queries + API endpoint</strong>.
+          Once this loop is clear, junior developers can replicate it for new modules
+          without touching the core framework.
+        </div>
+
+<section id="quickstart-enterprise-module">
+  <h2>Quickstart: Roles, Employees & Enterprise Tools</h2>
+  <p>
+    When you run the <code>create-bastion-app</code> generator, Bastion does not give you
+    a "hello world". It gives you an <strong>opinionated enterprise boilerplate</strong>:
+    authentication, layouts, components, database layer, and a dashboard wired with real
+    data and security helpers.
+  </p>
+
+  <div class="alert alert-info">
+    <strong>Goal of this section:</strong> show, step by step, how a non-PHP developer
+    can extend the generated boilerplate to support:
+    <ul>
+      <li>Multiple roles: <code>admin</code>, <code>supervisor</code>, <code>employee</code></li>
+      <li>An <strong>Employee CRUD</strong> using the ORM & Query Builder</li>
+      <li>A real UI page using <code>layout.php</code>, DV Engine and components</li>
+      <li>Typed API endpoints with <code>+server.php</code></li>
+    </ul>
+  </div>
+
+  <h3>1. What the generator already gives you</h3>
+  <p>
+    After running <code>./create-bastion-app AcmeTool</code>, you get a fully wired
+    application skeleton:
+  </p>
+
+  <ul>
+    <li><code>app/core/</code> – Kernel, Router, IoC Container, DV Engine, Auth, DB, helpers, etc.</li>
+    <li><code>app/views/layouts/</code> – Base layouts used to wrap all pages.</li>
+    <li><code>app/login/page.php</code> and <code>app/login/+server.php</code> – Login UI & handler.</li>
+    <li><code>app/dashboard/page.php</code> – Example internal dashboard that reads from the database.</li>
+    <li><code>app/components/</code> – Reusable UI components (Cards, Tables, Alerts, Badges…)</li>
+    <li><code>database/migrations/</code> – Database blueprints (for example, <code>users</code> table).</li>
+    <li><code>database/seeds/</code> – Seeders that insert demo users (including an admin).</li>
+  </ul>
+
+  <div class="alert alert-info">
+    <strong>Syntax Explanation (fixed vs. example names)</strong><br>
+    In this guide:
+    <ul>
+      <li>
+        <strong>Framework words that you should NOT change</strong>:
+        <code>Auth</code>, <code>DV</code>, <code>DB</code>, <code>Response</code>,
+        <code>request()</code>, <code>dv()</code>, <code>component()</code>,
+        <code>csrf_field()</code>, <code>url()</code>, <code>asset()</code>,
+        <code>layout.php</code>, <code>page.php</code>, <code>+server.php</code>.
+      </li>
+      <li>
+        <strong>Business words that are just examples</strong>:
+        <code>Employee</code>, <code>VacationRequest</code>, table names like
+        <code>employees</code>, route folders like <code>app/employees</code>,
+        labels like <code>admin</code>, <code>supervisor</code>, <code>employee</code>.
+        These can change depending on your company.
+      </li>
+    </ul>
+  </div>
+
+  <h3>2. Extending roles: admin, supervisor, employee</h3>
+  <p>
+    By default, the boilerplate seeds users with a simple <code>role</code> field
+    (e.g. <code>admin</code> / <code>user</code>). You can extend this to support
+    enterprise roles like <code>admin</code>, <code>supervisor</code> and
+    <code>employee</code>.
+  </p>
+
+  <h4>2.1. Users table (migration)</h4>
+  <p>Edit the users migration in <code>database/migrations/...</code> to make the
+  intention of roles explicit:</p>
+
+  <pre><code class="language-php">&lt;?php
+
+use App\Core\Database\Schema\Schema;
+use App\Core\Database\Schema\Blueprint;
+
+return new class {
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table-&gt;id();
+            $table-&gt;string('name');
+            $table-&gt;string('email')-&gt;unique();
+            $table-&gt;string('password');
+
+            // Allowed roles: admin, supervisor, employee
+            $table-&gt;string('role')-&gt;nullable();
+
+            $table-&gt;timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::drop('users');
+    }
+};
+</code></pre>
+
+  <div class="alert alert-info">
+    <strong>Syntax Explanation (Migration)</strong>
+    <ul>
+      <li><code>$table-&gt;string('name')</code> means "add a VARCHAR column called <code>name</code>".</li>
+      <li><code>-&gt;unique()</code> adds a UNIQUE constraint.</li>
+      <li><code>&lt;?php</code> is the opening tag for PHP code. It tells the server
+        "from here on, we are writing PHP, not plain HTML".</li>
+      <li>
+        <strong>The part you can change:</strong> column names like <code>'name'</code>,
+        <code>'role'</code> are just strings. <br>
+        <strong>The part you should not change:</strong> things like
+        <code>Schema::create</code>, method names <code>string</code>, <code>timestamps</code>,
+        and the <code>$table-&gt;...</code> pattern: that is the Bastion schema API.
+      </li>
+    </ul>
+  </div>
+
+  <h4>2.2. Seeding admin, supervisor and employee</h4>
+  <p>In <code>database/seeds/DatabaseSeeder.php</code>, you can insert demo users
+  for each role:</p>
+
+  <pre><code class="language-php">&lt;?php
+
+namespace Database\Seeds;
+
+use App\Models\User;
+
+class DatabaseSeeder
+{
+    public function run()
+    {
+        // Admin
+        User::create([
+            'name' =&gt; 'System Administrator',
+            'email' =&gt; 'admin@example.com',
+            'password' =&gt; password_hash('password', PASSWORD_DEFAULT),
+            'role' =&gt; 'admin',
+        ]);
+
+        // Supervisor
+        User::create([
+            'name' =&gt; 'Team Supervisor',
+            'email' =&gt; 'supervisor@example.com',
+            'password' =&gt; password_hash('password', PASSWORD_DEFAULT),
+            'role' =&gt; 'supervisor',
+        ]);
+
+        // Regular Employee
+        User::create([
+            'name' =&gt; 'John Employee',
+            'email' =&gt; 'employee@example.com',
+            'password' =&gt; password_hash('password', PASSWORD_DEFAULT),
+            'role' =&gt; 'employee',
+        ]);
+    }
+}
+</code></pre>
+
+  <div class="alert alert-info">
+    <strong>Syntax Explanation (Model::create)</strong>
+    <ul>
+      <li><code>User::create([...])</code> is Active Record style: "create a new row in table <code>users</code>".</li>
+      <li><code>'role' =&gt; 'supervisor'</code> is a simple key/value pair, like a JavaScript object:
+        <code>{ role: "supervisor" }</code>.</li>
+      <li><code>password_hash()</code> hashes the password so it is not stored in plain text.</li>
+      <li><strong>Fixed part:</strong> <code>User::create</code>, the <code>=&gt;</code> syntax, array brackets <code>[ ]</code>.</li>
+      <li><strong>Custom part:</strong> names and emails, and the role labels
+        (<code>'admin'</code>, <code>'supervisor'</code>, <code>'employee'</code>).</li>
+    </ul>
+  </div>
+
+  <h3>3. Defining the Employee model</h3>
+  <p>Create <code>app/models/Employee.php</code> to represent the employees table:</p>
+
+  <pre><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use App\Core\Database\Model;
+
+class Employee extends Model
+{
+    // Table name in the database
+    protected static string $table = 'employees';
+
+    // Primary key column (default is "id", so this line is optional)
+    protected static string $primaryKey = 'id';
+
+    // Mass-assignable fields when calling Employee::create([...])
+    protected array $fillable = [
+        'name',
+        'email',
+        'position',
+        'department',
+        'status',
+        'supervisor_id',
+    ];
+}
+</code></pre>
+
+  <div class="alert alert-info">
+    <strong>Syntax Explanation (Model)</strong>
+    <ul>
+      <li><code>class Employee extends Model</code> means "Employee is a model with database behavior".</li>
+      <li><code>protected static string $table = 'employees';</code> ties the model to the <code>employees</code> table.</li>
+      <li><code>$fillable</code> tells Bastion which columns can be filled from input safely.</li>
+      <li><strong>Fixed part:</strong> <code>extends Model</code>, using the <code>App\Core\Database\Model</code> base class.</li>
+      <li><strong>Custom part:</strong> the table name, column names and which fields you allow in <code>$fillable</code>.</li>
+    </ul>
+  </div>
+
+  <h3>4. Employee CRUD API (+server.php endpoint)</h3>
+  <p>
+    Now create an API endpoint for employees at
+    <code>app/api/employees/+server.php</code>. This will handle HTMX/JS calls
+    for listing, creating and updating employees.
+  </p>
+
+  <pre><code class="language-php">&lt;?php
+
+use App\Core\Http\Request;
+use App\Core\Http\Response;
+use App\Models\Employee;
+use App\Core\Auth;
+
+return [
+
+    // GET /api/employees
+    'get' =&gt; function (Request $request) {
+        $user = Auth::user();
+
+        // Only admin or supervisor can see the full list
+        if (!in_array($user['role'], ['admin', 'supervisor'], true)) {
+            return Response::json(['error' =&gt; 'Forbidden'], 403);
+        }
+
+        // Example queries using the Query Builder API
+        $status = $request-&gt;query('status', 'active');
+
+        $employees = Employee::query()
+            -&gt;where('status', '=', $status)
+            -&gt;orderBy('created_at', 'desc')
+            -&gt;limit(50)
+            -&gt;get();
+
+        return Response::json($employees);
+    },
+
+    // POST /api/employees
+    'post' =&gt; function (Request $request) {
+        $user = Auth::user();
+
+        if (!in_array($user['role'], ['admin', 'supervisor'], true)) {
+            return Response::json(['error' =&gt; 'Forbidden'], 403);
+        }
+
+        $data = $request-&gt;validate([
+            'name'         =&gt; 'required|string',
+            'email'        =&gt; 'required|email',
+            'position'     =&gt; 'required|string',
+            'department'   =&gt; 'required|string',
+            'status'       =&gt; 'required|string',
+            'supervisor_id' =&gt; 'nullable|integer',
+        ]);
+
+        $employee = Employee::create($data);
+
+        return Response::json($employee, 201);
+    },
+
+    // PATCH /api/employees/{id}
+    'patch' =&gt; function (Request $request) {
+        $user = Auth::user();
+
+        if (!in_array($user['role'], ['admin', 'supervisor'], true)) {
+            return Response::json(['error' =&gt; 'Forbidden'], 403);
+        }
+
+        $id = $request-&gt;route('id');
+
+        $employee = Employee::find($id);
+        if (!$employee) {
+            return Response::json(['error' =&gt; 'Not Found'], 404);
+        }
+
+        $data = $request-&gt;validate([
+            'position'   =&gt; 'sometimes|string',
+            'department' =&gt; 'sometimes|string',
+            'status'     =&gt; 'sometimes|string',
+        ]);
+
+        $employee-&gt;fill($data);
+        $employee-&gt;save();
+
+        return Response::json($employee);
+    },
+];
+</code></pre>
+
+  <div class="alert alert-info">
+    <strong>Syntax Explanation (Query Builder &amp; Arrow <code>-&gt;</code>)</strong>
+    <ul>
+      <li>
+        <code>Employee::query()</code> returns a <strong>Query Builder</strong> object for the
+        <code>employees</code> table.
+      </li>
+      <li>
+        <code>-&gt;</code> in PHP is like <code>.</code> in JavaScript or <code>.</code> in Python:
+        it calls a method on an object. Each call returns the same builder, so you can chain:
+        <code>query()-&gt;where(...)-&gt;orderBy(...)-&gt;limit(...)-&gt;get()</code>.
+      </li>
+      <li><code>where('status', '=', $status)</code> → <code>WHERE status = ?</code> (safe, parameterized).</li>
+      <li><code>orderBy('created_at', 'desc')</code> → <code>ORDER BY created_at DESC</code>.</li>
+      <li><code>limit(50)</code> → <code>LIMIT 50</code>.</li>
+      <li><code>get()</code> → runs the SQL and returns an array of rows.</li>
+      <li><code>find($id)</code> → fetches a single row by primary key (or <code>null</code>).</li>
+      <li><code>exists()</code>, <code>count()</code>, <code>first()</code> are also available for checks.</li>
+      <li>
+        <strong>Fixed part:</strong> method names like <code>where</code>, <code>orderBy</code>,
+        <code>limit</code>, <code>get</code>, <code>find</code>.
+      </li>
+      <li>
+        <strong>Custom part:</strong> column names (<code>'status'</code>), values (<code>$status</code>),
+        and your business logic in <code>if</code> conditions.
+      </li>
+    </ul>
+  </div>
+
+  <h3>5. Employees UI page (layout + DV + components)</h3>
+  <p>
+    Finally, create an internal UI for supervisors and admins at
+    <code>app/employees/page.php</code>. This page will:
+  </p>
+  <ul>
+    <li>Check the logged-in user and role using <code>Auth</code>.</li>
+    <li>Set page title via <code>dv()</code> so layouts can read it.</li>
+    <li>Render a table using the <code>Data.Table</code> component.</li>
+  </ul>
+
+  <pre><code class="language-php">&lt;?php
+
+use App\Core\Auth;
+use App\Core\DV;
+use App\Core\Database\DB;
+
+// 1) Guard: only admin or supervisor can see this page
+if (!Auth::check()) {
+    return \App\Core\Http\Response::redirect('/login');
+}
+
+$user = Auth::user();
+
+if (!in_array($user['role'], ['admin', 'supervisor'], true)) {
+    return \App\Core\Http\Response::redirect('/dashboard');
+}
+
+// 2) Page state for layouts (DV Engine)
+DV::set('title', 'Employees');
+
+// 3) Fetch employees using the Query Builder
+$employees = DB::table('employees')
+    -&gt;orderBy('created_at', 'desc')
+    -&gt;limit(100)
+    -&gt;get();
+
+// 4) Prepare headers and rows for the Data.Table component
+$headers = ['ID', 'Name', 'Email', 'Position', 'Department', 'Status'];
+
+$rows = array_map(function ($e) {
+    return [
+        $e['id'],
+        e($e['name']),
+        e($e['email']),
+        e($e['position']),
+        e($e['department']),
+        component('Data.Badge', [
+            'text'  =&gt; ucfirst($e['status']),
+            'color' =&gt; $e['status'] === 'active' ? 'success' : 'warning',
+        ]),
+    ];
+}, $employees);
+
+$table = component('Data.Table', [
+    'headers' =&gt; $headers,
+    'rows'    =&gt; $rows,
+]);
+
+// 5) Render page content (the layout.php will wrap this)
+echo &lt;&lt;&lt;HTML
+&lt;div class="space-y-6"&gt;
+  &lt;div class="flex items-center justify-between"&gt;
+    &lt;h1 class="text-2xl font-bold text-white"&gt;Employees&lt;/h1&gt;
+    &lt;div class="flex gap-2"&gt;
+      &lt;!-- You can hook this button to an HTMX form or modal --&gt;
+      &lt;?= component('Forms.Button', [
+            'text' =&gt; 'New Employee',
+            'variant' =&gt; 'primary',
+            'size' =&gt; 'sm',
+        ]) ?&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class="bg-slate-900/40 border border-slate-700 rounded-xl p-4"&gt;
+    {$table}
+  &lt;/div&gt;
+&lt;/div&gt;
+HTML;
+</code></pre>
+
+  <div class="alert alert-info">
+    <strong>Syntax Explanation (DV, components, layouts)</strong>
+    <ul>
+      <li><code>DV::set('title', 'Employees');</code> stores a value in the DV Engine, so
+        <code>layout.php</code> can read it and put <code>&lt;title&gt;Employees&lt;/title&gt;</code> in the HTML head.</li>
+      <li><code>component('Data.Table', ...)</code> loads a functional PHP component from
+        <code>app/components/Data/Table.php</code> and returns HTML.</li>
+      <li><code>e($e['name'])</code> escapes output to prevent XSS. Always wrap untrusted data in <code>e()</code>.</li>
+      <li>
+        The outer HTML is just a big string with Tailwind classes. Bastion's
+        <code>layout.php</code> at the root (and optional <code>app/employees/layout.php</code>)
+        will wrap this content automatically.
+      </li>
+      <li>
+        <strong>Fixed part:</strong> functions <code>component()</code>, <code>e()</code>, the fact that
+        the file is named <code>page.php</code>.
+      </li>
+      <li>
+        <strong>Custom part:</strong> the Tailwind classes, text labels, which component names you use
+        (<code>Data.Table</code>, <code>Forms.Button</code>), the columns you show, etc.
+      </li>
+    </ul>
+  </div>
+
+  <h3>6. How this maps to Bastion’s philosophy</h3>
+  <p>
+    This example uses every major idea of Bastion:
+  </p>
+  <ul>
+    <li><strong>Monolith Modular:</strong> all code lives in <code>app/</code> as first-party code.</li>
+    <li><strong>Hybrid Routing:</strong> <code>page.php</code> for UI and <code>+server.php</code> for API live under the same folder structure.</li>
+    <li><strong>DV Engine:</strong> <code>DV::set()</code> bridges "controller" logic and layouts without globals.</li>
+    <li><strong>Secure by default:</strong> roles are enforced at the edge (<code>Auth</code> checks), and UI uses <code>e()</code> for escaping.</li>
+    <li><strong>Query Builder & ORM:</strong> readable SQL-like chains with parameter binding instead of raw strings.</li>
+  </ul>
+
+  <p>
+    Your juniors can copy this pattern to build other internal tools: incidents,
+    vacation requests, asset management, purchase orders – always the same recipe:
+    <strong>Model + Migration + +server.php + page.php + components + DV + layouts</strong>.
+  </p>
       </section>
 
   <section id="structure">
